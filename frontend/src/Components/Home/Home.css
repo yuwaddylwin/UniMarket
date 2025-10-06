@@ -1,0 +1,56 @@
+.img {
+    display: block;         /* Centers it when using margin auto */
+    width: 60%;             /* Makes the image smaller than the page width */
+    max-width: 1000px;      /* Prevents it from getting too large on big screens */
+    margin: 30px auto;      /* Adds space top/bottom and centers horizontally */
+    border-radius: 12px;    /* Optional: gives smooth corners */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);  /* Optional: subtle shadow */
+    object-fit: cover;
+  }
+  
+  .hero-text {
+    text-align: center;
+    margin-top: 30px;
+    color: #333;
+  }
+  
+  .hero-text h1 {
+      font-size: 50px;
+      font-weight: 800;
+      color: #21548b;
+      font-family: serif;
+      letter-spacing: -0.5px;
+  }
+
+  .hero-text h2{
+    font-size: 30px;
+    font-family: serif;
+    letter-spacing: -0.5px;
+  }
+  .hero-text h5{
+    font-size: 15px;
+    font-family: 'Times New Roman', Times, serif;
+    letter-spacing: -0.5px;
+  }
+  
+  
+  .btn {
+    margin-top: 25px;
+    text-align: center;
+    background: #21548b;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .btn:hover {
+    background: #154068;
+    transform: translateY(-2.5px);
+  }
+  
+  
