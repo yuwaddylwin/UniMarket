@@ -9,7 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<SignUp />} />
       </Routes>
     </Router>
   );
@@ -19,6 +19,6 @@ function Login() {
   return <h1>Login Page for student</h1>;
 }
 
-function Register() {
+function SignUp() {
   return <h1>Register Page for student</h1>;
 }

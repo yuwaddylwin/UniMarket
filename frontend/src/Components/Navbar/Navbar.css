@@ -19,7 +19,7 @@
 .logo {
     font-size: 35px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #681555;
     font-family: Serif; 
     letter-spacing: -0.5px;
 }
@@ -104,8 +104,9 @@
 }
 
 .cart-icon:hover, .profile-icon:hover {
-    transform: translateY(-1.5px);
-    box-shadow: 0 2px 10px #154068;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px #154068;
+    
 }
 
 .cart-icon img, .profile-icon img {

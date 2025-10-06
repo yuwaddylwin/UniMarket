@@ -28,10 +28,11 @@ function Search(){
 }
 
 function Cart(){
+    const CartNumber = 0
     return(
         <div className="cart-icon">
             <img src="/Images/cart.png" alt="Cart" />
-            <div className="cart-badge">3</div>
+            {CartNumber > 0 && <div className="cart-badge">{CartNumber}</div>}
         </div>
     )
 }
