@@ -2,7 +2,7 @@
 
 /* Main container styling */
 .home-container {
-  min-height: 100vh;
+  min-height: 50vh;
   background: rgb(255, 255, 255);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -20,6 +20,13 @@
 
 /* Text content styling */
 .hero-text {
+  flex: 1;
+  color: rgb(0, 0, 0);
+  text-align: left;
+  animation: fadeInUp 1s ease-out;
+}
+
+.hero-text2 {
   flex: 1;
   color: rgb(0, 0, 0);
   text-align: left;
@@ -46,6 +53,29 @@
   line-height: 1.4;
 }
 
+.hero-text2 h1 {
+  font-size: 2rem;
+  font-family: serif;
+  font-weight: 800;
+  margin-bottom: 25px;
+  background: #681555;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-text2 h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 15px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.hero-text2 h2 strong{
+  font-weight: 750
+}
+
 
 /* Image styling */
 .hero-image {
@@ -60,7 +90,7 @@
   max-width: 500px;
   height: 400px;
   object-fit: cover;
-  border-radius: 20px;
+  border-radius: 15px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   border: 3px solid rgba(255, 255, 255, 0.1);
@@ -140,6 +170,14 @@
   }
   
   .hero-text h2 {
+    font-size: 1.2rem;
+  }
+
+  .hero-text2 h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-text2 h2 {
     font-size: 1.2rem;
   }
   

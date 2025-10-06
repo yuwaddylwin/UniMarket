@@ -2,8 +2,10 @@ import React from 'react';
 import './Home.css';
 import Navbar from '../Navbar/Navbar';
 
+
 export default function Home() {
   return(
+    <>
     <div className="home-container">
       <Navbar/>
       <div className="hero-section">
@@ -13,10 +15,21 @@ export default function Home() {
           <h2>Buy & Sell Things and Services</h2>
         </main>
         <div className="hero-image">
-          <img className="img" src='/Images/students1.jpg' alt="UniMarket Platform"></img>
+          <img className="img" src='/Images/IMG2.jpeg' alt="UniMarket Platform"></img>
         </div>
       </div>
       <button className="btn">Start Selling</button>
     </div>
+    <div className="hero-section">
+        <main className="hero-text2">
+          <h1>How it Works?</h1>
+          <h2>1. <strong>Sign Up:</strong> Verify with your Student Email - RSU Email to join the community.</h2>
+          <h2>2. <strong>List or Browse:</strong> Post Items to Sell or Explore to Buy the Things.</h2>
+          <h2>3. <strong>Connect & Chat:</strong> Chat with the Sellers or Buyers to ask questions.</h2>
+          <h2>4. <strong>Meet up & Complete:</strong> Meet up and finalize the deal.</h2>
+        </main>
+    </div>
+    
+    </>
   )
 }
