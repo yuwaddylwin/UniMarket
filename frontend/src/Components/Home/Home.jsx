@@ -1,11 +1,14 @@
 import React from 'react';
 import './Home.css';
 import Navbar from '../Navbar/Navbar';
+import ItemsList from '../ItemsList/ItemsList';
+
 
 
 export default function Home() {
   return(
     <>
+    {/* First Section */}
     <div className="home-container">
       <Navbar/>
       <div className="hero-section">
@@ -18,18 +21,20 @@ export default function Home() {
           <img className="img" src='/Images/IMG2.jpeg' alt="UniMarket Platform"></img>
         </div>
       </div>
-      <button className="btn">Start Selling</button>
+      <button className="btn">Sell Now</button>
     </div>
+
+    {/* How it Works? */}
     <div className="hero-section">
         <main className="hero-text2">
           <h1>How it Works?</h1>
-          <h2>1. <strong>Sign Up:</strong> Verify with your Student Email - RSU Email to join the community.</h2>
-          <h2>2. <strong>List or Browse:</strong> Post Items to Sell or Explore to Buy the Things.</h2>
+          <h2>1. <strong>Sign Up:</strong> Verify with your Student Email to join the community.</h2>
+          <h2>2. <strong>List or Browse:</strong> Post Items to Sell or Explore to Buy Things.</h2>
           <h2>3. <strong>Connect & Chat:</strong> Chat with the Sellers or Buyers to ask questions.</h2>
           <h2>4. <strong>Meet up & Complete:</strong> Meet up and finalize the deal.</h2>
         </main>
     </div>
-    
+    <ItemsList/>
     </>
   )
 }

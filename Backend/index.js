@@ -1,7 +1,9 @@
-import express from "express";
+import express, { Router } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from 'cors'; // controls whether a web page can request resources (like data from an API)
+import ItemsList from "./API_routes/ItemsRoutes.js";
+
 
 const app = express();
 dotenv.config();
@@ -27,26 +29,8 @@ mongoose
 }).catch((err)=> console.log(err));
 
 
-
-// Schema is like a blueprint for your data : it tells mongoose what fields eachh document should have
-const userSchema = new mongoose.Schema({
-    name: String,
-    age: Number,
-});
+// Routes
+app.use("/api/items", ItemsList);
 
 
-const UserModel = mongoose.model("users", userSchema);
-
-
-//API route
-app.get("/getUsers", async (req, res) => {
-    try {
-      const userData = await UserModel.find();
-      console.log(userData);
-      res.json(userData);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to fetch users" });
-    }
-  });
   
