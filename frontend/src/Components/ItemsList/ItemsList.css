@@ -63,8 +63,41 @@
   
   .item-content p.price {
     font-weight: bold;
-    color: #0077cc;
+    font-size: 1.5rem;
+    color: #1d9d4e;
   }
+
+  .btns {
+    display: flex;
+    gap: 5px;
+  }
+
+  .item-card button{
+    display: block;
+    margin: 20px auto;
+    padding: 15px 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #21548b;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px #21548b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .item-card button:hover {
+    transform: translateY(-3px);
+    background: #681555;
+  }
+  
+  .item-card button:active {
+    transform: translateY(-1px);
+  }
+  
   
   /* Responsive */
   @media (max-width: 768px) {
@@ -76,5 +109,15 @@
     .item-card {
       width: 90%;
     }
-  }
+    .btns {
+      flex-direction: row;
+      gap: 15px;
+    }
   
+    .item-card button {
+      font-size: 0.75rem;
+      padding: 10px 10px;
+    }
+    
+  }
+

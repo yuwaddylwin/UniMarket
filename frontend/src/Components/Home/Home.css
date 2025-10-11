@@ -106,23 +106,21 @@
   display: block;
   margin: 40px auto;
   padding: 15px 40px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   background: #21548b;
   color: white;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 20px #21548b;
+  transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px #154068;
-  background: #154068;
+  background: #681555;
 }
 
 .btn:active {

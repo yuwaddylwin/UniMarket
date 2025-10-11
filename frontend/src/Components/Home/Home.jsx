@@ -2,6 +2,7 @@ import React from 'react';
 import './Home.css';
 import Navbar from '../Navbar/Navbar';
 import ItemsList from '../ItemsList/ItemsList';
+import Footer from '../Footer/footer';
 
 
 
@@ -35,6 +36,7 @@ export default function Home() {
         </main>
     </div>
     <ItemsList/>
+    <Footer/>
     </>
   )
 }

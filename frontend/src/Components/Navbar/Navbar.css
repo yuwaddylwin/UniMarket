@@ -46,7 +46,6 @@
 .search-form:focus-within {
     background: #ffffff;
     border-color: #21548b;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     transform: translateY(-1px);
 }
 
@@ -79,8 +78,8 @@
 }
 
 .search-button:hover {
-    background: #154068;
-    transform: translateY(-2.5px);
+    background: #681555;
+    transform: translateY(-1px);
 }
 
 /* Icon Container Styles */
@@ -104,8 +103,7 @@
 }
 
 .cart-icon:hover, .profile-icon:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px #154068;
+    transform: translateY(-5px);
     
 }
 

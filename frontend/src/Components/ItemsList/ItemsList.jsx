@@ -13,10 +13,12 @@ export default function ItemsList(){
       }, []);
     
       return (
+        
         <div className="items-container">
           <h2>For You!</h2>
           <div className="items-grid">
             {items.map((item) => (
+              <>
               <div className="item-card" key={item._id}>
                 <img src={item.image} alt={item.title} />
                 <div className="item-content">
@@ -24,9 +26,15 @@ export default function ItemsList(){
                   <p className="price">{item.price} Baht</p>
                   <p>{item.description}</p>
                 </div>
+                <div className="btns">
+                  <button> Add to Cart 🛒</button>
+                  <button> Talk to Seller 💬</button>
+                </div>
               </div>
+              </>
             ))}
           </div>
         </div>
+        
       );
 }
