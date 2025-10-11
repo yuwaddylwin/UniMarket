@@ -1,5 +1,5 @@
 .footer {
-    background-color: #b2b2b2;
+    background-color: #d8d8d8;
     color: #fff;
     padding: 40px 20px 15px;
     font-family: "Poppins", sans-serif;
@@ -21,15 +21,14 @@
     min-width: 200px;
   }
   
-  .footer-section h3,
   .footer-section h4 {
     margin-bottom: 10px;
-    color: #21548b;
-    font-weight: 700;
+    color: #681555;
+    font-weight: 900;
   }
   
   
-  .footer-section ul {
+  /* .footer-section ul {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -43,12 +42,12 @@
     color: #ffffff;
     text-decoration: none;
     transition: color 0.3s;
-    font-weight: 500;
+    font-weight: 800;
   }
   
   .footer-section ul li a:hover {
     color: #21548b;
-  }
+  } */
   
   /* Bottom section */
   .footer-bottom {
@@ -56,7 +55,7 @@
     text-align: center;
     padding-top: 10px;
     font-size: 0.9rem;
-    color: #e0e0e0;
+    color: #ffffff;
   }
   
   /* Responsive design */

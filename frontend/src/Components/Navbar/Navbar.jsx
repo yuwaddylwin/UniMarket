@@ -1,15 +1,16 @@
 import React from 'react';
 import './Navbar.css';
+import Profile from '../Profile/profile';
 
 export default function Navbar(){
     return(
-        <div className="navbar-container">
-            <Logo/>
-            <Search/>
-            <div className="icon-container">
-                <Cart/>
-                <Profile/>
-            </div>
+         <div className="navbar-container">
+                <Logo/>
+                <Search/>
+                <div className="icon-container">
+                    <Cart/>
+                    <Profile/>
+                </div>
         </div>
     )
 }
@@ -37,10 +38,3 @@ function Cart(){
     )
 }
 
-function Profile(){
-    return (
-        <div className="profile-icon">
-            <img src="/Images/user.png" alt="User" />
-        </div>
-    )
-}
