@@ -1,0 +1,201 @@
+/* Home.css */
+
+/* Main container styling */
+.home-container {
+  min-height: 50vh;
+  background: rgb(255, 255, 255);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Hero section - side by side layout */
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 20px;
+  gap: 50px;
+}
+
+/* Text content styling */
+.hero-text {
+  flex: 1;
+  color: rgb(0, 0, 0);
+  text-align: left;
+  animation: fadeInUp 1s ease-out;
+}
+
+.hero-text2 {
+  flex: 1;
+  color: rgb(0, 0, 0);
+  text-align: left;
+  animation: fadeInUp 1s ease-out;
+}
+
+.hero-text h1 {
+  font-size: 3.5rem;
+  font-family: serif;
+  font-weight: 800;
+  margin-bottom: 25px;
+  background: #681555;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hero-text h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.hero-text2 h1 {
+  font-size: 2rem;
+  font-family: serif;
+  font-weight: 800;
+  margin-bottom: 25px;
+  background: #681555;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-text2 h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 15px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.hero-text2 h2 strong{
+  font-weight: 750
+}
+
+
+/* Image styling */
+.hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  animation: fadeInRight 1s ease-out;
+}
+
+.hero-image .img {
+  width: 100%;
+  max-width: 500px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-image .img:hover {
+  transform: translateY(-8px) scale(1);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* Button styling */
+.btn {
+  display: block;
+  margin: 40px auto;
+  padding: 15px 40px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #21548b;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  background: #681555;
+}
+
+.btn:active {
+  transform: translateY(-1px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 20px;
+    gap: 30px;
+  }
+  
+  .hero-text {
+    text-align: center;
+  }
+  
+  .hero-text h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero-text h2 {
+    font-size: 1.2rem;
+  }
+
+  .hero-text2 h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-text2 h2 {
+    font-size: 1.2rem;
+  }
+  
+  .hero-image .img {
+    height: 300px;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-text h2 {
+    font-size: 1rem;
+  }
+  
+  .btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+  }
+}
