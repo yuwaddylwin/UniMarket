@@ -6,7 +6,7 @@ function Sell() {
     name: "",
     price: "",
     description: "",
-    image: [],
+    images: [], // multiple images
   });
 
   const handleChange = (e) => {
@@ -15,12 +15,27 @@ function Sell() {
   };
 
   const handleImageUpload = (e) => {
-    setItem({ ...item, image: e.target.files[0] });
+    const files = Array.from(e.target.files);
+    if (item.images.length + files.length > 6) {
+      alert("You can only upload up to 6 images.");
+      return;
+    }
+    const newImages = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file), // preview
+    }));
+    setItem({ ...item, images: [...item.images, ...newImages] });
+  };
+
+  const removeImage = (index) => {
+    const updated = [...item.images];
+    updated.splice(index, 1);
+    setItem({ ...item, images: updated });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(item); 
+    console.log(item);
     alert("Item posted successfully!");
   };
 
@@ -29,13 +44,36 @@ function Sell() {
       <h1 className="title">Post Your Items & Sell it!</h1>
       <form className="post-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Item Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            required
-          />
+          <label>Item Images (max 6)</label>
+          <div className="image-upload-container">
+            {/* Image Previews */}
+            {item.images.map((img, index) => (
+              <div className="image-preview" key={index}>
+                <img src={img.url} alt="preview" />
+                <button
+                  type="button"
+                  className="remove-btn"
+                  onClick={() => removeImage(index)}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+            {/* Upload Button */}
+            {item.images.length < 6 && (
+              <label className="upload-box">
+                +
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  hidden
+                />
+              </label>
+            )}
+          </div>
         </div>
 
         <div className="form-group">
@@ -81,6 +119,5 @@ function Sell() {
     </div>
   );
 }
+
 export default Sell;
-
-

@@ -1,6 +1,8 @@
-import React from 'react';
+// import React, { useState } from 'react';
 import './Navbar.css';
 import Profile from '../Profile/profile';
+
+
 
 export default function Navbar(){
     return(
@@ -31,6 +33,7 @@ function Search(){
 function Cart(){
     const CartNumber = 0
     return(
+        
         <div className="cart-icon">
             <img src="/Images/cart.png" alt="Cart" />
             {CartNumber > 0 && <div className="cart-badge">{CartNumber}</div>}
