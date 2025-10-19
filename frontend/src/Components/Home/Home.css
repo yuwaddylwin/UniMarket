@@ -2,6 +2,7 @@
 
 /* Main container styling */
 .home-container {
+  padding-top: 135px;
   min-height: 50vh;
   background: rgb(255, 255, 255);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import './Home.css';
 import Navbar from '../Navbar/Navbar';
 import ItemsList from '../ItemsList/ItemsList';
@@ -8,17 +7,10 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-export default function Home() {
+export default function Home({count, AddtoCart}) {
 
   const navigate = useNavigate();
-
-  // Itemlist Add to Cart function
-  const [count , setCount] = useState(0);
   
-      const AddtoCart = () => {
-          setCount (count + 1 );
-      }
-
   return(
     <>
     {/* First Section */}

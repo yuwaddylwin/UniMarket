@@ -1,18 +1,18 @@
-/* Navbar.css */
-
 /* Reset and Base Styles */
 .navbar-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 5%;
+    padding: 0 17rem;
     height: 80px;
     background: #ffffff;
     box-shadow: 0 2px 24px rgba(0, 0, 0, 0.08);
     border-bottom: 1px solid #f0f0f0;
-    position: sticky;
+    position: fixed;
     top: 0;
     z-index: 1000;
+    gap: 40px;
+    
 }
 
 /* Logo Styles */

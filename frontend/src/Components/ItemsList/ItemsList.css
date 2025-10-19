@@ -4,6 +4,7 @@
     max-width: 1200px;
     margin: 0 auto;
     margin-bottom: 30px;
+    position: relative;
   }
   
   /* Title */
@@ -99,6 +100,29 @@
     transform: translateY(-1px);
   }
   
+  /* View More button */
+  .link {
+    display: block;
+    margin: 0 80px 30px ;
+    color: #21548b;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s;
+    text-align: right;
+    
+  }
+  
+  .span {
+    color: #21548b;
+    font-size: 14px;
+    
+  }
+
+  .link:hover {
+    color: #681555;
+    text-decoration: underline;
+  }
+  
   
   /* Responsive */
   @media (max-width: 768px) {
@@ -118,6 +142,9 @@
     .item-card button {
       font-size: 0.75rem;
       padding: 10px 10px;
+    }
+    .link{
+      margin: 0 25px 30px ;
     }
     
   }
