@@ -1,16 +1,17 @@
-// import React, { useState } from 'react';
 import './Navbar.css';
 import Profile from '../Profile/profile';
+import Cart from './Nav_functions/Cart';
 
 
 
-export default function Navbar(){
+export default function Navbar({count}){
+
     return(
          <div className="navbar-container">
                 <Logo/>
                 <Search/>
                 <div className="icon-container">
-                    <Cart/>
+                    <Cart count={count}/>
                     <Profile/>
                 </div>
         </div>
@@ -30,14 +31,5 @@ function Search(){
     )
 }
 
-function Cart(){
-    const CartNumber = 0
-    return(
-        
-        <div className="cart-icon">
-            <img src="/Images/cart.png" alt="Cart" />
-            {CartNumber > 0 && <div className="cart-badge">{CartNumber}</div>}
-        </div>
-    )
-}
+
 

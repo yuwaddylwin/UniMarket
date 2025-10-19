@@ -13,9 +13,9 @@ function Profile() {
                 <img src="/Images/user.png" alt="User" />
         </div>
         
-        { form === "signup" && (
-            <div className="profile">
-                <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+    { form === "signup" && (
+        <div className="profile">
+            <form className="login-form" onSubmit={(e) => e.preventDefault()}>
                 <h1>Sign Up</h1>
                     <input type="text" placeholder="Username"/>
                     <input type="email" placeholder="Enter your student email" />
@@ -26,8 +26,8 @@ function Profile() {
                         <div className="send_button">
                         <button type="submit">Sign Up</button>
                         </div>
-                </form>
-            </div>
+            </form>
+         </div>
     )}
 
     {/* Login */}

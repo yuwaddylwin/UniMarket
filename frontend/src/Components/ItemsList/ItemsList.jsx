@@ -2,7 +2,8 @@ import React from 'react';
 import {useEffect, useState} from 'react'
 import './ItemsList.css'
 
-export default function ItemsList(){
+
+export default function ItemsList({AddtoCart}){
     const [items, setItems] = useState([]);
 
     useEffect(() => {
@@ -27,7 +28,7 @@ export default function ItemsList(){
                   <p>{item.description}</p>
                 </div>
                 <div className="btns">
-                  <button> Add to Cart 🛒</button>
+                  <button onClick={AddtoCart}> Add to Cart 🛒</button>
                   <button> Talk to Seller 💬</button>
                 </div>
               </div>

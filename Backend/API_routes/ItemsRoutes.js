@@ -14,16 +14,16 @@ router.get("/", async (req, res) => {
 });
 
 // Post new item
-router.post("/", async (req, res) => {
-  const { title, price, image, description, user } = req.body;
+// router.post("/", async (req, res) => {
+//   const { title, price, image, description, user } = req.body;
 
-  try {
-    const newItem = new Item({ title, price, image, description, user });
-    await newItem.save();
-    res.status(201).json(newItem);
-  } catch (error) {
-    res.status(400).json({ message: "Error posting item" });
-  }
-});
+//   try {
+//     const newItem = new Item({ title, price, image, description, user });
+//     await newItem.save();
+//     res.status(201).json(newItem);
+//   } catch (error) {
+//     res.status(400).json({ message: "Error posting item" });
+//   }
+// });
 
 export default router;

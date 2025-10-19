@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import './Home.css';
 import Navbar from '../Navbar/Navbar';
 import ItemsList from '../ItemsList/ItemsList';
@@ -11,11 +12,20 @@ export default function Home() {
 
   const navigate = useNavigate();
 
+  // Itemlist Add to Cart function
+  const [count , setCount] = useState(0);
+  
+      const AddtoCart = () => {
+          setCount (count + 1 );
+      }
+
   return(
     <>
     {/* First Section */}
     <div className="home-container">
-      <Navbar/>
+      
+      <Navbar count={count}/>
+
       <div className="hero-section">
         <main className="hero-text">
           <h1>WHAT's UniMarket??</h1>
@@ -29,6 +39,8 @@ export default function Home() {
       <button className="btn" onClick={() => navigate("/sell")}>Sell Now</button>
     </div>
 
+    <ItemsList AddtoCart={AddtoCart}/>
+
     {/* How it Works? */}
     <div className="hero-section">
         <main className="hero-text2">
@@ -39,7 +51,7 @@ export default function Home() {
           <h2>4. <strong>Meet up & Complete:</strong> Meet up and finalize the deal.</h2>
         </main>
     </div>
-    <ItemsList/>
+
     <Footer/>
     </>
   )
