@@ -4,15 +4,58 @@ import Navbar from '../Navbar/Navbar';
 import ItemsList from '../ItemsList/ItemsList';
 import Footer from '../Footer/footer';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 
 
-export default function Home({count, AddtoCart}) {
+
+export default function Home() {
 
   const navigate = useNavigate();
+
+      // Fix: Only manage cartItems, derive count from it
+  const [cartItems, setCartItems] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
   
+  const count = cartItems.length;
+
+  const AddtoCart = (itemId, itemTitle) => {
+    
+    if (!cartItems.includes(itemId)) {
+      setCartItems([...cartItems, itemId]);
+      setToastMessage("Added to cart!");
+      setShowToast(true);
+  
+      setTimeout(() => {
+        setShowToast(false);
+      }, 1000);
+    } else {
+      setToastMessage('Item already in Cart!'); 
+    }
+  };
+
+
   return(
     <>
+    {/* Toast Notification */}
+    
+    {showToast && (
+  <div className="toast-notification">
+    <div className="toast-content">
+      <span className="toast-message">{toastMessage}</span>
+      <button 
+        className="toast-close" 
+        onClick={() => setShowToast(false)}
+      >
+        ×
+      </button>
+    </div>
+  </div>
+)}
+
+    
     {/* First Section */}
     <div className="home-container">
       
@@ -31,7 +74,7 @@ export default function Home({count, AddtoCart}) {
       <button className="btn" onClick={() => navigate("/sell")}>Sell Now</button>
     </div>
 
-    <ItemsList AddtoCart={AddtoCart}/>
+    <ItemsList AddtoCart={AddtoCart} cartItems={cartItems}/>
 
     {/* How it Works? */}
     <div className="hero-section">

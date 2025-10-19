@@ -3,21 +3,8 @@ import {useEffect, useState} from 'react'
 import './ItemsList.css'
 
 
-export default function ItemsList(){
+export default function ItemsList({AddtoCart, cartItems}){
     const [items, setItems] = useState([]);
-
-    // Itemlist Add to Cart function
-    const [cartItems, setCartItems] = useState([]);
-    const [count , setCount] = useState(0);
-      
-      const AddtoCart = (itemId) => {
-        // check if this item is not already added
-        if (!cartItems.includes(itemId)) {
-          setCartItems([...cartItems, itemId]); // add this item to the list
-          setCount(count + 1); // increase count by 1
-        }
-      };
-      
 
     useEffect(() => {
         fetch("http://localhost:8000/api/items")
@@ -47,8 +34,10 @@ export default function ItemsList(){
                   <p>{item.description}</p>
                 </div>
                 <div className="btns">
-                  <button onClick={() => AddtoCart(item._id)}
-                disabled={cartItems.includes(item._id)}>Add to Cart 🛒</button>
+                  <button onClick={() => {
+                      AddtoCart(item._id, item.title);}}
+                    disabled={cartItems.includes(item._id)}>
+                      Add to Cart 🛒</button>
                   <button> Talk to Seller 💬</button>
                 </div>
               </div>
