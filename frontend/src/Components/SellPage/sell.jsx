@@ -6,7 +6,7 @@ function Sell() {
     name: "",
     price: "",
     description: "",
-    images: [], // multiple images
+    images: []
   });
 
   const handleChange = (e) => {

@@ -1,35 +1,35 @@
-import './Navbar.css';
-import Profile from '../Profile/profile';
-import Cart from './Nav_functions/Cart';
+import "./Navbar.css";
+import Profile from "../Profile/profile";
+import Cart from "./Cart_Components/Cart";
 
-
-
-export default function Navbar({count}){
-
-    return(
-         <div className="navbar-container">
-                <Logo/>
-                <Search/>
-                <div className="icon-container">
-                    <Cart count={count}/>
-                    <Profile/>
-                </div>
-        </div>
-    )
+export default function Navbar({ count }) {
+  return (
+    <div className="navbar-container">
+      <Logo />
+      <Search />
+      <div className="icon-container">
+        <Cart count={count} />
+        <Profile />
+      </div>
+    </div>
+  );
 }
 
-function Logo(){
-    return <div className="logo">Uni<span>Market</span></div>;
+function Logo() {
+  return (
+    <div className="logo">
+      Uni<span>Market</span>
+    </div>
+  );
 }
 
-function Search(){
-    return(
-        <form className="search-form">
-            <input type='text' placeholder='🔍 Search products...' />
-            <button type="button" className="search-button">Search</button>
-        </form>
-    )
+function Search() {
+  return (
+    <form className="search-form">
+      <input type="text" placeholder="🔍 Search products..." />
+      <button type="button" className="search-button">
+        Search
+      </button>
+    </form>
+  );
 }
-
-
-

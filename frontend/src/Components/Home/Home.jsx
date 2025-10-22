@@ -9,22 +9,20 @@ import { useState } from 'react';
 
 
 
-export default function Home() {
+export default function Home({ cartItems, setCartItems }) {
 
   const navigate = useNavigate();
 
       // Fix: Only manage cartItems, derive count from it
-  const [cartItems, setCartItems] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
   
   const count = cartItems.length;
 
-  const AddtoCart = (itemId, itemTitle) => {
-    
-    if (!cartItems.includes(itemId)) {
-      setCartItems([...cartItems, itemId]);
+  const AddtoCart = (item) => {
+    if (!cartItems.includes(cartItem => cartItem.id === item.id)) {
+      setCartItems([...cartItems, item]);
       setToastMessage("Added to cart!");
       setShowToast(true);
   

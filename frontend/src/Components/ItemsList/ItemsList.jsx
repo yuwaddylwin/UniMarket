@@ -29,13 +29,13 @@ export default function ItemsList({AddtoCart, cartItems}){
               <div className="item-card" key={item._id}>
                 <img src={item.image} alt={item.title} />
                 <div className="item-content">
-                  <h3>{item.title}</h3>
                   <p className="price">{item.price} Baht</p>
+                  <h3>{item.title}</h3>
                   <p>{item.description}</p>
                 </div>
                 <div className="btns">
                   <button onClick={() => {
-                      AddtoCart(item._id, item.title);}}
+                      AddtoCart(item)}}
                     disabled={cartItems.includes(item._id)}>
                       Add to Cart 🛒</button>
                   <button> Talk to Seller 💬</button>
