@@ -1,11 +1,10 @@
 import React from 'react';
 import {useEffect, useState} from 'react'
-import { useNavigate } from 'react-router-dom';
 import './ItemsList.css'
 
 
-export default function ItemsList() {
-  const navigate = useNavigate();
+export default function ItemsList({AddtoCart, cartItems}) {
+  
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -15,10 +14,6 @@ export default function ItemsList() {
       .catch(err => console.error(err));
   }, []);
 
-  // when user clicks an item, go to detail page
-  const handleItemClick = () => {
-    navigate('/Items');
-  };
 
   return (
     <div className="items-container">
@@ -30,7 +25,6 @@ export default function ItemsList() {
           <div
             className="item-card"
             key={item._id}
-            onClick={ handleItemClick()} // navigate when clicking a card
           >
             <img src={item.image} alt={item.title} />
             <div className="item-content">
@@ -38,6 +32,13 @@ export default function ItemsList() {
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </div>
+            <div className="btns">
+                <button onClick={() => {
+                        AddtoCart(item)}}
+                        disabled={cartItems.includes(item._id)}>
+                        Add to Cart 🛒</button>
+                <button> Talk to Seller 💬</button>
+          </div>
           </div>
         ))}
       </div>
@@ -45,10 +46,4 @@ export default function ItemsList() {
   );
 }
     
-    // {/* <div className="btns">
-    //   <button onClick={() => {
-    //       AddtoCart(item)}}
-    //     disabled={cartItems.includes(item._id)}>
-    //       Add to Cart 🛒</button>
-    //   <button> Talk to Seller 💬</button>
-    // </div> */}
+    
