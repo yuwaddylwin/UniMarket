@@ -18,3 +18,15 @@ export default function App() {
     </Router>
   );
 }
+
+
+// function App() {
+//     return (
+//       <div style={{ textAlign: "center", marginTop: "100px" }}>
+//         <h1>Hello React App 🚀</h1>
+//       </div>
+//     );
+//   }
+  
+//   export default App;
+  

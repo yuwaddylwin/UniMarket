@@ -1,43 +1,11 @@
-import React, { useState } from "react";
+// 📁 src/Components/SellPage/Sell.jsx
+import React from "react";
 import "./sell.css";
+import { useSellLogic } from "../Logics/useSell";
 
 function Sell() {
-  const [item, setItem] = useState({
-    name: "",
-    price: "",
-    description: "",
-    images: []
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setItem({ ...item, [name]: value });
-  };
-
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (item.images.length + files.length > 6) {
-      alert("You can only upload up to 6 images.");
-      return;
-    }
-    const newImages = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file), // preview
-    }));
-    setItem({ ...item, images: [...item.images, ...newImages] });
-  };
-
-  const removeImage = (index) => {
-    const updated = [...item.images];
-    updated.splice(index, 1);
-    setItem({ ...item, images: updated });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(item);
-    alert("Item posted successfully!");
-  };
+  const { item, handleChange, handleImageUpload, removeImage, handleSubmit } =
+    useSellLogic();
 
   return (
     <div className="post-container">
