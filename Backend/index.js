@@ -1,16 +1,30 @@
 import express, { Router } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import cors from 'cors'; // controls whether a web page can request resources (like data from an API)
-import ItemsList from "./API_routes/ItemsRoutes.js";
+import cors from 'cors'; 
+import ItemsList from "./src/routes/Items.js";
+import authRoutes from "./src/routes/auth.js";
 
 
+//Middleware
 const app = express();
 dotenv.config();
 app.use(cors());
+app.use(express.json());
+
 
 const PORT = process.env.PORT || 8000;
 const MONGOURL = process.env.MONGO_URL || "mongodb+srv://yuwaddylwin:ThhDEm2ZWMQbNngz@marketplace-cluster.7hjiut5.mongodb.net/MarketPlace";
+
+
+// Routes
+app.use("/api/items", ItemsList);
+app.use("/api/auth", authRoutes);
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("API is running!");
+});
 
 
 // Connect DB
@@ -29,8 +43,7 @@ mongoose
 }).catch((err)=> console.log(err));
 
 
-// Routes
-app.use("/api/items", ItemsList);
+
 
 
   
