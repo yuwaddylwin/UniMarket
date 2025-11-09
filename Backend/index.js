@@ -1,20 +1,23 @@
 import express, { Router } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+dotenv.config();
+
 import cors from 'cors'; 
-import ItemsList from "./src/routes/Items.js";
-import authRoutes from "./src/routes/auth.js";
+import cookieParser from "cookie-parser";
+import ItemsList from "./src/routes/Items.route.js";
+import authRoutes from "./src/routes/auth.route.js";
 
 
 //Middleware
 const app = express();
-dotenv.config();
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 
 const PORT = process.env.PORT || 8000;
-const MONGOURL = process.env.MONGO_URL || "mongodb+srv://yuwaddylwin:ThhDEm2ZWMQbNngz@marketplace-cluster.7hjiut5.mongodb.net/MarketPlace";
+const MONGOURL = process.env.MONGO_URL;
 
 
 // Routes
