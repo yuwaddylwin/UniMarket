@@ -5,8 +5,9 @@ export const generateToken = (userId, res ) =>{
         expiresIn: "7d",
     })
 
+    //Save the JWT in the browser as a cookie (not in localStorage)
     res.cookie("jwt", token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000, //7 days
         httpOnly: true,
         sameSite: "strict",
         secure: process.env.NODE_DEV !== "development",
