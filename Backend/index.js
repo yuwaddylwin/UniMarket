@@ -7,6 +7,8 @@ import cors from 'cors';
 import cookieParser from "cookie-parser";
 import ItemsList from "./src/routes/Items.route.js";
 import authRoutes from "./src/routes/auth.route.js";
+import messageRoutes from "./src/routes/message.route.js";
+
 
 
 //Middleware
@@ -23,6 +25,7 @@ const MONGOURL = process.env.MONGO_URL;
 // Routes
 app.use("/api/items", ItemsList);
 app.use("/api/auth", authRoutes);
+app.use("/api/message", messageRoutes); 
 
 // Test route
 app.get("/", (req, res) => {
