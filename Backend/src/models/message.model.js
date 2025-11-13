@@ -19,7 +19,7 @@ const messageSchema = new mongoose.Schema(
             type: String,
         },
     },
-    { timestamps: true} //12:10pm
+    { timestamps: true} // createdAt , updatedAt 
 );
 
 const Message = mongoose.model("Message", messageSchema);

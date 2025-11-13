@@ -13,9 +13,13 @@ import messageRoutes from "./src/routes/message.route.js";
 
 //Middleware
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", //frontend URL
+  credentials: true, // to allow cookies
+}));
 app.use(express.json());
 app.use(cookieParser());
+
 
 
 const PORT = process.env.PORT || 8000;
