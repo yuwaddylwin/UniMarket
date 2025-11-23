@@ -3,6 +3,7 @@ import "./profile.css";
 import { useEffect } from "react";
 import { useProfileLogic } from "../Logics/useProfile";
 import { useAuthStore } from "../store/useAuthStore";
+import { Toaster } from "react-hot-toast";
 import {Loader} from "lucide-react";
 
 import SignUpForm from "./forms/SignUpForm";
@@ -10,6 +11,7 @@ import LoginForm from "./forms/LoginForm";
 import ResetForm from "./forms/ResetForm";
 import VerifyForm from "./forms/VerifyForm";
 import NewPasswordForm from "./forms/NewPasswordForm";
+import ProfilePage from "./forms/ProfilePage";
 
 export default function Profile() {
   const { authUser, checkAuth, isCheckingAuth} = useAuthStore();
@@ -37,14 +39,16 @@ export default function Profile() {
 
   return (
     <>
+    <Toaster/>
       {/* Profile Icon */}
-      {/* Haven't Done the showProfile yet , fix this */}
-      <div className="profile-icon" onClick={authUser ? () => console.log("Profile coming soon") : showSignUp}>
+      <div className="profile-icon" onClick={() => (authUser ? <ProfilePage/> : showLogin())}>
         <img src="/Images/user.png" alt="User" />
       </div>
 
       {/* Conditional Rendering */}
+
       {form === "signup" && <SignUpForm showLogin={showLogin} />}
+
       {form === "login" && (
         <LoginForm showReset={showReset} showSignUp={showSignUp} />
       )}
@@ -56,5 +60,5 @@ export default function Profile() {
       )}
       {form === "new_pw" && <NewPasswordForm />}
     </>
-  );
+  )
 }
