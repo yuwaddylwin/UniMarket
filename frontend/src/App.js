@@ -4,7 +4,7 @@ import Home from "./Components/Home/Home";
 import Sell from "./Components/SellPage/sell";
 import CartPage from "./Components/Navbar/Cart_Components/CartPage";
 import ProductsDetails from "./Components/Products/ProductsDetails";
-import "./App.css";
+import "./App.css"; 
 
 export default function App({AddtoCart}) {
   const [cartItems, setCartItems] = useState([]);
