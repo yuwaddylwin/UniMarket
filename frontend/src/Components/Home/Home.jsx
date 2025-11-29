@@ -34,7 +34,7 @@ export default function Home({ cartItems, setCartItems }) {
           <div className="hero-image">
             <img
               className="img"
-              src="/Images/IMG2.jpeg"
+              src="/Images/secondhand.jpg.webp"
               alt="UniMarket Platform"
             />
           </div>

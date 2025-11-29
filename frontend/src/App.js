@@ -4,6 +4,7 @@ import Home from "./Components/Home/Home";
 import Sell from "./Components/SellPage/sell";
 import CartPage from "./Components/Navbar/Cart_Components/CartPage";
 import ProductsDetails from "./Components/Products/ProductsDetails";
+import ProfilePage from "./Components/Profile/forms/ProfilePage";
 import "./App.css"; 
 
 export default function App({AddtoCart}) {
@@ -15,6 +16,7 @@ export default function App({AddtoCart}) {
         <Route path="/" element={<Home cartItems={cartItems} setCartItems={setCartItems} />} />
         <Route path="/sell" element={<Sell />} />
         <Route path="/cart" element={<CartPage cartItems={cartItems} />} />
+        <Route path="/profile" element={<ProfilePage/>} />
         <Route path="/products/:id" element={<ProductsDetails AddtoCart={AddtoCart} cartItems={cartItems}/>} />
       </Routes>
     </Router>

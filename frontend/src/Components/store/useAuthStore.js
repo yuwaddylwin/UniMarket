@@ -49,16 +49,33 @@ export const useAuthStore = create((set)=>({
         }finally{
             set({isLoggingIn: false});
         }
+    },
+
+    logout: async()=> {
+        try{
+            await axiosInstance.post("/auth/logout");
+            set({authUser: null});
+            toast.success("Logged out successfully");
+        }catch(error){
+            toast.error(error.response.data.message);
+        }
+    },
+
+    updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+        const res = await axiosInstance.post("/auth/update-profile", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+        });
+        set({ authUser: res.data });
+        toast.success("Profile updated successfully!");
+    } catch (error) {
+        console.log("ERROR RESPONSE:", error.response);
+        console.log("ERROR MESSAGE:", error.message);
+        console.log("ERROR DATA:", error.response?.data);
+        toast.error(error.response?.data?.message || "Something went wrong!");
+    } finally {
+        set({ isUpdatingProfile: false });
     }
-
-// logout: async()=> {
-//     try{
-//         await axiosInstance.post("/auth/logout");
-//         set({authUser: null});
-//         toast.success("Logged out successfully");
-//     }catch(error){
-//         toast.error(error.response.data.message);
-//     }
-// }
-
+    }
 }));

@@ -1,19 +1,20 @@
-import React from "react";
 import "./profile.css";
 import { useEffect } from "react";
 import { useProfileLogic } from "../Logics/useProfile";
 import { useAuthStore } from "../store/useAuthStore";
 import { Toaster } from "react-hot-toast";
 import {Loader} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import SignUpForm from "./forms/SignUpForm";
 import LoginForm from "./forms/LoginForm";
 import ResetForm from "./forms/ResetForm";
 import VerifyForm from "./forms/VerifyForm";
 import NewPasswordForm from "./forms/NewPasswordForm";
-import ProfilePage from "./forms/ProfilePage";
+
 
 export default function Profile() {
+  const navigate = useNavigate();
   const { authUser, checkAuth, isCheckingAuth} = useAuthStore();
   useEffect(() =>{
     checkAuth();
@@ -41,7 +42,9 @@ export default function Profile() {
     <>
     <Toaster/>
       {/* Profile Icon */}
-      <div className="profile-icon" onClick={() => (authUser ? <ProfilePage/> : showLogin())}>
+      <div className="profile-icon" onClick={() => {
+        console.log("profile is clicked")
+        authUser ? navigate("/profile") : showLogin()}}>
         <img src="/Images/user.png" alt="User" />
       </div>
 
