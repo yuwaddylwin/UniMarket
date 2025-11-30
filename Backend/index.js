@@ -17,7 +17,7 @@ app.use(cors({
   origin: "http://localhost:3000", //frontend URL
   credentials: true, // to allow cookies
 }));
-app.use(express.json());
+app.use(express.json({ limit: "20mb" }));
 app.use(cookieParser());
 
 
