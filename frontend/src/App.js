@@ -2,24 +2,29 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import Home from "./Components/Home/Home";
 import Sell from "./Components/SellPage/sell";
-import CartPage from "./Components/Navbar/Cart_Components/CartPage";
+import CartPage from "./Components/BottomNavBar/ShoppingCart/CartPage";
 import ProductsDetails from "./Components/Products/ProductsDetails";
 import ProfilePage from "./Components/Profile/forms/ProfilePage";
+import { useHomeLogic } from "./Components/Logics/useHome";
 import { Toaster } from "react-hot-toast";
+import BottomNav from "./Components/BottomNavBar/BottomNav";
 import "./App.css"; 
 
-export default function App({AddtoCart}) {
+export default function App() {
   const [cartItems, setCartItems] = useState([]);
+  const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
+
   
   return (
     <Router>
+      <BottomNav cartCount={cartItems.length} />
       <Toaster/>
       <Routes>
         <Route path="/" element={<Home cartItems={cartItems} setCartItems={setCartItems} />} />
         <Route path="/sell" element={<Sell />} />
-        <Route path="/cart" element={<CartPage cartItems={cartItems} />} />
+        <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />}/>
         <Route path="/profile" element={<ProfilePage/>} />
-        <Route path="/products/:id" element={<ProductsDetails AddtoCart={AddtoCart} cartItems={cartItems}/>} />
+        <Route path="/products/:id" element={<ProductsDetails AddtoCart={AddtoCart} cartItems={cartItems} setCartItems={setCartItems}/>} />
       </Routes>
     </Router>
   );

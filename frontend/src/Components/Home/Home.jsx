@@ -3,23 +3,15 @@ import "./Home.css";
 import Navbar from "../Navbar/Navbar";
 import ItemsList from "../ItemsList/ItemsList";
 import Footer from "../Footer/footer";
-import Toast from "./Toast";
 import { useNavigate } from "react-router-dom";
 import { useHomeLogic } from "../Logics/useHome";
 
 export default function Home({ cartItems, setCartItems }) {
   const navigate = useNavigate();
-  const { showToast, setShowToast, toastMessage, count, AddtoCart } =
-    useHomeLogic(cartItems, setCartItems);
+  const { count, AddtoCart } = useHomeLogic(cartItems, setCartItems);
 
   return (
     <>
-      {/* Toast */}
-      <Toast
-        show={showToast}
-        message={toastMessage}
-        onClose={() => setShowToast(false)}
-      />
 
       {/* Main Section */}
       <div className="home-container">

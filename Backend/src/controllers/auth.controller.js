@@ -105,7 +105,7 @@ const updateProfile = async (req, res) => {
       { new: true }
     ).select("-password");
 
-    res.json({ message: "Profile updated", user: updatedUser });
+    res.json(updatedUser);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server error" });

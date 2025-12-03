@@ -84,53 +84,11 @@
 }
 
 /* Icon Container Styles */
-.icon-container {
+/* .icon-container {
     display: flex;
     align-items: center;
     gap: 24px;
-}
-
-.cart-icon, .profile-icon {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: #f8f9fa; 
-}
-
-.cart-icon:hover, .profile-icon:hover {
-    transform: translateY(-5px);
-    
-}
-
-.cart-icon img, .profile-icon img {
-    width: 25px;
-    height: 25px;
-    object-fit: cover;
-}
-
-/* Cart Badge */
-.cart-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    background: #a0223b;
-    color: white;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white;
-}
+} */
 
 /* Responsive Design */
 @media (max-width: 768px) {

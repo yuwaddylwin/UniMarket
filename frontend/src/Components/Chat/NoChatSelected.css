@@ -1,0 +1,32 @@
+.no-chat-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-chat-content {
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* CHAT ICON */
+.chat-icon {
+  color: #c9a55b;
+  margin-bottom: 14px;
+}
+
+/* TITLE */
+.no-chat-content h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #e6c27a;
+  margin-bottom: 6px;
+}
+
+/* SUBTEXT */
+.no-chat-content p {
+  font-size: 14px;
+  color: #b9a9c5;
+}

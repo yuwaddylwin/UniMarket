@@ -17,10 +17,10 @@ export default function ItemsList({ AddtoCart, cartItems }) {
           <div className="item-card" 
           key={item._id} 
           onClick={() => {
-  console.log("Card clicked!");
-  navigate(`/products/${item._id}`);
-}}
->
+            console.log("Card clicked!");
+            navigate(`/products/${item._id}`);
+          }}
+          >
             <img src={item.image} alt={item.title} />
             <div className="item-content">
               <p className="price">{item.price} Baht</p>
@@ -28,12 +28,7 @@ export default function ItemsList({ AddtoCart, cartItems }) {
               <p>{item.description}</p>
             </div>
             <div className="btns">
-              <button
-                onClick={() => AddtoCart(item)}
-                disabled={cartItems.some(
-                  (cartItem) => cartItem._id === item._id
-                )}
-              >
+              <button onClick={() => AddtoCart(item)}>
                 Add to Cart 🛒
               </button>
               <button>Talk to Seller 💬</button>

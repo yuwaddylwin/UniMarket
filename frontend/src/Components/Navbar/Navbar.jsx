@@ -1,15 +1,15 @@
 import "./Navbar.css";
-import Profile from "../Profile/profile";
-import Cart from "./Cart_Components/Cart";
 
-export default function Navbar({ count }) {
+export default function Navbar() {
   return (
     <div className="navbar-container">
       <Logo />
       <Search />
       <div className="icon-container">
-        <Cart count={count} />
-        <Profile />
+        {/* TOP RIGHT CHAT
+      <div className="top-chat-icon" onClick={() => navigate("/chat")}>
+        <MessageCircle size={22} />
+      </div> */}
       </div>
     </div>
   );

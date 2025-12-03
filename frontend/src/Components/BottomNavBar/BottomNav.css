@@ -1,0 +1,127 @@
+/* TOP CHAT BUTTON */
+.top-chat-icon {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #681555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* BOTTOM NAV BAR */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 68px;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #eee;
+  z-index: 999;
+}
+
+/* ICONS */
+.bottom-nav svg {
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  color: #333;
+  transition: transform 0.2s ease;
+}
+
+.bottom-nav svg:hover {
+  transform: scale(1.1);
+}
+
+/* PLUS BUTTON */
+.plus-btn {
+  background: #7a2b6a;
+  color: rgb(255, 255, 255);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -11px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.plus-btn svg {
+  color: white !important;
+}
+
+
+/* PROFILE IMAGE */
+.avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* MOBILE SAFE SPACE BELOW */
+body {
+  padding-bottom: 70px;
+}
+
+/* Make Cart fit bottom navbar */
+.bottom-nav .cart-icon {
+  width: 28px;
+  height: 28px;
+  background: none;
+  box-shadow: none;
+}
+
+/* Badge adjust */
+.bottom-nav .cart-badge {
+  top: -4px;
+  right: -6px;
+  transform: scale(0.85);
+}
+
+/* Ensure badge shows inside bottom nav version */
+.bottom-nav .cart-icon {
+    position: relative;
+    overflow: visible;   /* ✅ important */
+}
+
+/* Fix badge position */
+.bottom-nav .cart-badge {
+    top: -6px;
+    right: -6px;
+    transform: scale(0.8);
+}
+
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: rgb(183, 44, 44);
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: bold;
+}
+

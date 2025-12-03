@@ -51,7 +51,8 @@ export default function Profile() {
           authUser ? navigate("/profile") : showLogin();
         }}
       >
-        <img src="/Images/user.png" alt="User" />
+        <img src={authUser?.profilePic || "/Images/user.png"} />
+
       </div>
 
       {/* Conditional Rendering */}

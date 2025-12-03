@@ -1,0 +1,25 @@
+.chat-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #120b16, #1a0f23);
+  color: white;
+  overflow: hidden;
+}
+
+/* LEFT SIDEBAR */
+.chat-sidebar {
+  width: 280px;
+  background: rgba(15, 10, 20, 0.9);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+}
+
+/* RIGHT CHAT AREA */
+.chat-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
