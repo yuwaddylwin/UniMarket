@@ -9,6 +9,8 @@ import { useHomeLogic } from "./Components/Logics/useHome";
 import { Toaster } from "react-hot-toast";
 import BottomNav from "./Components/BottomNavBar/BottomNav";
 import "./App.css"; 
+import LoginForm from "./Components/Profile/forms/LoginForm";
+import SignUpForm from "./Components/Profile/forms/SignUpForm";
 
 export default function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -24,6 +26,8 @@ export default function App() {
         <Route path="/sell" element={<Sell />} />
         <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />}/>
         <Route path="/profile" element={<ProfilePage/>} />
+        <Route path="/login" element={<LoginForm/>} />
+        <Route path="/signup" element={<SignUpForm/>} />
         <Route path="/products/:id" element={<ProductsDetails AddtoCart={AddtoCart} cartItems={cartItems} setCartItems={setCartItems}/>} />
       </Routes>
     </Router>

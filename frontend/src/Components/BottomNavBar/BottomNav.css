@@ -1,20 +1,3 @@
-/* TOP CHAT BUTTON */
-.top-chat-icon {
-  position: fixed;
-  top: 18px;
-  right: 18px;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #681555;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  z-index: 1000;
-}
-
 /* BOTTOM NAV BAR */
 .bottom-nav {
   position: fixed;
@@ -44,7 +27,7 @@
 
 /* PLUS BUTTON */
 .plus-btn {
-  background: #7a2b6a;
+  background: #1b4a91;
   color: rgb(255, 255, 255);
   width: 48px;
   height: 48px;

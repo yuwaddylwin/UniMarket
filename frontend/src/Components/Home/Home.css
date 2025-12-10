@@ -39,7 +39,7 @@
   font-family: serif;
   font-weight: 800;
   margin-bottom: 25px;
-  background: #681555;
+  background: #1b4a91;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -59,7 +59,7 @@
   font-family: serif;
   font-weight: 800;
   margin-bottom: 25px;
-  background: #681555;
+  background: #153368;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -109,7 +109,7 @@
   padding: 15px 40px;
   font-size: 1rem;
   font-weight: 500;
-  background: #21548b;
+  background: #1b4a91;
   color: white;
   border: none;
   border-radius: 50px;
@@ -121,64 +121,11 @@
 
 .btn:hover {
   transform: translateY(-3px);
-  background: #681555;
+  background: #3e79ca;
 }
 
 .btn:active {
   transform: translateY(-1px);
-}
-
-
-/* Toast Notification Styles */
-.toast-notification {
-  position: fixed;
-  top: 80px;
-  right: 40px;
-  background-color: #681555;
-  color: white;
-  padding: 16px 20px;
-  border-radius: 8px;
-  box-shadow: 0 20px 12px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  animation: slideIn 0.3s ease-out;
-  min-width: 300px;
-  max-width: 400px;
-  font-family: inherit;
-}
-
-.toast-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.toast-message {
-  font-weight: 500;
-  color: white;
-  flex: 1;
-  font-size: 14px;
-}
-
-.toast-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-  flex-shrink: 0;
-}
-
-.toast-close:hover {
-  background-color: rgba(255, 255, 255, 0.2);
 }
 
 @keyframes slideIn {

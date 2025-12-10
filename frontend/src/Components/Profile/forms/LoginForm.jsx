@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import "./SignUpForm.css"; // Reuse same CSS
 
 export default function LoginForm({ showSignup }) {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -62,7 +64,7 @@ export default function LoginForm({ showSignup }) {
 
         <div className="links">
           <span className="span">Don't have an account?</span>
-          <span className="link" onClick={showSignup}>
+          <span className="link" onClick={() => navigate("/signup")}>
             Sign Up
           </span>
         </div>

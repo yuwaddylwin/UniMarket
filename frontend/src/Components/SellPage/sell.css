@@ -59,7 +59,7 @@
   .title {
     text-align: center;
     margin-bottom: 30px;
-    color: #21548b;
+    color: #1b4a91;
     font-size: 28px;
     font-weight: 600;
   }
@@ -95,7 +95,7 @@
   input[type="text"]:focus,
   input[type="number"]:focus,
   textarea:focus {
-    border-color: #21548b;
+    border-color: #153a68;
   }
   
   input[type="file"] {
@@ -103,7 +103,7 @@
   }
   
   .submit-btn {
-    background-color: #21548b;
+    background-color: #1a62c6;
     color: white;
     padding: 12px;
     border: none;
@@ -114,6 +114,6 @@
   }
   
   .submit-btn:hover {
-    background-color: #1a4372;
+    background-color: #3e79ca;
   }
   

@@ -1,18 +1,19 @@
 import "./Navbar.css";
+// import { useNavigate } from "react-router-dom";
+// import { MessageCircle } from "lucide-react";
+
 
 export default function Navbar() {
+  // const navigate = useNavigate();
   return (
     <div className="navbar-container">
       <Logo />
       <Search />
-      <div className="icon-container">
-        {/* TOP RIGHT CHAT
-      <div className="top-chat-icon" onClick={() => navigate("/chat")}>
-        <MessageCircle size={22} />
+      {/* <div className="top-chat-icon" onClick={() => navigate("/chat")}>
+        <MessageCircle size={18} />
       </div> */}
       </div>
-    </div>
-  );
+  )
 }
 
 function Logo() {

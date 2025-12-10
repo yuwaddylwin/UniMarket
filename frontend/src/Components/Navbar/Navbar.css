@@ -14,12 +14,11 @@
     gap: 40px;
     
 }
-
 /* Logo Styles */
 .logo {
     font-size: 35px;
     font-weight: 600;
-    color: #681555;
+    color: #1b4a91;
     font-family: Serif; 
     letter-spacing: -0.5px;
 }
@@ -46,7 +45,7 @@
 
 .search-form:focus-within {
     background: #ffffff;
-    border-color: #21548b;
+    border-color: #153568;
     transform: translateY(-1px);
 }
 
@@ -67,7 +66,7 @@
 }
 
 .search-button {
-    background: #21548b;
+    background: #1a62c6;
     color: white;
     border: none;
     padding: 8px 20px;
@@ -79,16 +78,9 @@
 }
 
 .search-button:hover {
-    background: #681555;
+    background: #3e79ca;
     transform: translateY(-1px);
 }
-
-/* Icon Container Styles */
-/* .icon-container {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-} */
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -135,3 +127,4 @@ button:focus, .cart-icon:focus, .profile-icon:focus {
     outline: 2px solid #007bff;
     outline-offset: 2px;
 }
+

@@ -30,7 +30,7 @@
 
 /* Title */
 .login-form h1 {
-  color: #681555;
+  color: #1b4a91;
   margin-bottom: 25px;
   font-size: 32px;
   font-weight: 600;
@@ -97,7 +97,7 @@
 }
 
 .link:hover {
-  color: #681555;
+  color: #2653b4;
   text-decoration: underline;
 }
 
@@ -106,7 +106,7 @@
   padding: 10px 20px;
   border: none;
   border-radius: 30px;
-  background-color: #21548b;
+  background-color: #1a62c6;
   color: white;
   font-size: 15px;
   cursor: pointer;
@@ -115,7 +115,7 @@
 }
 
 .send_button:hover {
-  background-color: #681555;
+  background-color: #3e79ca;
 }
 
 .send_button:disabled {

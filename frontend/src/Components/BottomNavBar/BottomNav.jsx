@@ -33,7 +33,16 @@ export default function BottomNav({ cartCount = 0 }) {
       </div>
 
       {/* Profile Avatar */}
-      <div className="avatar" onClick={() => navigate("/profile")}>
+      <div 
+        className="avatar" 
+        onClick={() => {
+          if (!authUser) {
+            navigate("/login");
+          } else {
+            navigate("/profile");
+          }
+        }}
+      >
         <img 
           src={authUser?.profilePic || "/Images/user.png"} 
           alt="profile" 

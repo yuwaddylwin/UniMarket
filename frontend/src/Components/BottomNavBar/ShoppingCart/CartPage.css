@@ -11,7 +11,7 @@
 .cart-page h2 {
   font-size: 1.8rem;
   text-align: center;
-  color: #681555;
+  color: #1b4a91;
   margin-bottom: 25px;
   border-bottom: 2px solid #f2f2f2;
   padding-bottom: 10px;
@@ -83,12 +83,12 @@
 
 /* 💬 Talk to Seller button */
 .talk-btn {
-  background-color: #21548b;
+  background-color: #1a62c6;
   color: #fff;
 }
 
 .talk-btn:hover {
-  background-color: #681555;
+  background-color: #3e79ca;
   transform: scale(1);
 }
 
