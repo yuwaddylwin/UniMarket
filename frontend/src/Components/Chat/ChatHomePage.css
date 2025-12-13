@@ -2,7 +2,10 @@
   display: flex;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #120b16, #1a0f23);
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+
+
+
   color: white;
   overflow: hidden;
 }
@@ -10,9 +13,8 @@
 /* LEFT SIDEBAR */
 .chat-sidebar {
   width: 280px;
-  background: rgba(15, 10, 20, 0.9);
+  background: white;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(8px);
 }
 
 /* RIGHT CHAT AREA */

@@ -13,7 +13,7 @@
 
 /* CHAT ICON */
 .chat-icon {
-  color: #c9a55b;
+  color: #ffffff;
   margin-bottom: 14px;
 }
 
@@ -21,12 +21,12 @@
 .no-chat-content h2 {
   font-size: 22px;
   font-weight: 600;
-  color: #e6c27a;
+  color: #1b4a91;
   margin-bottom: 6px;
 }
 
 /* SUBTEXT */
 .no-chat-content p {
   font-size: 14px;
-  color: #b9a9c5;
+  color: #3e79ca;
 }

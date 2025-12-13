@@ -29,7 +29,7 @@ const MONGOURL = process.env.MONGO_URL;
 // Routes
 app.use("/api/items", ItemsList);
 app.use("/api/auth", authRoutes);
-app.use("/api/message", messageRoutes); 
+app.use("/api/messages", messageRoutes); 
 
 // Test route
 app.get("/", (req, res) => {
