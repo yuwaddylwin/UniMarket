@@ -11,11 +11,22 @@ import BottomNav from "./Components/BottomNavBar/BottomNav";
 import LoginForm from "./Components/Profile/forms/LoginForm";
 import SignUpForm from "./Components/Profile/forms/SignUpForm";
 import ChatHomePage from "./Components/Chat/ChatHomePage";
+import { useEffect } from "react";
+import { useAuthStore } from "./Components/store/useAuthStore"
 import "./App.css"; 
 
 export default function App() {
   const [cartItems, setCartItems] = useState([]);
+  const { checkAuth, isCheckingAuth } = useAuthStore();
   const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  if (isCheckingAuth) {
+    return <div>Loading...</div>;
+  }
 
   
   return (

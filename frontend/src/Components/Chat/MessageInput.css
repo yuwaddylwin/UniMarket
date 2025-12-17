@@ -1,0 +1,76 @@
+.message-input-container {
+  padding: 10px 14px;
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+/* IMAGE PREVIEW */
+.image-preview {
+  position: relative;
+  width: 140px;
+  margin-bottom: 8px;
+}
+
+.image-preview img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.image-preview button {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #111;
+  color: #fff;
+  border-radius: 50%;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+/* INPUT BAR */
+.message-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f1f1f1;
+  padding: 10px 14px;
+  border-radius: 999px;
+}
+
+.message-input-row input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+}
+
+/* ICONS */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #555;
+}
+
+.icon-btn:hover {
+  color: #000;
+}
+
+/* SEND BUTTON (INSTAGRAM STYLE) */
+.send-btn {
+  background: none;
+  border: none;
+  color: #0095f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.send-btn:hover {
+  color: #0077cc;
+}
+
