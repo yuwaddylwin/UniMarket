@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, Image, X, Send } from "lucide-react";
+import { Image, X, Send } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 import "./MessageInput.css";
 
@@ -54,15 +54,6 @@ const MessageInput = () => {
 
       {/* INPUT BAR */}
       <div className="message-input-row">
-        {/* CAMERA (REAL TIME) */}
-        <button
-          type="button"
-          className="icon-btn"
-          onClick={() => cameraInputRef.current.click()}
-        >
-          <Camera size={20} />
-        </button>
-
         <input
           type="text"
           placeholder="Message..."

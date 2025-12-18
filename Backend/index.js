@@ -8,11 +8,11 @@ import cookieParser from "cookie-parser";
 import ItemsList from "./src/routes/Items.route.js";
 import authRoutes from "./src/routes/auth.route.js";
 import messageRoutes from "./src/routes/message.route.js";
+import { app, server } from "./src/lib/socket.js";
 
 
 
 //Middleware
-const app = express();
 app.use(cors({
   origin: "http://localhost:3000", //frontend URL
   credentials: true, // to allow cookies
@@ -47,7 +47,7 @@ mongoose
     console.log("Connected DB name:", mongoose.connection.name);
 
 
-    app.listen(PORT, ()=>{
+    server.listen(PORT, ()=>{
         console.log(`Server is running on port ${PORT}`);
     });
 }).catch((err)=> console.log(err));

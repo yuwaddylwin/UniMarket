@@ -1,19 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 import Home from "./Components/Home/Home";
 import Sell from "./Components/SellPage/sell";
 import CartPage from "./Components/BottomNavBar/ShoppingCart/CartPage";
 import ProductsDetails from "./Components/Products/ProductsDetails";
 import ProfilePage from "./Components/Profile/forms/ProfilePage";
-import { useHomeLogic } from "./Components/Logics/useHome";
-import { Toaster } from "react-hot-toast";
-import BottomNav from "./Components/BottomNavBar/BottomNav";
 import LoginForm from "./Components/Profile/forms/LoginForm";
 import SignUpForm from "./Components/Profile/forms/SignUpForm";
 import ChatHomePage from "./Components/Chat/ChatHomePage";
-import { useEffect } from "react";
-import { useAuthStore } from "./Components/store/useAuthStore"
-import "./App.css"; 
+
+import { useHomeLogic } from "./Components/Logics/useHome";
+import { useAuthStore } from "./Components/store/useAuthStore";
+
+import MainLayout from "./Components/layouts/MainLayout";
+import { Toaster } from "react-hot-toast";
+import "./App.css";
 
 export default function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -28,25 +30,36 @@ export default function App() {
     return <div>Loading...</div>;
   }
 
-  
   return (
     <Router>
-      <BottomNav cartCount={cartItems.length} />
-      <Toaster/>
+      <Toaster />
+
       <Routes>
-        <Route path="/" element={<Home cartItems={cartItems} setCartItems={setCartItems} />} />
-        <Route path="/sell" element={<Sell />} />
-        <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />}/>
-        <Route path="/profile" element={<ProfilePage/>} />
-        <Route path="/login" element={<LoginForm/>} />
-        <Route path="/signup" element={<SignUpForm/>} />
-        <Route path="/chat"  element={<ChatHomePage/>} />
-        <Route path="/products/:id" element={<ProductsDetails AddtoCart={AddtoCart} cartItems={cartItems} setCartItems={setCartItems}/>} />
+        {/* ROUTES WITH BottomNav */}
+        <Route element={<MainLayout cartItems={cartItems} />}>
+          <Route path="/" element={<Home cartItems={cartItems} setCartItems={setCartItems} />} />
+          <Route path="/login" element={<LoginForm/>} /> 
+          <Route path="/signup" element={<SignUpForm/>} />
+          <Route path="/sell" element={<Sell />} />
+          <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/products/:id"
+            element={
+              <ProductsDetails
+                AddtoCart={AddtoCart}
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+              />
+            }
+          />
+        </Route>
+
+        {/* ROUTES WITHOUT BottomNav */}
+        <Route path="/chat" element={<ChatHomePage />} />
       </Routes>
     </Router>
   );
 }
-
 
 
 //Testing Code
