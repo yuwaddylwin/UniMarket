@@ -7,15 +7,18 @@ import "./ChatContainer.css";
 import { useAuthStore } from "../store/useAuthStore";
 
 const ChatContainer = () => {
-  const { messages, getMessages, isMessagesLoading, selectedUser } =
-    useChatStore();
+  const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessages } =useChatStore();
   const { authUser } = useAuthStore();
 
   useEffect(() => {
     if (selectedUser?._id) {
       getMessages(selectedUser._id);
+
+      subscribeToMessages();
+
+      return () => unsubscribeFromMessages();
     }
-  }, [selectedUser?._id, getMessages]);
+  }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   if (isMessagesLoading) return <div className="loading">Loading...</div>;
 
