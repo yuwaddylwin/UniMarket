@@ -19,8 +19,10 @@ import "./App.css";
 
 export default function App() {
   const [cartItems, setCartItems] = useState([]);
-  const { checkAuth, isCheckingAuth } = useAuthStore();
+  const { checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
+
+  console.log({onlineUsers})
 
   useEffect(() => {
     checkAuth();

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./SidebarSkeleton/SidebarSkeleton";
-import "./Sidebar.css"
+import "./Sidebar.css";
 
 const Sidebar = () => {
   const {
@@ -11,10 +11,9 @@ const Sidebar = () => {
     selectedUser,
     setSelectedUser,
     isUsersLoading,
-    onlineUsers,
   } = useChatStore();
 
-  const { authUser } = useAuthStore();
+  const { authUser, onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getUsers();
@@ -28,7 +27,6 @@ const Sidebar = () => {
 
       <div className="user-list">
         {users
-          // ❌ do not show yourself
           .filter((user) => user._id !== authUser?._id)
           .map((user) => {
             const isOnline = onlineUsers.includes(user._id);
@@ -46,12 +44,14 @@ const Sidebar = () => {
                     alt={user.fullName}
                     className="sidebar-avatar"
                   />
+
+                  {/* 🟢 ONLINE DOT */}
                   {isOnline && <span className="online-dot" />}
                 </div>
 
                 <div className="user-info">
                   <p className="username">{user.fullName}</p>
-                  <span className="status">
+                  <span className={`status ${isOnline ? "online" : ""}`}>
                     {isOnline ? "Online" : "Offline"}
                   </span>
                 </div>

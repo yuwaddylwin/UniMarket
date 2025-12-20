@@ -1,13 +1,11 @@
 import { X } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
-import "./ChatHeader.css"
+import { useAuthStore } from "../store/useAuthStore";
+import "./ChatHeader.css";
 
 const ChatHeader = () => {
-  const {
-    selectedUser,
-    setSelectedUser,
-    onlineUsers, 
-  } = useChatStore();
+  const { selectedUser, setSelectedUser } = useChatStore();
+  const { onlineUsers } = useAuthStore();
 
   if (!selectedUser) return null;
 
@@ -16,15 +14,20 @@ const ChatHeader = () => {
   return (
     <div className="chat-header">
       <div className="chat-header-left">
-        <img
-          src={selectedUser.profilePic || "/Image.user.png"}
-          alt={selectedUser.fullName}
-          className="chat-header-avatar"
-        />
+        <div className="chat-header-avatar-wrapper">
+          <img
+            src={selectedUser.profilePic || "/Images/user.png"}
+            alt={selectedUser.fullName}
+            className="chat-header-avatar"
+          />
+
+          {/* 🟢 ONLINE DOT */}
+          {isOnline && <span className="chat-online-dot" />}
+        </div>
 
         <div className="chat-header-info">
           <h4>{selectedUser.fullName}</h4>
-          <span className={isOnline ? "online" : "offline"}>
+          <span className={`status ${isOnline ? "online" : "offline"}`}>
             {isOnline ? "Online" : "Offline"}
           </span>
         </div>

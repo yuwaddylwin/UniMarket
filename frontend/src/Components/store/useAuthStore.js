@@ -7,6 +7,7 @@ const BASE_URL = "http://localhost:8000"
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
+  onlineUsers: [],
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
@@ -91,11 +92,18 @@ export const useAuthStore = create((set, get) => ({
     if (!authUser || socket) return;
 
     const newSocket = io(BASE_URL, {
+      query: {
+        userId: authUser._id,
+      },
       withCredentials: true,
       transports: ["websocket"],
     });
 
     set({ socket: newSocket });
+
+    newSocket.on("getOnlineUsers", (userId) => {
+      set({onlineUsers: userId})
+    });
   },
 
   disconnectSocket: () => {

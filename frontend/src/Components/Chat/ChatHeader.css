@@ -64,3 +64,39 @@
   background: #f3f4f6;
 }
 
+.chat-header-avatar-wrapper {
+  position: relative;
+}
+
+.chat-header-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* 🟢 ONLINE DOT */
+.chat-online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+/* status text */
+.status {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.status.online {
+  color: #22c55e;
+}
+
+.status.offline {
+  color: #9ca3af;
+}

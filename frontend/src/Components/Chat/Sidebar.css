@@ -72,3 +72,37 @@
   font-size: 12px;
   color: #6b7280;
 }
+
+.avatar-wrapper {
+  position: relative;
+}
+
+/* avatar */
+.sidebar-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* 🟢 ONLINE DOT */
+.online-dot {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 12px;
+  height: 12px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+/* status text */
+.status {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.status.online {
+  color: #22c55e;
+}
