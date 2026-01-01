@@ -1,12 +1,16 @@
 .chat-header {
-  width: 100%;              
-  box-sizing: border-box;   
+  position: sticky;          
+  top: 0;                   
+  z-index: 30;               
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: rgb(253, 253, 253);
   padding: 14px 18px;
   flex-shrink: 0;
+  border-bottom: 1px solid #eee;
 }
 
 
@@ -99,4 +103,15 @@
 
 .status.offline {
   color: #9ca3af;
+}
+
+.chat-header-back {
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+  .chat-header-close {
+    display: none;
+  }
 }

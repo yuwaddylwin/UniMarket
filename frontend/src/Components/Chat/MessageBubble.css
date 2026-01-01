@@ -24,48 +24,44 @@
   max-width: 65%;
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
 
+/* TEXT BUBBLE */
 .message-bubble {
   background: #ffffff;
   padding: 10px 14px;
   border-radius: 18px;
   font-size: 14px;
   line-height: 1.4;
+  width: fit-content;
 }
 
 .own-bubble {
   background: #daf1ff;
   border-bottom-right-radius: 6px;
+  align-self: flex-end;
 }
 
-.reaction-bar {
-  margin-top: 4px;
-  display: flex;
-  gap: 6px;
-  font-size: 12px;
-}
-
-.message-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: gray;
-  margin-top: 4px;
-}
-
-.seen {
-  margin-left: 8px;
-}
-
-.message-text {
-  margin-bottom: 6px;
-}
-
+/* IMAGE (SEPARATE FROM BUBBLE) */
 .message-image {
-  max-width: 220px;
-  max-height: 260px;
+  max-width: 200px;
+  max-height: 200px;
   border-radius: 12px;
   cursor: pointer;
   object-fit: cover;
+}
+
+.message-row.own .message-image {
+  align-self: flex-end;
+}
+
+.message-row.other .message-image {
+  align-self: flex-start;
+}
+
+/* META */
+.message-meta {
+  font-size: 11px;
+  color: gray;
 }

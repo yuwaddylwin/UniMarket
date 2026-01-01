@@ -48,16 +48,16 @@ export default function App() {
           <Route path="/products/:id"
             element={
               <ProductsDetails
-                AddtoCart={AddtoCart}
-                cartItems={cartItems}
-                setCartItems={setCartItems}
+              AddtoCart={AddtoCart}
+              cartItems={cartItems}
+              setCartItems={setCartItems}
               />
             }
           />
         </Route>
 
         {/* ROUTES WITHOUT BottomNav */}
-        <Route path="/chat" element={<ChatHomePage />} />
+            <Route path="/chat" element={<ChatHomePage />} />
       </Routes>
     </Router>
   );

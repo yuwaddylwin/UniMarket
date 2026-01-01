@@ -1,14 +1,5 @@
 import "./MessageBubble.css";
 
-const reactionsList = [
-  { key: "heart", emoji: "❤️" },
-  { key: "haha", emoji: "😂" },
-  { key: "sad", emoji: "😢" },
-  { key: "wow", emoji: "😮" },
-  { key: "angry", emoji: "😡" },
-  { key: "good", emoji: "👍" },
-];
-
 const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
   return (
     <div className={`message-row ${isOwn ? "own" : "other"}`}>
@@ -21,35 +12,24 @@ const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
       )}
 
       <div className="message-content">
-        <div className={`message-bubble ${isOwn ? "own-bubble" : ""}`}>
-          {/* TEXT */}
-          {message.text && (
+        {/* TEXT BUBBLE */}
+        {message.text && (
+          <div className={`message-bubble ${isOwn ? "own-bubble" : ""}`}>
             <p className="message-text">{message.text}</p>
-          )}
+          </div>
+        )}
 
-          {/* IMAGE */}
-          {message.image && (
-            <img
-              src={message.image}
-              alt="sent"
-              className="message-image"
-              onClick={() => window.open(message.image, "_blank")}
-            />
-          )}
-        </div>
+        {/* IMAGE (SEPARATE) */}
+        {message.image && (
+          <img
+            src={message.image}
+            alt="sent"
+            className="message-image"
+            onClick={() => window.open(message.image, "_blank")}
+          />
+        )}
 
-        {/* reactions */}
-        <div className="reaction-bar">
-          {reactionsList.map((r) =>
-            message.reactions?.[r.key] > 0 ? (
-              <span key={r.key}>
-                {r.emoji} {message.reactions[r.key]}
-              </span>
-            ) : null
-          )}
-        </div>
-
-        {/* meta */}
+        {/* META (ONLY TIME) */}
         <div className="message-meta">
           <span className="time">
             {new Date(message.createdAt).toLocaleTimeString([], {
@@ -57,12 +37,6 @@ const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
               minute: "2-digit",
             })}
           </span>
-
-          {isOwn && (
-            <span className="seen">
-              {message.seen ? "Seen" : "Delivered"}
-            </span>
-          )}
         </div>
       </div>
 

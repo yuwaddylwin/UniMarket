@@ -1,24 +1,29 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
 .chat-layout {
   display: flex;
-  width: 100%;
   height: 100vh;
-  overflow: hidden;
+  
 }
 
-
-/* LEFT SIDEBAR */
-.chat-sidebar {
-  width: 280px;
-  background: white;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* RIGHT CHAT AREA */
 .chat-main {
   flex: 1;
+  height: 100%;
+  
+}
+
+.chat-container {
+  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  flex-direction: column;
+  
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
 }
 

@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./SidebarSkeleton/SidebarSkeleton";
 import "./Sidebar.css";
+import BottomNav from "../BottomNavBar/BottomNav";
 
 const Sidebar = () => {
   const {
@@ -14,6 +15,7 @@ const Sidebar = () => {
   } = useChatStore();
 
   const { authUser, onlineUsers } = useAuthStore();
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     getUsers();
@@ -21,14 +23,29 @@ const Sidebar = () => {
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
+  const filteredUsers = users
+    .filter((user) => user._id !== authUser?._id)
+    .filter((user) =>
+      user.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
   return (
     <aside className="sidebar">
-      <h3 className="sidebar-title">Search 🔍</h3>
+      {/*  SEARCH BAR */}
+      <div className="sidebar-search">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
 
       <div className="user-list">
-        {users
-          .filter((user) => user._id !== authUser?._id)
-          .map((user) => {
+        {filteredUsers.length === 0 ? (
+          <p className="no-users">No users found</p>
+        ) : (
+          filteredUsers.map((user) => {
             const isOnline = onlineUsers.includes(user._id);
             const isSelected = selectedUser?._id === user._id;
 
@@ -45,7 +62,6 @@ const Sidebar = () => {
                     className="sidebar-avatar"
                   />
 
-                  {/* 🟢 ONLINE DOT */}
                   {isOnline && <span className="online-dot" />}
                 </div>
 
@@ -57,8 +73,10 @@ const Sidebar = () => {
                 </div>
               </div>
             );
-          })}
+          })
+        )}
       </div>
+      <BottomNav/>
     </aside>
   );
 };

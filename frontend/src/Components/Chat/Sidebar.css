@@ -106,3 +106,69 @@
 .status.online {
   color: #22c55e;
 }
+
+
+/* search bar */
+/* SEARCH BAR */
+.sidebar-search {
+  margin-top: 20px;
+  margin-right: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar-search input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 15px;
+}
+
+.sidebar-search input:focus {
+  border-color: #4da3ff;
+}
+
+/* NO RESULT */
+.no-users {
+  padding: 16px;
+  font-size: 13px;
+  color: gray;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100vw;          /* FULL WIDTH */
+    height: 100vh;         /* FULL HEIGHT */
+    padding: 12px;
+    border-right: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-search {
+    margin: 0;
+    padding: 10px 12px;
+    background: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .sidebar-search input {
+    width: 80%;
+    font-size: 15px;          /* prevent iOS zoom */
+    padding: 12px 14px;
+    border-radius: 999px;    /* pill shape */
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;     /* subtle contrast */
+  }
+
+  .sidebar-search input:focus {
+    background: #ffffff;
+    border-color: #4da3ff;
+  }
+}
+

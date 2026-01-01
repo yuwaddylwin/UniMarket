@@ -1,24 +1,28 @@
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
+  height: 100dvh;   
 }
 
-/* .chat-container {
+
+.chat-header {
+  padding-top: 20px;
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #f5f5f5;
-} */
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
 
 .chat-messages {
   flex: 1;
-  padding: 16px;
+  min-height: 0; 
   overflow-y: auto;
+  padding: 16px 16px 0 16px;
+  box-sizing: border-box;
 }
 
 .loading {
   padding: 20px;
   text-align: center;
 }
+

@@ -1,11 +1,13 @@
-import { X } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
+import { useIsMobile } from "./IsMobile";
 import "./ChatHeader.css";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
+  const isMobile = useIsMobile();
 
   if (!selectedUser) return null;
 
@@ -14,6 +16,15 @@ const ChatHeader = () => {
   return (
     <div className="chat-header">
       <div className="chat-header-left">
+        {/* ← BACK ARROW (MOBILE ONLY) */}
+        {isMobile && (
+          <ArrowLeft
+            className="chat-header-back"
+            size={22}
+            onClick={() => setSelectedUser(null)}
+          />
+        )}
+
         <div className="chat-header-avatar-wrapper">
           <img
             src={selectedUser.profilePic || "/Images/user.png"}
@@ -21,7 +32,6 @@ const ChatHeader = () => {
             className="chat-header-avatar"
           />
 
-          {/* 🟢 ONLINE DOT */}
           {isOnline && <span className="chat-online-dot" />}
         </div>
 
@@ -33,12 +43,15 @@ const ChatHeader = () => {
         </div>
       </div>
 
-      <button
-        className="chat-header-close"
-        onClick={() => setSelectedUser(null)}
-      >
-        <X size={20} />
-      </button>
+      {/* ❌ CLOSE (DESKTOP ONLY) */}
+      {!isMobile && (
+        <button
+          className="chat-header-close"
+          onClick={() => setSelectedUser(null)}
+        >
+          <X size={20} />
+        </button>
+      )}
     </div>
   );
 };
