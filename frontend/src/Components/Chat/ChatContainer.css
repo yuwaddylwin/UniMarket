@@ -19,6 +19,7 @@
   overflow-y: auto;
   padding: 16px 16px 0 16px;
   box-sizing: border-box;
+  padding-bottom: 70px;
 }
 
 .loading {

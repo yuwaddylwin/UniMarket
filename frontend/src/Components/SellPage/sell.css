@@ -1,29 +1,115 @@
+/* ---------- Container ---------- */
+.post-container {
+  max-width: 600px;
+  margin: 80px auto;
+  padding: 32px;
+  background: linear-gradient(180deg, #ffffff, #f9fbff);
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(27, 74, 145, 0.12);
+}
+
+/* ---------- Title ---------- */
+.title {
+  text-align: center;
+  margin-bottom: 35px;
+  color: #1b4a91;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+}
+
+/* ---------- Logo ---------- */
+.logo_sellpage {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1b4a91;
+  font-family: "Playfair Display", serif;
+  letter-spacing: -0.5px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ---------- Form ---------- */
+.post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Labels ---------- */
+label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1f2d3d;
+  font-size: 14px;
+}
+
+/* ---------- Inputs ---------- */
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d6e0f0;
+  background: #fdfefe;
+  outline: none;
+  font-size: 15px;
+  transition: all 0.25s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9aa6b2;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #1b4a91;
+  box-shadow: 0 0 0 3px rgba(27, 74, 145, 0.15);
+}
+
+/* ---------- Image Upload ---------- */
 .image-upload-container {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .upload-box {
-  width: 80px;
-  height: 80px;
-  border: 2px dashed #ccc;
-  border-radius: 12px;
+  width: 90px;
+  height: 90px;
+  border: 2px dashed #1b4a91;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  color: #aaa;
+  font-size: 30px;
+  color: #1b4a91;
   cursor: pointer;
-  background: #f9f9f9;
+  background: linear-gradient(145deg, #f4f7ff, #ffffff);
+  transition: all 0.25s ease;
 }
 
+.upload-box:hover {
+  background: #eaf0ff;
+  transform: translateY(-2px);
+}
+
+/* ---------- Image Preview ---------- */
 .image-preview {
   position: relative;
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
+  width: 90px;
+  height: 90px;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .image-preview img {
@@ -32,88 +118,119 @@
   object-fit: cover;
 }
 
+/* ---------- Remove Button ---------- */
 .remove-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.6);
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.65);
   border: none;
   color: white;
   font-size: 14px;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
+.remove-btn:hover {
+  background: #ff4d4f;
+}
 
-.post-container {
-    max-width: 600px;
-    margin: 60px auto;
-    padding: 30px;
-    background: #ffffff;
+/* ---------- Submit Button ---------- */
+.submit-btn {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #1b4a91, #1a62c6);
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(26, 98, 198, 0.35);
+}
+
+/* ============================= */
+/* 📱 Small devices (phones) */
+/* ============================= */
+@media (max-width: 480px) {
+  .post-container {
+    margin: 40px 12px;
+    padding: 20px;
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
-  .title {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #1b4a91;
+
+  .logo_sellpage {
     font-size: 28px;
-    font-weight: 600;
   }
-  
-  .post-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+
+  .title {
+    font-size: 22px;
+    margin-bottom: 24px;
   }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  label {
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: #333;
-  }
-  
-  input[type="text"],
-  input[type="number"],
-  textarea {
+
+  input,
+  textarea,
+  select {
+    font-size: 14px;
     padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    outline: none;
-    transition: border-color 0.2s;
-    font-size: 15px;
   }
-  
-  input[type="text"]:focus,
-  input[type="number"]:focus,
-  textarea:focus {
-    border-color: #153a68;
+
+  .image-upload-container {
+    gap: 10px;
+    justify-content: center;
   }
-  
-  input[type="file"] {
-    padding: 5px;
+
+  .upload-box,
+  .image-preview {
+    width: 70px;
+    height: 70px;
+    border-radius: 14px;
   }
-  
+
   .submit-btn {
-    background-color: #1a62c6;
-    color: white;
+    font-size: 15px;
     padding: 12px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
+    margin-bottom: 30%;
   }
-  
-  .submit-btn:hover {
-    background-color: #3e79ca;
+}
+
+/* ============================= */
+/* 📱📲 Medium devices (tablets) */
+/* ============================= */
+@media (max-width: 768px) {
+  .post-container {
+    margin: 60px 20px;
+    padding: 26px;
   }
-  
+
+  .logo_sellpage {
+    font-size: 32px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .upload-box,
+  .image-preview {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* ============================= */
+/* 💻 Large screens */
+/* ============================= */
+@media (min-width: 1200px) {
+  .post-container {
+    max-width: 680px;
+  }
+}

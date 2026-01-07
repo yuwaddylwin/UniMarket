@@ -33,10 +33,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
+
   background: #f1f1f1;
   padding: 10px 14px;
+
   border-radius: 999px;
 }
+
 
 .message-input-row input {
   flex: 1;
@@ -72,4 +75,20 @@
 
 .send-btn:hover {
   color: #0077cc;
+}
+
+@media (max-width: 768px) {
+  .message-input-row {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: 8px;
+    z-index: 100;
+  }
+
+  .chat-messages {
+    padding-bottom: 90px; /* prevent overlap */
+  }
 }

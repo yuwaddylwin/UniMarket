@@ -39,7 +39,7 @@ function Logo() {
 function Search() {
   return (
     <form className="search-form">
-      <input type="text" placeholder="🔍 Search by categories..." />
+      <input type="text" placeholder="Search by categories..." />
       <button type="button" className="search-button">
         Search
       </button>
