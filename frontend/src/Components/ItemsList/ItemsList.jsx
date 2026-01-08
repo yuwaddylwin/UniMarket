@@ -21,7 +21,8 @@ export default function ItemsList({ AddtoCart, cartItems }) {
             navigate(`/products/${item._id}`);
           }}
           >
-            <img src={item.image} alt={item.title} />
+            <img src={item?.images?.[0] || item.image} alt={item.title} />
+
             <div className="item-content">
               <p className="price">{item.price} Baht</p>
               <h3>{item.title}</h3>

@@ -14,6 +14,27 @@ router.get("/", async (req, res) => {
 });
 
 // Post new item
+router.post("/", async (req, res) => {
+  try {
+    const { title, price, images, category, description, user } = req.body;
+
+    const newItem = await Item.create({
+      title,
+      price,
+      images: images || [],
+      category,
+      description,
+      user,
+    });
+
+    res.status(201).json(newItem);
+  } catch (err) {
+    res.status(400).json({ message: err.message || "Error creating item" });
+  }
+});
+
+
+// Post new item
 // router.post("/", async (req, res) => {
 //   const { title, price, image, description, user } = req.body;
 

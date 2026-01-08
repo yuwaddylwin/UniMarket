@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import ItemsList from "./src/routes/Items.route.js";
 import authRoutes from "./src/routes/auth.route.js";
 import messageRoutes from "./src/routes/message.route.js";
+import uploadRoutes from "./src/routes/upload.route.js"
 import { app, server } from "./src/lib/socket.js";
 
 
@@ -30,6 +31,9 @@ const MONGOURL = process.env.MONGO_URL;
 app.use("/api/items", ItemsList);
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes); 
+app.use("/api/upload", uploadRoutes);
+
+
 
 // Test route
 app.get("/", (req, res) => {
