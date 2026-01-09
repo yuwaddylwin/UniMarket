@@ -12,7 +12,7 @@
   --shadow: 0 14px 40px rgba(17, 24, 39, 0.10);
   --shadow-soft: 0 10px 24px rgba(17, 24, 39, 0.10);
 
-  --btn: #1b4a91;            /* black-ish */
+  --btn: #1b4a91;
   --btn-hover: #3e79ca;
   --btn-soft: #ffffff;
   --btn-soft-border: rgba(17, 24, 39, 0.18);
@@ -29,7 +29,7 @@ body {
 
 /* ====== Card Container ====== */
 .item-post {
-  width: min(920px, 100%);     /* desktop looks nicer */
+  width: min(920px, 100%);
   margin: 18px auto;
   background: var(--card);
   border: 1px solid var(--line);
@@ -57,6 +57,7 @@ body {
   border: 1px solid rgba(17, 24, 39, 0.12);
   box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08);
   object-fit: cover;
+  flex: 0 0 auto;
 }
 
 .seller-name {
@@ -72,11 +73,62 @@ body {
   margin-top: 2px;
 }
 
+/* If you want name + badge row */
+.seller-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.seller-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* This is the badge you render now: <p className="seller-badge"> */
+.seller-badge {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  color: #0f766e;
+  line-height: 1;
+  display: inline-flex;
+  width: fit-content;
+}
+
+/* Optional generic badges (if you use them later) */
+.listing-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
+  border: 1px solid transparent;
+}
+
+.badge-mine {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.28);
+  color: #0f766e;
+}
+
+.badge-seller {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.10);
+  color: #374151;
+}
+
 /* ====== Carousel ====== */
 .carousel {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;           /* responsive height */
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: #f3f4f6;
 }
@@ -339,7 +391,6 @@ body {
 
 /* ====== Responsive: all devices ====== */
 @media (min-width: 900px) {
-  /* Make it look more premium on desktop */
   .item-post {
     display: grid;
     grid-template-columns: 1.35fr 1fr;
@@ -351,7 +402,7 @@ body {
   }
 
   .carousel {
-    aspect-ratio: 1 / 1; /* square image on desktop */
+    aspect-ratio: 1 / 1;
     border-right: 1px solid var(--line);
   }
 

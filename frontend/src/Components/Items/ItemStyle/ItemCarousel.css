@@ -1,0 +1,70 @@
+.items-single {
+  width: 100%;
+}
+
+.items-carousel-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* Horizontal swipe area */
+.items-carousel {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 2px 2px 10px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  touch-action: pan-x;
+
+  /* optional: hide scrollbar (cross-browser-ish) */
+  scrollbar-width: none;          /* Firefox */
+}
+.items-carousel::-webkit-scrollbar { /* WebKit browsers */
+  width: 0;
+  height: 0;
+}
+
+/* Each slide takes most of the width (so user sees "next" peek) */
+.items-slide {
+  flex: 0 0 82%;
+  scroll-snap-align: start;
+}
+
+/* On bigger screens show more cards */
+@media (min-width: 768px) {
+  .items-slide {
+    flex-basis: 320px; /* fixed card width on desktop */
+  }
+}
+
+/* Arrow buttons (optional) */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.carousel-btn.left {
+  left: -6px;
+}
+.carousel-btn.right {
+  right: -6px;
+}
+
+/* Hide arrows on small touch screens if you want */
+@media (max-width: 480px) {
+  .carousel-btn {
+    display: none;
+  }
+}

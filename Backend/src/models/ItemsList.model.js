@@ -2,38 +2,22 @@ import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
+    title: { type: String, required: true, trim: true },
     price: { type: Number, required: true },
-    images: [{ type: String }],     //  multiple
+    images: [{ type: String }],
     category: { type: String, required: true },
-    description: { type: String, required: true },
-    user: { type: String },         // or ObjectId ref if you have auth
+    description: { type: String, required: true, trim: true },
+
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
+    // optional snapshot (so frontend can show seller without populate)
+    seller: {
+      id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      fullName: { type: String },
+      profilePic: { type: String },
+    },
   },
   { timestamps: true }
 );
 
-const Item = mongoose.model("Item", itemSchema);
-export default Item;
-
-
-
-
-
-
-
-
-// import mongoose from "mongoose";
-
-// const itemSchema = new mongoose.Schema(
-//   {
-//     title: String,
-//     price: Number,
-//     image: String,
-//     description: String,
-//     user: String,
-//   },
-//   { timestamps: true }
-// );
-
-// const Item = mongoose.model("Item", itemSchema);
-// export default Item;
+export default mongoose.model("Item", itemSchema);

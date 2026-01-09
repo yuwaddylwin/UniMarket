@@ -1,63 +1,54 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 import toast from "react-hot-toast";
 
-const initialItem = {
+const emptyItem = {
   name: "",
   category: "",
   price: "",
   description: "",
-  images: [], // [{ url, publicId }]
+  images: [],
 };
 
 export function useSellLogic() {
-  const [item, setItem] = useState(initialItem);
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [item, setItem] = useState(emptyItem);
+  const [posting, setPosting] = useState(false);
+
+  const { authUser } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setItem((prev) => ({ ...prev, [name]: value }));
   };
 
-  //  Upload files to backend -> backend uploads to Cloudinary -> returns real URLs
-const handleImageUpload = async (e) => {
-  const files = Array.from(e.target.files || []);
-  if (!files.length) return;
-
-  const remaining = 6 - item.images.length;
-  const selected = files.slice(0, remaining);
-
-  const formData = new FormData();
-  selected.forEach((f) => formData.append("images", f));
-
-  try {
-    setUploading(true);
-
-    const res = await axios.post("http://localhost:8000/api/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
 
-    const uploaded = res.data.urls.map((url, idx) => ({
-      url,
-      publicId: res.data.publicIds?.[idx],
-    }));
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const remaining = 6 - item.images.length;
+    const picked = files.slice(0, remaining);
+
+    const urls = await Promise.all(picked.map(fileToDataUrl));
+    const newImgs = urls.map((url) => ({ url }));
 
     setItem((prev) => ({
       ...prev,
-      images: [...prev.images, ...uploaded],
+      images: [...prev.images, ...newImgs],
     }));
 
-    toast.success("Image uploaded!");
-  } catch (err) {
-    console.error(err);
-    toast.error("Image upload failed");
-  } finally {
-    setUploading(false);
     e.target.value = "";
-  }
-};
-
+  };
 
   const removeImage = (index) => {
     setItem((prev) => ({
@@ -68,34 +59,44 @@ const handleImageUpload = async (e) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading || uploading) return;
 
-    // Save real Cloudinary urls in DB
+    if (!authUser?._id) {
+      toast.error("You must be logged in to post an item.");
+      return;
+    }
+
+    // backend expects: title, price, images (string[]), category, description
     const payload = {
-      title: item.name,
+      title: item.name.trim(),
       category: item.category,
       price: Number(item.price),
-      description: item.description,
-      images: item.images.map((img) => img.url), //  real URLs
+      description: item.description.trim(),
+      images: item.images.map((img) => img.url).slice(0, 6),
     };
 
     try {
-      setLoading(true);
+      setPosting(true);
 
       await toast.promise(
-        axios.post("http://localhost:8000/api/items", payload),
+        axios.post("http://localhost:8000/api/items", payload, {
+          withCredentials: true,
+        }),
         {
           loading: "Posting item...",
           success: "Item successfully posted 🎉",
-          error: "Error posting item!",
+          error: (err) => err?.response?.data?.message ||"Error posting item!",
         }
       );
 
-      setItem(initialItem); //  clear form
+      setItem(emptyItem);
+      navigate("/");
     } catch (err) {
-      console.error(err);
+      console.error("Post item error:", err);
+
+      // Optional: show backend message instead of generic error
+      toast.error(err?.response?.data?.message || err.message || "Post failed");
     } finally {
-      setLoading(false);
+      setPosting(false);
     }
   };
 
@@ -105,7 +106,6 @@ const handleImageUpload = async (e) => {
     handleImageUpload,
     removeImage,
     handleSubmit,
-    loading,
-    uploading,
+    posting,
   };
 }

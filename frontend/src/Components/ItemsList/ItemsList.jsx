@@ -14,25 +14,53 @@ export default function ItemsList({ AddtoCart, cartItems }) {
 
       <div className="items-grid">
         {items.map((item) => (
-          <div className="item-card" 
-          key={item._id} 
-          onClick={() => {
-            console.log("Card clicked!");
-            navigate(`/products/${item._id}`);
-          }}
+          <div
+            className="item-card"
+            key={item._id}
+            onClick={() => navigate(`/products/${item._id}`)}
+            style={{ cursor: "pointer" }}
           >
-            <img src={item?.images?.[0] || item.image} alt={item.title} />
+            <img
+              src={item?.images?.[0] || "/Images/placeholder.png"}
+              alt={item.title}
+            />
 
             <div className="item-content">
               <p className="price">{item.price} Baht</p>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
+
+              {/*  seller info (optional) */}
+              {item?.seller?.fullName && (
+                <p style={{ marginTop: 6, fontSize: 12, opacity: 0.75 }}>
+                  Seller: {item.seller.fullName}
+                </p>
+              )}
             </div>
+
             <div className="btns">
-              <button onClick={() => AddtoCart(item)}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); //  prevent card navigation
+                  AddtoCart(item);
+                }}
+              >
                 Add to Cart 🛒
               </button>
-              <button>Talk to Seller 💬</button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); //  prevent card navigation
+                  if (!item?.seller?.id) {
+                    alert("Seller info not available for this item.");
+                    return;
+                  }
+                  // Change this route to your chat route if needed:
+                  navigate(`/chat/${item.seller.id}`);
+                }}
+              >
+                Talk to Seller 💬
+              </button>
             </div>
           </div>
         ))}
@@ -40,4 +68,3 @@ export default function ItemsList({ AddtoCart, cartItems }) {
     </div>
   );
 }
-

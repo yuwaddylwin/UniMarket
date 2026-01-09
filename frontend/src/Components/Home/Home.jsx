@@ -5,15 +5,16 @@ import ItemsList from "../ItemsList/ItemsList";
 import Footer from "../Footer/footer";
 import { useNavigate } from "react-router-dom";
 import { useHomeLogic } from "../Logics/useHome";
+import { useItemStore } from "../store/useItemStore";
 
 export default function Home({ cartItems, setCartItems }) {
   const navigate = useNavigate();
   const { count, AddtoCart } = useHomeLogic(cartItems, setCartItems);
 
+  const items = useItemStore((s) => s.items); //  get all posted items
+
   return (
     <>
-
-      {/* Main Section */}
       <div className="home-container">
         <Navbar count={count} />
 
@@ -23,6 +24,7 @@ export default function Home({ cartItems, setCartItems }) {
             <h2>A Second-Hand Market Platform for Uni Students</h2>
             <h2>Buy & Sell Things and Services</h2>
           </main>
+
           <div className="hero-image">
             <img
               className="img"
@@ -37,9 +39,9 @@ export default function Home({ cartItems, setCartItems }) {
         </button>
       </div>
 
-      <ItemsList AddtoCart={AddtoCart} cartItems={cartItems} />
+      {/* pass items here */}
+      <ItemsList items={items} AddtoCart={AddtoCart} cartItems={cartItems} />
 
-      {/* How it Works */}
       <div className="hero-section">
         <main className="hero-text2">
           <h1>How it Works?</h1>
