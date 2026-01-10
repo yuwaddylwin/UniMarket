@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuthStore } from "../../store/useAuthStore";
-import { Camera, LogOut } from "lucide-react";
+import { Camera, LogOut, LogIn } from "lucide-react";
 import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
+import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const { authUser, updateProfile, logout, isUpdatingProfile } = useAuthStore();
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -16,6 +18,18 @@ export default function ProfilePage() {
   const [myItems, setMyItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(true);
   const [itemsError, setItemsError] = useState("");
+
+  // If logged out, clear everything (acts like a refresh)
+  useEffect(() => {
+    if (!authUser) {
+      setSelectedFile(null);
+      setPreview(null);
+      setShowLogoutConfirm(false);
+      setMyItems([]);
+      setLoadingItems(false);
+      setItemsError("");
+    }
+  }, [authUser]);
 
   // Generate preview when a file is selected
   useEffect(() => {
@@ -36,9 +50,7 @@ export default function ProfilePage() {
         withCredentials: true,
       });
 
-      // backend returns array
       const list = Array.isArray(res.data) ? res.data : res.data?.items || [];
-
       setMyItems(list);
     } catch (err) {
       console.error("Fetch my items error:", err);
@@ -49,7 +61,6 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    // only fetch if logged in
     if (authUser?._id || authUser?.id) fetchMyItems();
   }, [authUser]);
 
@@ -60,9 +71,6 @@ export default function ProfilePage() {
     try {
       await updateProfile({ profilePic: preview });
       setSelectedFile(null);
-
-      // optional: refresh items (if you store seller snapshot in each item and want updated picture)
-      // fetchMyItems();
     } catch (err) {
       console.error("Upload error:", err);
     }
@@ -70,11 +78,51 @@ export default function ProfilePage() {
 
   const handleLogoutClick = () => setShowLogoutConfirm(true);
   const handleCancelLogout = () => setShowLogoutConfirm(false);
-  const handleConfirmLogout = () => {
-    logout();
+
+  const handleConfirmLogout = async () => {
+    await logout();          // should set authUser=null in store
     setShowLogoutConfirm(false);
+    navigate("/login");      // optional: send to login page
   };
 
+  // LOGGED OUT VIEW (no data)
+  if (!authUser) {
+    return (
+      <div className="profile-container">
+        <header className="profile-header">
+          <h1 className="brand">Profile</h1>
+        </header>
+
+        <div className="photo-section">
+          <div className="photo-wrapper">
+            <img
+              src="/Images/user1.png"
+              alt="profile"
+              className="profile-photo"
+            />
+          </div>
+
+          <p className="username">User</p>
+
+          <button
+            className="menu-btn logout"
+            type="button"
+            onClick={() => navigate("/login")}
+          >
+            <LogIn size={18} style={{ marginRight: "6px" }} />
+            Log In
+          </button>
+        </div>
+
+        <section className="sell-items-section">
+          <h2>Your Sell Items</h2>
+          <p style={{ opacity: 0.7 }}>Please log in to see your items.</p>
+        </section>
+      </div>
+    );
+  }
+
+  //  LOGGED IN VIEW (your original UI)
   return (
     <div className="profile-container">
       <header className="profile-header">
@@ -112,7 +160,6 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Sell items section (DB-backed) */}
       <section className="sell-items-section">
         <h2>Your Sell Items</h2>
 
@@ -124,15 +171,9 @@ export default function ProfilePage() {
           <p style={{ opacity: 0.7 }}>No items posted yet.</p>
         ) : (
           <ItemCarousel items={myItems} />
-          // <div className="sell-items-grid">
-          //   {myItems.map((it) => (
-          //     <ItemCard key={it._id} item={it} />
-          //   ))}
-          // </div>
         )}
       </section>
 
-      {/* Menu section */}
       <div className="menu-section">
         <button className="menu-btn">Purchase History</button>
         <button className="menu-btn">Language</button>
@@ -143,7 +184,6 @@ export default function ProfilePage() {
         </button>
       </div>
 
-      {/* Logout confirmation modal */}
       {showLogoutConfirm && (
         <div className="confirm-overlay">
           <div className="confirm-box">

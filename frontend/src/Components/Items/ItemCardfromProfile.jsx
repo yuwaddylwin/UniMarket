@@ -1,8 +1,8 @@
 import React from "react";
-import "./ItemCard.css";
+import "./ItemCardfromProfile.css";
 
 export default function ItemCard({ item }) {
-  //  supports: images = ["string"] OR images = [{url:"string"}]
+  // supports: images = ["string"] OR images = [{ url: "string" }]
   const cover =
     Array.isArray(item?.images) && item.images.length > 0
       ? typeof item.images[0] === "string"
@@ -28,9 +28,7 @@ export default function ItemCard({ item }) {
       <div className="item-body">
         <div className="item-title-row">
           <h3 className="item-title">{title}</h3>
-          <p className="item-price">
-            ฿{Number(item?.price || 0).toLocaleString()}
-          </p>
+          <p className="item-price">฿{Number(item?.price || 0).toLocaleString()}</p>
         </div>
       </div>
     </div>

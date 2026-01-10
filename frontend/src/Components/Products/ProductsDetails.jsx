@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useItemsList } from "../Logics/useItemsList";
+import { useNavigate } from "react-router-dom";
 import "./ProductsDetails.css";
 
 function extractId(value) {
@@ -13,11 +14,23 @@ function extractId(value) {
 export default function ItemPage({ AddtoCart }) {
   const { id } = useParams();
   const { items, loading } = useItemsList();
+  const navigate = useNavigate();
 
+  
+  
   const item = useMemo(
     () => items.find((i) => String(i._id) === String(id)),
     [items, id]
   );
+  const sellerId = useMemo(() => {
+    // try item.seller first
+    const fromSeller = extractId(item?.seller);
+    if (fromSeller) return fromSeller;
+  
+    // fallback to item.user
+    const fromUser = extractId(item?.user);
+    return fromUser || null;
+  }, [item]);
 
   // NEW: get current user from backend (cookie jwt)
   const [me, setMe] = useState(null);
@@ -162,10 +175,21 @@ export default function ItemPage({ AddtoCart }) {
         )}
 
         {!isMine && (
-          <button className="talk-to-seller" type="button">
+          <button
+            className="talk-to-seller"
+            type="button"
+            onClick={() => {
+              if (!sellerId) {
+                alert("Seller info not available for this item.");
+                return;
+              }
+              navigate(`/chat/${sellerId}`);
+            }}
+          >
             Talk to Seller 💬
           </button>
         )}
+
       </div>
 
       {/* Fullscreen Modal */}

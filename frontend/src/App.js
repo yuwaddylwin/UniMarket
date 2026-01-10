@@ -58,6 +58,8 @@ export default function App() {
 
         {/* ROUTES WITHOUT BottomNav */}
             <Route path="/chat" element={<ChatHomePage />} />
+            <Route path="/chat/:sellerId" element={<ChatHomePage />} />
+
       </Routes>
     </Router>
   );

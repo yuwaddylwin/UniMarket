@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from "react";
-import ItemCard from "../ItemCard";
+import ItemCard from "../ItemCardfromProfile";
 import "./ItemCarousel.css";
 
 export default function ItemCarousel({ items = [] }) {

@@ -1,174 +1,328 @@
-/* Container for the entire component */
+/* ItemsList.css - Responsive (desktop / laptop / tablet / mobile) */
+
+/* ============ Base / Mobile-first ============ */
 .items-container {
-  padding: 20px;
+  padding: 14px;
   max-width: 1200px;
-  margin: 0 auto;
-  margin-bottom: 30px;
-  position: relative;
+  margin: 0 auto 30px;
 }
 
-/* Title */
-.items-container h2 {
-  text-align: center;
-  margin-bottom: 18px;
-  font-size: 1.7rem;
+.items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.items-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
   color: #333;
   font-family: Arial, sans-serif;
 }
 
-/* HORIZONTAL scrolling list - works on desktop & mobile */
+.link {
+  color: #21548b;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s;
+  user-select: none;
+}
+.link:hover {
+  color: #681555;
+  text-decoration: underline;
+}
+
+/* Horizontal list */
 .items-grid {
   display: flex;
-  flex-wrap: nowrap;            /* keep in one row */
-  gap: 16px;
-  overflow-x: auto;             /* horizontal scroll */
-  overflow-y: hidden;           /* prevent vertical scroll */
-  -webkit-overflow-scrolling: touch; /* momentum scrolling on iOS */
+  flex-wrap: nowrap;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
   scroll-behavior: smooth;
-  scroll-snap-type: x mandatory; /* snap to card */
-  padding: 10px 6px 18px 6px;
-  align-items: start;
-  touch-action: pan-x;          /* prefer horizontal pan gestures */
+  scroll-snap-type: x mandatory;
+  padding: 8px 4px 12px;
+  align-items: flex-start; /* don't stretch cards */
+  scrollbar-width: thin;
 }
 
-/* Desktop scrollbar (visible) */
-.items-grid::-webkit-scrollbar {
-  height: 8px;
-}
-.items-grid::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 999px;
-}
-.items-grid::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
-
-/* Hide scrollbars on mobile while allowing scrolling */
-.items-grid {
-  scrollbar-width: none; /* Firefox */
-}
-.items-grid::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-/* Card base */
+/* Card */
 .item-card {
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  flex: 0 0 auto;           /* crucial: prevent shrinking */
-  scroll-snap-align: center;/* snap each card */
-  width: 260px;             /* desktop default */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: center;
+  align-self: flex-start;
+  cursor: pointer;
+
+  /* Mobile default width */
+  width: 82vw;
+  max-width: 360px;
+  flex: 0 0 auto;
 }
 
-/* Hover effect for desktop */
 .item-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Image */
-.item-card img {
+.item-img {
   width: 100%;
-  height: 180px;
+  height: 220px; /* mobile */
+  background: #f3f4f6;
+}
+.item-img img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   display: block;
 }
 
-/* Content */
-.item-content {
-  padding: 12px;
+/* Body */
+.item-body {
+  padding: 10px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.item-content h3 {
-  font-size: 1.05rem;
-  margin: 8px 0 4px 0;
-  color: #222;
+
+/* Price */
+.item-price {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 800;
+  color: #10b981;
+  white-space: nowrap;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
-.item-content p {
-  font-size: 0.95rem;
-  margin: 4px 0;
-  color: #555;
+
+/* Title */
+.item-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.item-content p.price {
-  font-weight: bold;
-  font-size: 1.25rem;
-  color: #0f813a;
+
+/* Seller row */
+.seller-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seller-pic {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.seller-name {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Description (2 lines with "...") */
+.item-desc {
+  margin: 0;
+  margin-left: 32px; /* aligns under seller text */
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.3;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* Buttons */
-.btns { display:flex; gap:10px; margin-top:12px; align-items:center; justify-content:space-between; }
-.item-card button {
-  display:block;
-  margin:14px auto 10px;
-  padding:12px 18px;
-  font-size:0.8rem;
-  font-weight:700;
-  background:#1b4a91;
-  color:white;
-  border:none;
-  border-radius:30px;
-  cursor:pointer;
-  transition:all .3s ease;
-  box-shadow:0 2px 5px #122558;
-  text-transform:uppercase;
-  letter-spacing:1px;
+.item-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
 }
-.item-card button:hover { transform: translateY(-3px); background:#3e79ca; }
-.item-card button:active { transform: translateY(-1px); }
 
-/* View More link */
-.link {
-  display:block;
-  margin:0 80px 18px;
-  color:#21548b;
-  font-size:16px;
-  cursor:pointer;
-  transition:color .3s;
-  text-align:right;
+.btn {
+  flex: 1;
+  height: 44px; /* touch friendly on mobile */
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
-.link:hover { color:#681555; text-decoration:underline; }
 
-/* Fading edges (desktop only) */
-.items-container::before,
-.items-container::after {
-  content:"";
-  position:absolute;
-  top:0;
-  bottom:0;
-  width:40px;
-  pointer-events:none;
-  z-index:1;
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
 }
-.items-container::before { left:0; background: linear-gradient(to right, white, transparent); }
-.items-container::after  { right:0; background: linear-gradient(to left, white, transparent); }
 
-/* ---------------- Responsive rules ---------------- */
+.btn.primary {
+  background: #1b4a91;
+  color: #fff;
+  border-color: rgba(27, 74, 145, 0.35);
+}
+.btn.primary:hover {
+  background: #3e79ca;
+}
 
-/* Small screens & phones: keep horizontal, make cards wider for tapping */
-@media (max-width: 768px) {
-  .items-container { padding:14px; }
-  .items-container h2 { font-size:1.4rem; margin-bottom:12px; }
-  .link { margin:0 20px 12px; font-size:14px; }
+.btn.secondary {
+  background: #fff;
+  color: #111827;
+}
+.btn.secondary:hover {
+  background: #f3f4f6;
+}
 
-  .item-card {
-    width: calc(82vw);  /* most of viewport so tapping is easy */
-    max-width: 360px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+.btn.disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============ Small phones (<= 360px) ============ */
+@media (max-width: 360px) {
+  .item-img {
+    height: 200px;
+  }
+  .btn {
+    font-size: 10px;
+  }
+}
+
+/* ============ Tablets / small laptops (>= 600px) ============ */
+@media (min-width: 600px) {
+  .items-container {
+    padding: 18px;
   }
 
-  .item-card img { height: 200px; }
+  .items-header h2 {
+    font-size: 1.55rem;
+  }
 
-  /* Remove fading edges on touch screens so they don't block touches */
-  .items-container::before,
-  .items-container::after { display: none; }
+  .link {
+    font-size: 15px;
+  }
+
+  .items-grid {
+    gap: 14px;
+  }
+
+  .item-card {
+    width: 320px;       /* bigger cards */
+    max-width: none;
+    border-radius: 16px;
+  }
+
+  .item-img {
+    height: 210px;
+  }
+
+  .item-title {
+    font-size: 17px;
+  }
+
+  .btn {
+    height: 42px;
+    font-size: 9.3px;
+  }
 }
 
-/* Very small phones */
-@media (max-width: 420px) {
-  .item-card { width: calc(92vw); max-width: none; }
-  .item-card img { height: 180px; }
-  .item-content h3 { font-size: 1rem; }
-  .item-content p.price { font-size: 1.1rem; }
+/* ============ Laptops / Desktop (>= 900px) ============ */
+@media (min-width: 900px) {
+  .items-container {
+    padding: 20px;
+  }
+
+  .items-header h2 {
+    font-size: 1.7rem;
+  }
+
+  .link {
+    font-size: 16px;
+  }
+
+  .items-grid {
+    gap: 16px;
+    padding: 10px 6px 14px;
+  }
+
+  .item-card {
+    width: 280px; /* tight desktop cards */
+  }
+
+  .item-img {
+    height: 200px;
+  }
+
+  .item-body {
+    padding: 12px 14px 12px;
+    gap: 6px;
+  }
+
+  .item-title {
+    font-size: 16.5px;
+  }
+
+  .item-desc {
+    font-size: 13px;
+  }
+
+  .btn {
+    height: 40px;
+    font-size: 9.3px;
+  }
+}
+
+/* ============ Large Desktop / PC monitors (>= 1200px) ============ */
+@media (min-width: 1200px) {
+  .item-card {
+    width: 300px;
+  }
+
+  .item-img {
+    height: 210px;
+  }
+
+  .item-title {
+    font-size: 17px;
+  }
+
+  .item-desc {
+    font-size: 13.5px;
+  }
+
+  .btn {
+    height: 40px;
+    font-size: 9.2px;
+  }
 }

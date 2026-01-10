@@ -2,68 +2,99 @@ import React from "react";
 import "./ItemsList.css";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
-export default function ItemsList({ AddtoCart, cartItems }) {
+export default function ItemsList({ AddtoCart }) {
   const { items } = useItemsList();
+  const { authUser } = useAuthStore();
   const navigate = useNavigate();
+
+  const filteredItems = items.filter((item) => {
+    const sellerId = item?.seller?._id || item?.seller?.id;
+    if (!authUser?._id || !sellerId) return true; // keep if unknown
+    return sellerId !== authUser._id; // hide own items
+  });
 
   return (
     <div className="items-container">
-      <h2>For You!</h2>
-      <span className="link">View More</span>
+      <div className="items-header">
+        <h2>For You!</h2>
+        <span className="link" onClick={() => navigate("/products")}>
+          View More
+        </span>
+      </div>
 
       <div className="items-grid">
-        {items.map((item) => (
-          <div
-            className="item-card"
-            key={item._id}
-            onClick={() => navigate(`/products/${item._id}`)}
-            style={{ cursor: "pointer" }}
-          >
-            <img
-              src={item?.images?.[0] || "/Images/placeholder.png"}
-              alt={item.title}
-            />
+        {filteredItems.length === 0 ? (
+          <p>No items to show.</p>
+        ) : (
+          filteredItems.map((item) => (
+            <div
+              className="item-card"
+              key={item._id}
+              onClick={() => navigate(`/products/${item._id}`)}
+              style={{ cursor: "pointer" }}
+            >
+              <div className="item-img">
+                <img
+                  src={item?.images?.[0] || "/Images/placeholder.png"}
+                  alt={item.title}
+                  loading="lazy"
+                />
+              </div>
 
-            <div className="item-content">
-              <p className="price">{item.price} Baht</p>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
+              <div className="item-body">
+                <div className="item-price">{item.price} Baht</div>
+                <h3 className="item-title">{item.title}</h3>
 
-              {/*  seller info (optional) */}
-              {item?.seller?.fullName && (
-                <p style={{ marginTop: 6, fontSize: 12, opacity: 0.75 }}>
-                  Seller: {item.seller.fullName}
-                </p>
-              )}
+                {item?.seller?.fullName && (
+                  <div className="seller-row">
+                    {item?.seller?.profilePic && (
+                      <img
+                        className="seller-pic"
+                        src={item.seller.profilePic}
+                        alt={item.seller.fullName}
+                        loading="lazy"
+                      />
+                    )}
+                    <span className="seller-name">
+                      Seller: {item.seller.fullName}
+                    </span>
+                  </div>
+                )}
+
+                <p className="item-desc">{item.description}</p>
+
+                <div className="item-actions">
+                  <button
+                    className="btn primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      AddtoCart(item);
+                    }}
+                  >
+                    ADD TO CART 🛒
+                  </button>
+
+                  <button
+                    className="btn secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const sellerId = item?.seller?._id || item?.seller?.id;
+                      if (!sellerId) {
+                        alert("Seller info not available for this item.");
+                        return;
+                      }
+                      navigate(`/chat/${sellerId}`);
+                    }}
+                  >
+                    TALK TO SELLER 💬
+                  </button>
+                </div>
+              </div>
             </div>
-
-            <div className="btns">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation(); //  prevent card navigation
-                  AddtoCart(item);
-                }}
-              >
-                Add to Cart 🛒
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation(); //  prevent card navigation
-                  if (!item?.seller?.id) {
-                    alert("Seller info not available for this item.");
-                    return;
-                  }
-                  // Change this route to your chat route if needed:
-                  navigate(`/chat/${item.seller.id}`);
-                }}
-              >
-                Talk to Seller 💬
-              </button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
