@@ -45,6 +45,7 @@ export default function App() {
           <Route path="/sell" element={<Sell />} />
           <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/sell" element={<Sell />} />
           <Route path="/products/:id"
             element={
               <ProductsDetails

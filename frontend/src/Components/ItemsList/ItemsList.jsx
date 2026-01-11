@@ -4,6 +4,26 @@ import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 
+const API_BASE = "http://localhost:8000";
+
+function getFirstImageSrc(item) {
+  const first = item?.images?.[0];
+
+  let url =
+    typeof first === "string"
+      ? first
+      : typeof first === "object"
+      ? first?.url
+      : "";
+
+  if (!url) return "/Images/placeholder.png";
+
+  // if url stored as /uploads/xxx.jpg, it must be loaded from backend server
+  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
+
+  return url;
+}
+
 export default function ItemsList({ AddtoCart }) {
   const { items } = useItemsList();
   const { authUser } = useAuthStore();
@@ -11,8 +31,8 @@ export default function ItemsList({ AddtoCart }) {
 
   const filteredItems = items.filter((item) => {
     const sellerId = item?.seller?._id || item?.seller?.id;
-    if (!authUser?._id || !sellerId) return true; // keep if unknown
-    return sellerId !== authUser._id; // hide own items
+    if (!authUser?._id || !sellerId) return true;
+    return sellerId !== authUser._id;
   });
 
   return (
@@ -37,9 +57,12 @@ export default function ItemsList({ AddtoCart }) {
             >
               <div className="item-img">
                 <img
-                  src={item?.images?.[0] || "/Images/placeholder.png"}
+                  src={getFirstImageSrc(item)}
                   alt={item.title}
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = "/Images/placeholder.png";
+                  }}
                 />
               </div>
 
@@ -52,9 +75,16 @@ export default function ItemsList({ AddtoCart }) {
                     {item?.seller?.profilePic && (
                       <img
                         className="seller-pic"
-                        src={item.seller.profilePic}
+                        src={
+                          item.seller.profilePic.startsWith("/uploads/")
+                            ? `${API_BASE}${item.seller.profilePic}`
+                            : item.seller.profilePic
+                        }
                         alt={item.seller.fullName}
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
                       />
                     )}
                     <span className="seller-name">

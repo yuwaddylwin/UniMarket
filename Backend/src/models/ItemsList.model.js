@@ -3,18 +3,23 @@ import mongoose from "mongoose";
 const itemSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
-    price: { type: Number, required: true },
-    images: [{ type: String }],
     category: { type: String, required: true },
     description: { type: String, required: true, trim: true },
+    price: { type: Number, required: true },
+
+    images: [
+      {
+        url: { type: String, required: true },
+        publicId: { type: String, required: true }, //  for delete
+      },
+    ],
 
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
-    // optional snapshot (so frontend can show seller without populate)
     seller: {
       id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      fullName: { type: String },
-      profilePic: { type: String },
+      fullName: String,
+      profilePic: String,
     },
   },
   { timestamps: true }

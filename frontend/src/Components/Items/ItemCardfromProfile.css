@@ -1,234 +1,123 @@
-/* ItemCard.css (NO -webkit) */
-
-.item-card {
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
+.profile-item-card {
+  position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-  display: flex;
-  flex-direction: column;
-  min-height: 260px;
+  border-radius: 14px; /* optional */
 }
 
-.item-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
-}
-
-/* Image */
-.item-img {
+/* ✅ IMAGE SAME SIZE */
+.profile-item-img {
   width: 100%;
-  height: 170px;
-  background: #f3f4f6;
+  aspect-ratio: 4 / 3;       /* change to 1/1 if you want square */
+  overflow: hidden;
+  background: #f3f3f3;
 }
 
-.item-img img {
+.profile-item-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
+  display: block;            /* removes weird gaps */
 }
 
-/* Body */
-.item-body {
-  padding: 12px 14px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* ✅ MENU DOES NOT MOVE THE DOTS */
+.profile-item-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+
+  /* KEY: keep this container fixed to the button size */
+  width: 34px;
+  height: 34px;
 }
 
-/* Title + price row */
-.item-title-row {
+/* button */
+.profile-kebab-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  cursor: pointer;
+
+  /* stable alignment */
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+
+  font-size: 20px;
+  line-height: 1;
+
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.profile-kebab-btn:active {
+  transform: none; /* prevents press shifting */
+}
+
+.profile-kebab-btn:focus {
+  outline: none;
+}
+
+/* ✅ dropdown positioned absolutely so it doesn't affect button position */
+.profile-kebab-menu {
+  position: absolute;
+  top: 40px;     /* below the button */
+  right: 0;
+
+  margin-top: 0; /* IMPORTANT (remove margin-top pushing layout) */
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  min-width: 140px;
+}
+
+.profile-kebab-item {
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+}
+
+.profile-kebab-item:hover {
+  background: #f6f6f6;
+}
+
+.profile-kebab-item.danger {
+  color: #c0392b;
+}
+
+/* body */
+.profile-item-body {
+  padding: 10px 12px;
+}
+
+.profile-item-title-row {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.item-title {
+.profile-item-title {
   margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: #111827;
-  line-height: 1.25;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  flex: 1;
-}
-
-.item-price {
-  margin-top:10px;
-  font-size: 14px;
-  font-weight: 800;
-  color: #10b981;
-  white-space: nowrap;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-
-
-.item-category {
-  margin: 0;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.item-desc {
-  margin: 0;
-  font-size: 13px;
-  color: #374151;
-  line-height: 1.35;
-
-  /* Pure CSS single-line ellipsis */
+  font-size: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Optional seller row */
-.seller-row {
-  margin-top: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.seller-pic {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.seller-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.item-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.item-actions {
-  position: relative;
-}
-
-.kebab-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 20px;
-  line-height: 1;
-  padding: 4px 8px;
-  border-radius: 8px;
-}
-
-.kebab-btn:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.kebab-menu {
-  position: absolute;
-  right: 0;
-  top: 28px;
-  min-width: 140px;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 10px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  z-index: 20;
-}
-
-.kebab-item {
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border: none;
-  background: white;
-  cursor: pointer;
-}
-
-.kebab-item:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.kebab-item.danger {
-  color: #c62828;
-}
-
-/* Simple modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-.modal {
-  width: min(420px, 92vw);
-  background: white;
-  border-radius: 14px;
-  padding: 16px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.field input {
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.field textarea {
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  resize: vertical;
-}
-
-
-/* Mobile */
-@media (max-width: 480px) {
-  .item-card {
-    border-radius: 14px;
-    min-height: 240px;
-  }
-
-  .item-img {
-    height: 150px;
-  }
-
-  .item-title {
-    font-size: 14px;
-  }
-
-  .item-price {
-    font-size: 13px;
-    padding: 5px 9px;
-  }
+.profile-item-price {
+  margin: 0;
+  font-size: 14px;
+  white-space: nowrap;
 }

@@ -1,10 +1,31 @@
 import React from "react";
 import "./CartPage.css";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
+
+const API_BASE = "http://localhost:8000";
+
+function getFirstImageSrc(item) {
+  const first = item?.images?.[0];
+
+  let url =
+    typeof first === "string"
+      ? first
+      : typeof first === "object"
+      ? first?.url
+      : "";
+
+  if (!url) url = item?.image || "";
+
+  if (!url) return "/no-image.png";
+
+  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
+
+  return url;
+}
 
 export default function CartPage({ cartItems, setCartItems }) {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleDelete = (id) => {
     const updated = cartItems.filter((item) => item._id !== id);
@@ -21,10 +42,7 @@ export default function CartPage({ cartItems, setCartItems }) {
       ) : (
         <ul>
           {cartItems.map((item) => {
-            // FIX IMAGE SOURCE
-            const imageSrc = item?.images?.[0] || item?.image || "/no-image.png";
-
-            // seller id (support seller._id or seller.id)
+            const imageSrc = getFirstImageSrc(item);
             const sellerId = item?.seller?._id || item?.seller?.id;
 
             return (

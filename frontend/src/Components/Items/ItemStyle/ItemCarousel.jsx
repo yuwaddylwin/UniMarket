@@ -1,28 +1,55 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import ItemCard from "../ItemCardfromProfile";
 import "./ItemCarousel.css";
 
 export default function ItemCarousel({ items = [] }) {
   const scrollerRef = useRef(null);
 
-  const isCarousel = useMemo(() => (items?.length || 0) > 1, [items]);
+  // ✅ keep local items so we can remove after delete
+  const [localItems, setLocalItems] = useState(items);
+
+  // keep localItems in sync when parent items change
+  useEffect(() => {
+    setLocalItems(items || []);
+  }, [items]);
+
+  const isCarousel = useMemo(() => (localItems?.length || 0) > 1, [localItems]);
 
   const scrollByOneCard = (dir = 1) => {
     const el = scrollerRef.current;
     if (!el) return;
-
-    // Scroll by ~1 card (uses container width so it behaves well on mobile)
     const amount = Math.round(el.clientWidth * 0.82) * dir;
     el.scrollBy({ left: amount, behavior: "smooth" });
   };
 
-  if (!items || items.length === 0) return null;
+  const handleDeleteItem = async (id) => {
+    try {
+      const res = await fetch(`/api/items/${id}`, {
+        method: "DELETE",
+        credentials: "include", // ✅ IMPORTANT if you use cookies/session auth
+      });
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message || "Delete failed");
+
+      // ✅ update UI immediately
+      setLocalItems((prev) => prev.filter((x) => (x._id || x.id) !== id));
+      toast.success("Item deleted successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.message || "Delete failed");
+      throw err;
+    }
+  };
+
+  if (!localItems || localItems.length === 0) return null;
 
   // If only one item, render normally (no swipe UI)
   if (!isCarousel) {
     return (
       <div className="items-single">
-        <ItemCard item={items[0]} />
+        <ItemCard item={localItems[0]} onDeleteItem={handleDeleteItem} />
       </div>
     );
   }
@@ -30,14 +57,14 @@ export default function ItemCarousel({ items = [] }) {
   return (
     <div className="items-carousel-wrap">
       <div className="items-carousel" ref={scrollerRef}>
-        {items.map((it) => (
-          <div className="items-slide" key={it._id || it.id || it.title || Math.random()}>
-            <ItemCard item={it} />
+        {localItems.map((it) => (
+          <div className="items-slide" key={it._id || it.id || it.title}>
+            <ItemCard item={it} onDeleteItem={handleDeleteItem} />
           </div>
         ))}
       </div>
 
-      {/* Optional arrows (nice on desktop, harmless on mobile) */}
+      {/* Optional arrows */}
       <button
         className="carousel-btn left"
         type="button"

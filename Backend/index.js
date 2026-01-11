@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
 dotenv.config();
 
 import cors from 'cors'; 
@@ -32,7 +33,7 @@ app.use("/api/items", ItemsList);
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes); 
 app.use("/api/upload", uploadRoutes);
-
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 
 // Test route

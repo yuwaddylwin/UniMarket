@@ -1,19 +1,24 @@
-// 📁 src/Components/SellPage/Sell.jsx
 import React from "react";
 import "./sell.css";
 import { useSellLogic } from "../Logics/useSell";
 
-
-
-
 function Sell() {
-  const { item, handleChange, handleImageUpload, removeImage, handleSubmit } =
-    useSellLogic();
+  const {
+    item,
+    isEditMode,
+    handleChange,
+    handleImageUpload,
+    removeImage,
+    handleSubmit,
+    handleCancel,
+  } = useSellLogic();
 
   return (
-    <>
     <div className="post-container">
-      <h1 className="title">Post Your Items & Sell it!</h1>
+      <h1 className="title">
+        {isEditMode ? "Edit Your Item" : "Post Your Items & Sell it!"}
+      </h1>
+
       <form className="post-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Item Images (max 6)</label>
@@ -78,7 +83,6 @@ function Sell() {
           </select>
         </div>
 
-
         <div className="form-group">
           <label>Price (THB)</label>
           <input
@@ -109,12 +113,23 @@ function Sell() {
           />
         </div>
 
-        <button type="submit" className="submit-btn">
-          Post Item
-        </button>
+        {/* Buttons */}
+        {isEditMode ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button type="submit" className="submit-btn">
+              Save
+            </button>
+            <button type="button" className="submit-btn" onClick={handleCancel}>
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button type="submit" className="submit-btn">
+            Post Item
+          </button>
+        )}
       </form>
     </div>
-    </>
   );
 }
 
