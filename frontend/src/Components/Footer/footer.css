@@ -65,8 +65,7 @@
       align-items: center;
       text-align: center;
     }
-  
-    .footer-section {
+    .footer-section h4{
       margin-bottom: 10px;
     }
   }

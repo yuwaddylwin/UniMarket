@@ -9,6 +9,7 @@ import ProfilePage from "./Components/Profile/forms/ProfilePage";
 import LoginForm from "./Components/Profile/forms/LoginForm";
 import SignUpForm from "./Components/Profile/forms/SignUpForm";
 import ChatHomePage from "./Components/Chat/ChatHomePage";
+import ItemsPage from "./Components/ItemsPage/ItemsPage";
 
 import { useHomeLogic } from "./Components/Logics/useHome";
 import { useAuthStore } from "./Components/store/useAuthStore";
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/sell" element={<Sell />} />
           <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/products" element={<ItemsPage AddtoCart={AddtoCart} />} />
           <Route path="/sell" element={<Sell />} />
           <Route path="/products/:id"
             element={

@@ -43,6 +43,13 @@
   color: white !important;
 }
 
+.bn-chat-icon {
+  margin-top: 4px;
+  width: 22px !important;
+  height: 22px !important;
+}
+
+
 
 /* PROFILE IMAGE */
 .avatar {

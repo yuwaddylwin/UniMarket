@@ -81,26 +81,52 @@
   transition: all 0.2s ease-in-out;
 }
 
-/* 💬 Talk to Seller button */
+/* 🧩 Button container */
+.cart-page-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* ✅ Buttons base style (same feel as ItemsPage buttons) */
+.cart-page-btns button {
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: 800;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.cart-page-btns button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* 💬 Talk to Seller (Primary like ItemsPage) */
 .talk-btn {
-  background-color: #1a62c6;
+  background: #1b4a91;
   color: #fff;
+  border-color: rgba(27, 74, 145, 0.35);
 }
 
 .talk-btn:hover {
-  background-color: #3e79ca;
-  transform: scale(1);
+  background: #3e79ca;
 }
 
-/* ❌ Delete button */
+/* ❌ Delete (Secondary like ItemsPage) */
 .delete-btn {
-  background-color: #7e7e7e;
-  color: #fff;
+  background: #fff;
+  color: #111827;
 }
 
 .delete-btn:hover {
-  background-color: #5d5d5d;
-  transform: scale(1);
+  background: #f3f4f6;
 }
 
 /* Toast Notification Styles */

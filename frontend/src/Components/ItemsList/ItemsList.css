@@ -209,6 +209,47 @@
   cursor: not-allowed;
 }
 
+/* Add these to the bottom of ItemsList.css (or anywhere after .items-grid) */
+
+/* wrapper only for arrows in ItemsList */
+.il-wrap {
+  position: relative;
+}
+
+/* arrows (hidden on mobile automatically by not rendering them in JSX) */
+.il-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+  cursor: pointer;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.il-left {
+  left: 6px;
+}
+
+.il-right {
+  right: 6px;
+}
+
+/* give space for arrows ONLY on tablet/desktop so they don't cover cards */
+@media (min-width: 600px) {
+  .items-grid {
+    padding-left: 44px;
+    padding-right: 44px;
+  }
+}
+
+
 /* ============ Small phones (<= 360px) ============ */
 @media (max-width: 360px) {
   .item-img {

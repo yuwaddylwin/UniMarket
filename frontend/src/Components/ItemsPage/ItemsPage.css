@@ -1,0 +1,204 @@
+/* ItemsPage.css (all class names are unique: ip-*) */
+
+.ip-page {
+  padding: 14px;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+}
+
+.ip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ip-title {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+/* Search chip */
+.ip-chip {
+  font-size: 12px;
+  color: #374151;
+  background: rgba(33, 84, 139, 0.08);
+  border: 1px solid rgba(33, 84, 139, 0.18);
+  padding: 6px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* No match message */
+.ip-result {
+  padding: 10px 6px 2px;
+}
+
+.ip-notfound {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.ip-notfound-sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Wrapper for arrows + row */
+.ip-wrap {
+  position: relative;
+}
+
+/* Horizontal row */
+.ip-row {
+  --ip-gap: 16px;
+
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--ip-gap);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+
+  padding: 10px 44px 14px; /* space for arrows */
+  align-items: flex-start;
+
+  scrollbar-width: none; /* Firefox */
+}
+.ip-row::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Arrows */
+.ip-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+  cursor: pointer;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.ip-left {
+  left: 6px;
+}
+
+.ip-right {
+  right: 6px;
+}
+
+/* Card */
+.ip-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: center;
+  align-self: flex-start;
+  cursor: pointer;
+
+  /* 5 cards visible */
+  flex: 0 0 calc((100% - (var(--ip-gap) * 4)) / 5);
+  box-sizing: border-box;
+  position: relative;
+}
+
+.ip-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Image */
+.ip-img {
+  width: 100%;
+  height: 200px;
+  background: #f3f4f6;
+}
+
+.ip-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Body */
+.ip-body {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Title */
+.ip-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Seller row */
+.ip-seller {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ip-seller-pic {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.ip-seller-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive: still horizontal scrolling, fewer cards visible */
+@media (max-width: 1000px) {
+  .ip-card {
+    flex-basis: calc((100% - (var(--ip-gap) * 2)) / 3);
+  }
+}
+
+@media (max-width: 600px) {
+  .ip-card {
+    flex-basis: calc((100% - (var(--ip-gap) * 1)) / 2);
+  }
+  .ip-img {
+    height: 190px;
+  }
+}

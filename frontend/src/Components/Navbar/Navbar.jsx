@@ -1,32 +1,33 @@
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useState } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { authUser } = useAuthStore();
+  const [q, setQ] = useState("");
 
-  const handleChatClick = () => {
-    if (!authUser) {
-      navigate("/login");
-    } else {
-      navigate("/chat");
-    }
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const query = q.trim();
+    if (!query) return; 
+    navigate(`/products?search=${encodeURIComponent(query)}`);
   };
 
   return (
-    <div className="navbar-container">
-      <Logo />
-      <Search />
+  <div className="navbar-container">
+    <Logo />
 
-      <div className="top-chat-icon" onClick={handleChatClick}>
-        <MessageCircle size={18} />
-      </div>
+    <div className="navbar-search-center">
+      <Search
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        onSubmit={handleSearch}
+      />
     </div>
-  );
+  </div>
+);
 }
-
 
 function Logo() {
   return (
@@ -36,11 +37,16 @@ function Logo() {
   );
 }
 
-function Search() {
+function Search({ value, onChange, onSubmit }) {
   return (
-    <form className="search-form">
-      <input type="text" placeholder="Search by categories..." />
-      <button type="button" className="search-button">
+    <form className="search-form" onSubmit={onSubmit}>
+      <input
+        type="text"
+        placeholder="Search by title or seller..."
+        value={value}
+        onChange={onChange}
+      />
+      <button type="submit" className="search-button">
         Search
       </button>
     </form>

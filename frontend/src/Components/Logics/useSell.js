@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const emptyItem = {
-  images: [], // [{ url: string, file?: File, isNew?: boolean }]
+  images: [], // [{ url: string, publicId?: string, file?: File, isNew?: boolean }]
   name: "",
   category: "",
   price: 0,
@@ -12,10 +12,24 @@ const emptyItem = {
 
 function normalizeImages(images) {
   if (!Array.isArray(images)) return [];
+
   return images
     .map((img) => {
-      const url = typeof img === "string" ? img : img?.url;
-      return url ? { url } : null;
+      // Sometimes backend may return ["url1", "url2"]
+      if (typeof img === "string") return { url: img };
+
+      const url = img?.url || img?.secure_url; // handle common variants
+      const publicId =
+        img?.publicId ||
+        img?.public_id ||
+        img?.publicID ||
+        img?.cloudinaryId ||
+        img?.cloudinary_id;
+
+      if (!url) return null;
+
+      // Keep publicId if we have it (needed for edit mode)
+      return publicId ? { url, publicId } : { url };
     })
     .filter(Boolean);
 }
@@ -24,10 +38,13 @@ export function useSellLogic() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const editPayload = location.state?.mode === "edit" ? location.state?.item : null;
+  const editPayload =
+    location.state?.mode === "edit" ? location.state?.item : null;
 
   const [isEditMode, setIsEditMode] = useState(Boolean(editPayload));
-  const [editingId, setEditingId] = useState(editPayload?._id || editPayload?.id || null);
+  const [editingId, setEditingId] = useState(
+    editPayload?._id || editPayload?.id || null
+  );
 
   const [item, setItem] = useState(emptyItem);
 
@@ -83,9 +100,12 @@ export function useSellLogic() {
     setItem((prev) => {
       const next = [...prev.images];
       const removed = next[index];
+
+      // revoke only for newly created preview URLs
       if (removed?.isNew && removed?.url) {
         URL.revokeObjectURL(removed.url);
       }
+
       next.splice(index, 1);
       return { ...prev, images: next };
     });
@@ -94,74 +114,77 @@ export function useSellLogic() {
   const handleCancel = () => navigate(-1);
 
   async function getErrorMessage(res) {
-  const contentType = res.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) {
-    const data = await res.json().catch(() => null);
-    return data?.message || "Request failed";
-  }
-  const text = await res.text().catch(() => "");
-  return text || "Request failed";
-}
-
-const API_BASE = "http://localhost:8000";
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    const fd = new FormData();
-    fd.append("title", item.name);
-    fd.append("name", item.name);
-    fd.append("category", item.category);
-    fd.append("price", String(Number(item.price) || 0));
-    fd.append("description", item.description);
-
-    const existing = item.images
-  .filter((img) => !img.file)
-  .map((img) => ({ url: img.url, publicId: img.publicId || "" }));
-
-    if (isEditMode) {
-      fd.append("existingImages", JSON.stringify(existing));
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const data = await res.json().catch(() => null);
+      return data?.message || "Request failed";
     }
+    const text = await res.text().catch(() => "");
+    return text || "Request failed";
+  }
 
-    item.images
-      .filter((img) => img.file)
-      .forEach((img) => fd.append("images", img.file));
+  const API_BASE = "http://localhost:8000";
 
-    // ✅ EDIT MODE -> PUT
-    if (isEditMode) {
-      if (!editingId) throw new Error("Missing item id for edit");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      const res = await fetch(`${API_BASE}/api/items/${editingId}`, {
-        method: "PUT",
+    try {
+      const fd = new FormData();
+      fd.append("title", item.name);
+      fd.append("name", item.name);
+      fd.append("category", item.category);
+      fd.append("price", String(Number(item.price) || 0));
+      fd.append("description", item.description);
+
+      // ✅ Existing images (from DB). Only include ones with publicId.
+      // This prevents sending publicId: "" which causes Mongoose validation error.
+      const existing = item.images
+        .filter((img) => !img.file) // not newly uploaded
+        .map((img) => ({ url: img.url, publicId: img.publicId }))
+        .filter((img) => img.publicId); // only keep valid ones
+
+      if (isEditMode) {
+        fd.append("existingImages", JSON.stringify(existing));
+      }
+
+      // ✅ New uploads
+      item.images
+        .filter((img) => img.file)
+        .forEach((img) => fd.append("images", img.file));
+
+      // ✅ EDIT MODE -> PUT
+      if (isEditMode) {
+        if (!editingId) throw new Error("Missing item id for edit");
+
+        const res = await fetch(`${API_BASE}/api/items/${editingId}`, {
+          method: "PUT",
+          body: fd,
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error(await getErrorMessage(res));
+
+        toast.success("Item updated successfully");
+        navigate(-1);
+        return;
+      }
+
+      // ✅ CREATE MODE -> POST
+      const res = await fetch(`${API_BASE}/api/items`, {
+        method: "POST",
         body: fd,
         credentials: "include",
       });
 
       if (!res.ok) throw new Error(await getErrorMessage(res));
 
-      toast.success("Item updated successfully");
-      navigate(-1);
-      return;
+      toast.success("Item posted successfully");
+      setItem(emptyItem);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.message || "Something went wrong.");
     }
-
-    // ✅ CREATE MODE -> POST
-    const res = await fetch(`${API_BASE}/api/items`, {
-      method: "POST",
-      body: fd,
-      credentials: "include",
-    });
-
-    if (!res.ok) throw new Error(await getErrorMessage(res));
-
-    toast.success("Item posted successfully");
-    setItem(emptyItem);
-  } catch (err) {
-    console.error(err);
-    toast.error(err?.message || "Something went wrong.");
-  }
-};
-
+  };
 
   return {
     item,

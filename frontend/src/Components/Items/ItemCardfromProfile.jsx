@@ -1,36 +1,38 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import "./ItemCardfromProfile.css";
 
 const API_BASE = "http://localhost:8000";
 
+async function getErrorMessage(res) {
+  const contentType = res.headers.get("content-type") || "";
+  if (res.status === 204) return "";
+  if (contentType.includes("application/json")) {
+    const data = await res.json().catch(() => null);
+    return data?.message || "Request failed";
+  }
+  const text = await res.text().catch(() => "");
+  return text || "Request failed";
+}
+
 function getCoverSrc(item) {
   const first = item?.images?.[0];
-
-  let url =
-    typeof first === "string"
-      ? first
-      : typeof first === "object"
-      ? first?.url
-      : "";
-
+  const url = typeof first === "string" ? first : first?.url || "";
   if (!url) return "/Images/placeholder.png";
-
   if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
-
   return url;
 }
 
 export default function ItemCard({ item, onDeleteItem }) {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const menuRef = useRef(null);
 
   const coverSrc = getCoverSrc(item);
-
   const title = item?.title || item?.name || "Untitled";
   const itemId = item?._id || item?.id;
-
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -48,12 +50,33 @@ export default function ItemCard({ item, onDeleteItem }) {
 
   const handleDelete = async () => {
     setMenuOpen(false);
-    if (!itemId) return;
+
+    if (!itemId) {
+      toast.error("Missing item id");
+      return;
+    }
 
     const ok = window.confirm("Delete this item?");
     if (!ok) return;
 
-    await onDeleteItem?.(itemId);
+    try {
+      setIsDeleting(true);
+
+      const res = await fetch(`${API_BASE}/api/items/${itemId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error(await getErrorMessage(res));
+
+      toast.success("Item deleted");
+      onDeleteItem?.(itemId); // ✅ only UI update
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.message || "Delete failed");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -62,27 +85,19 @@ export default function ItemCard({ item, onDeleteItem }) {
         <button
           type="button"
           className="profile-kebab-btn"
-          aria-label="Item options"
           onClick={() => setMenuOpen((v) => !v)}
+          disabled={isDeleting}
         >
           ⋮
         </button>
 
         {menuOpen && (
           <div className="profile-kebab-menu" role="menu">
-            <button
-              type="button"
-              className="profile-kebab-item"
-              onClick={handleEdit}
-            >
+            <button type="button" className="profile-kebab-item" onClick={handleEdit} disabled={isDeleting}>
               Edit
             </button>
-            <button
-              type="button"
-              className="profile-kebab-item danger"
-              onClick={handleDelete}
-            >
-              Delete
+            <button type="button" className="profile-kebab-item danger" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete"}
             </button>
           </div>
         )}
@@ -92,9 +107,7 @@ export default function ItemCard({ item, onDeleteItem }) {
         <img
           src={coverSrc}
           alt={title}
-          onError={(e) => {
-            e.currentTarget.src = "/Images/placeholder.png";
-          }}
+          onError={(e) => (e.currentTarget.src = "/Images/placeholder.png")}
         />
       </div>
 
