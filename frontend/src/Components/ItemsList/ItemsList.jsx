@@ -4,7 +4,9 @@ import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE =
+  process.env.REACT_APP_API_URL || "http://localhost:8000";
+
 
 function getFirstImageSrc(item) {
   const first = item?.images?.[0];

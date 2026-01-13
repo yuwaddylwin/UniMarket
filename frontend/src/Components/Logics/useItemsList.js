@@ -45,7 +45,7 @@ export function useItemsList() {
       setLoading(true);
       setError("");
 
-      const res = await axios.get("http://localhost:8000/api/items", {
+      const res = await axios.get("https://unimarket-08di.onrender.com/api/items", {
         withCredentials: true,
       });
 

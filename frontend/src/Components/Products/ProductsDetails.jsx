@@ -39,7 +39,7 @@ export default function ItemPage({ AddtoCart }) {
     let mounted = true;
     (async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/auth/me", {
+        const res = await axios.get("https://unimarket-08di.onrender.com/api/auth/me", {
           withCredentials: true,
         });
         if (mounted) setMe(res.data);

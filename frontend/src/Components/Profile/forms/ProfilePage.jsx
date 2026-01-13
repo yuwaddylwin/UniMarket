@@ -46,7 +46,7 @@ export default function ProfilePage() {
       setLoadingItems(true);
       setItemsError("");
 
-      const res = await axios.get("http://localhost:8000/api/items/mine", {
+      const res = await axios.get("https://unimarket-08di.onrender.com/api/items/mine", {
         withCredentials: true,
       });
 
