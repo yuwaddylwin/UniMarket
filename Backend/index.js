@@ -12,23 +12,15 @@ import messageRoutes from "./src/routes/message.route.js";
 import uploadRoutes from "./src/routes/upload.route.js"
 import { app, server } from "./src/lib/socket.js";
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://uniamarket-1-55jg.onrender.com",
-];
 
-const corsOptions = {
-  origin: function (origin, cb) {
-    if (!origin) return cb(null, true);
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    return cb(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
+//Middleware
+app.use(cors({
+  origin: "https://uniamarket-1-55jg.onrender.com", 
+  credentials: true, // to allow cookies
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.options("*", cors()); // helps with preflight
 
 app.use(express.json({ limit: "20mb" }));
 app.use(cookieParser());
