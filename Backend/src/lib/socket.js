@@ -7,9 +7,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://uniamarket-1-55jg.onrender.com",
+    origin: "http://localhost:3001",
     credentials: true,
-    methods: ["GET", "POST"],
   },
 });
 
