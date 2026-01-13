@@ -6,9 +6,11 @@ import Footer from "../Footer/footer";
 import { useNavigate } from "react-router-dom";
 import { useHomeLogic } from "../Logics/useHome";
 import { useItemStore } from "../store/useItemStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function Home({ cartItems, setCartItems }) {
   const navigate = useNavigate();
+  const {authUser} = useAuthStore();
   const { count, AddtoCart } = useHomeLogic(cartItems, setCartItems);
 
   const items = useItemStore((s) => s.items); //  get all posted items
@@ -34,9 +36,13 @@ export default function Home({ cartItems, setCartItems }) {
           </div>
         </div>
 
-        <button className="btn" onClick={() => navigate("/sell")}>
-          Sell Now
-        </button>
+        <button
+            className="btn"
+            onClick={() => navigate(authUser ? "/sell" : "/login")}
+          >
+            Sell Now
+          </button>
+
       </div>
 
       {/* pass items here */}

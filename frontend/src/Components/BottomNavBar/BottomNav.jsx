@@ -25,9 +25,13 @@ export default function BottomNav({ cartCount = 0 }) {
       <div onClick={handleChatClick}>
         <MessageCircle className="bn-chat-icon"/>
       </div>
-      <div className="plus-btn" onClick={() => navigate("/sell")}>
-        <Plus />
-      </div>
+      <div
+          className="plus-btn"
+          onClick={() => navigate(authUser ? "/sell" : "/login")}
+        >
+          <Plus />
+        </div>
+
 
 
       <div className="cart-icon" onClick={() => navigate("/cart")}>

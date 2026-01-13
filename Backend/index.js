@@ -12,14 +12,10 @@ import messageRoutes from "./src/routes/message.route.js";
 import uploadRoutes from "./src/routes/upload.route.js"
 import { app, server } from "./src/lib/socket.js";
 
-const allowedOrigins = [
-  "https://unimarket-1-vfgu.onrender.com", // your frontend static site
-  "http://localhost:3000" // local dev (optional)
-];
 
 //Middleware
 app.use(cors({
-  origin: allowedOrigins, 
+  origin: "http://localhost:3000", 
   credentials: true, // to allow cookies
 }));
 app.use(express.json({ limit: "20mb" }));

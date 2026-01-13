@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 
-const API_BASE = (process.env.REACT_APP_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 function normalizeSeller(it) {
   // If backend sends seller snapshot
@@ -47,7 +46,7 @@ export function useItemsList() {
       setLoading(true);
       setError("");
 
-      const res = await axios.get(`${API_BASE}/api/items`, {
+      const res = await axios.get("http://localhost:8000/api/items", {
             withCredentials: true,
 });
 
