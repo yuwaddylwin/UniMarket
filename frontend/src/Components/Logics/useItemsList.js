@@ -47,7 +47,7 @@ export function useItemsList() {
       setLoading(true);
       setError("");
 
-      const res = await axios.get(`http://${API_BASE}/api/items`, {
+      const res = await axios.get(`${API_BASE}/api/items`, {
             withCredentials: true,
 });
 
