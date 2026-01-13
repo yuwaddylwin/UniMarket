@@ -15,9 +15,13 @@ import { app, server } from "./src/lib/socket.js";
 
 //Middleware
 app.use(cors({
-  origin: "http://localhost:3000", 
+  origin: "https://uniamarket-1-55jg.onrender.com", 
   credentials: true, // to allow cookies
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+app.options("*", cors()); // helps with preflight
+
 app.use(express.json({ limit: "20mb" }));
 app.use(cookieParser());
 
