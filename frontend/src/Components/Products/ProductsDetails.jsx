@@ -5,6 +5,8 @@ import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
 import "./ProductsDetails.css";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
 function extractId(value) {
   if (!value) return null;
   if (typeof value === "string") return value;
@@ -39,7 +41,7 @@ export default function ItemPage({ AddtoCart }) {
     let mounted = true;
     (async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/auth/me", {
+        const res = await axios.get(`http://${API_BASE}/api/auth/me`, {
           withCredentials: true,
         });
         if (mounted) setMe(res.data);

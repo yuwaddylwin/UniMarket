@@ -6,6 +6,8 @@ import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { authUser, updateProfile, logout, isUpdatingProfile } = useAuthStore();
@@ -46,7 +48,7 @@ export default function ProfilePage() {
       setLoadingItems(true);
       setItemsError("");
 
-      const res = await axios.get("http://localhost:8000/api/items/mine", {
+      const res = await axios.get(`http://${API_BASE}/api/items/mine`, {
         withCredentials: true,
       });
 
