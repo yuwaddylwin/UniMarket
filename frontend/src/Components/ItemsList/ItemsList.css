@@ -1,6 +1,3 @@
-/* ItemsList.css - Responsive (desktop / laptop / tablet / mobile) */
-
-/* ============ Base / Mobile-first ============ */
 .items-container {
   padding: 14px;
   max-width: 1200px;
@@ -44,7 +41,7 @@
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   padding: 8px 4px 12px;
-  align-items: flex-start; /* don't stretch cards */
+  align-items: flex-start; 
   scrollbar-width: thin;
 }
 
@@ -167,7 +164,7 @@
 
 .btn {
   flex: 1;
-  height: 44px; /* touch friendly on mobile */
+  height: 44px; 
   padding: 0 10px;
   font-size: 10px;
   font-weight: 800;
@@ -209,14 +206,11 @@
   cursor: not-allowed;
 }
 
-/* Add these to the bottom of ItemsList.css (or anywhere after .items-grid) */
-
-/* wrapper only for arrows in ItemsList */
 .il-wrap {
   position: relative;
 }
 
-/* arrows (hidden on mobile automatically by not rendering them in JSX) */
+/* arrows*/
 .il-arrow {
   position: absolute;
   top: 50%;
@@ -241,7 +235,7 @@
   right: 6px;
 }
 
-/* give space for arrows ONLY on tablet/desktop so they don't cover cards */
+
 @media (min-width: 600px) {
   .items-grid {
     padding-left: 44px;
@@ -249,8 +243,6 @@
   }
 }
 
-
-/* ============ Small phones (<= 360px) ============ */
 @media (max-width: 360px) {
   .item-img {
     height: 200px;
@@ -260,7 +252,7 @@
   }
 }
 
-/* ============ Tablets / small laptops (>= 600px) ============ */
+
 @media (min-width: 600px) {
   .items-container {
     padding: 18px;
@@ -279,7 +271,7 @@
   }
 
   .item-card {
-    width: 320px;       /* bigger cards */
+    width: 320px;       
     max-width: none;
     border-radius: 16px;
   }
@@ -298,7 +290,6 @@
   }
 }
 
-/* ============ Laptops / Desktop (>= 900px) ============ */
 @media (min-width: 900px) {
   .items-container {
     padding: 20px;
@@ -318,7 +309,7 @@
   }
 
   .item-card {
-    width: 280px; /* tight desktop cards */
+    width: 280px; 
   }
 
   .item-img {
@@ -344,7 +335,7 @@
   }
 }
 
-/* ============ Large Desktop / PC monitors (>= 1200px) ============ */
+
 @media (min-width: 1200px) {
   .item-card {
     width: 300px;

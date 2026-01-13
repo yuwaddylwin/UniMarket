@@ -49,8 +49,6 @@
   height: 22px !important;
 }
 
-
-
 /* PROFILE IMAGE */
 .avatar {
   width: 26px;
@@ -88,7 +86,7 @@ body {
 /* Ensure badge shows inside bottom nav version */
 .bottom-nav .cart-icon {
     position: relative;
-    overflow: visible;   /* ✅ important */
+    overflow: visible;   
 }
 
 /* Fix badge position */

@@ -4,7 +4,55 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import "./SignUpForm.css";
 
-export default function SignUpForm({ showLogin }) {
+const ALLOWED_DOMAINS = new Set([
+  "gmail.com",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "yahoo.com",
+  "icloud.com",
+  "me.com",
+  "proton.me",
+  "protonmail.com",
+]);
+
+// email validation
+const isValidEmail = (email) => {
+  const e = email.trim().toLowerCase();
+
+  if (!e) return false;
+  if (/\s/.test(e)) return false; // no spaces
+  if (e.includes("..")) return false; // no consecutive dots
+
+  const parts = e.split("@");
+  if (parts.length !== 2) return false;
+
+  const [local, domain] = parts;
+  if (!local || !domain) return false;
+
+  // local part rules
+  if (local.startsWith(".") || local.endsWith(".")) return false;
+  if (!/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/.test(local)) return false;
+
+  // domain rules
+  if (domain.startsWith(".") || domain.endsWith(".")) return false;
+  if (!/^[a-z0-9.-]+$/.test(domain)) return false;
+
+  const labels = domain.split(".");
+  if (labels.length < 2) return false; // must have a TLD
+  if (labels.some((l) => l.length === 0)) return false; // blocks gmail..com
+  if (labels.some((l) => l.startsWith("-") || l.endsWith("-"))) return false;
+
+  const tld = labels[labels.length - 1];
+  if (!/^[a-z]{2,24}$/.test(tld)) return false; // blocks gmail.c
+
+  // provider rule
+  if (!ALLOWED_DOMAINS.has(domain)) return false;
+
+  return true;
+};
+
+export default function SignUpForm() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,27 +64,52 @@ export default function SignUpForm({ showLogin }) {
   const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
-    if (!formData.fullName.trim()) return toast.error("Full name is required");
-    if (!formData.email.trim()) return toast.error("Email is required");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      return toast.error("Invalid email format");
-    if (!formData.password) return toast.error("Password is required");
-    if (formData.password.length < 6)
+    const fullName = formData.fullName.trim();
+    const email = formData.email.trim();
+    const password = formData.password;
+
+    if (!fullName) return toast.error("Full name is required");
+    if (fullName.length < 2) return toast.error("Full name is too short");
+
+    if (!email) return toast.error("Email is required");
+    if (!isValidEmail(email)) {
+      return toast.error(
+        "Invalid email or provider not supported (use Gmail/Outlook/Yahoo/iCloud/Proton)"
+      );
+    }
+
+    if (!password) return toast.error("Password is required");
+    if (password.length < 6)
       return toast.error("Password must be at least 6 characters");
 
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const clearForm = () =>
+    setFormData({ fullName: "", email: "", password: "" });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = validateForm();
-    console.log("Form validated:", success); // <-- debug
-    if (success === true) {
-      console.log("Calling signup with:", formData); // <-- debug
-      signup(formData);
+    const ok = validateForm();
+    if (ok !== true) return;
+
+    try {
+      const payload = {
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      };
+
+      // signup should throw on error OR return false on failure
+      const res = await signup(payload);
+      if (res === false) return;
+
+      clearForm();
+      navigate("/", { replace: true });
+    } catch (err) {
+      // toast.error(err?.message || "Signup failed");
     }
   };
-
 
   return (
     <div className="profile">
@@ -48,8 +121,9 @@ export default function SignUpForm({ showLogin }) {
           placeholder="Full Name"
           value={formData.fullName}
           onChange={(e) =>
-            setFormData({ ...formData, fullName: e.target.value })
+            setFormData((prev) => ({ ...prev, fullName: e.target.value }))
           }
+          autoComplete="name"
         />
 
         <input
@@ -57,8 +131,9 @@ export default function SignUpForm({ showLogin }) {
           placeholder="Enter your email"
           value={formData.email}
           onChange={(e) =>
-            setFormData({ ...formData, email: e.target.value })
+            setFormData((prev) => ({ ...prev, email: e.target.value }))
           }
+          autoComplete="email"
         />
 
         <div className="password-container">
@@ -67,13 +142,20 @@ export default function SignUpForm({ showLogin }) {
             placeholder="Enter your password"
             value={formData.password}
             onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
+              setFormData((prev) => ({ ...prev, password: e.target.value }))
             }
+            autoComplete="new-password"
           />
           <span
-            type="button"
             className="password-toggle"
-            onClick={() => setShowPassword(!showPassword)}
+            onClick={() => setShowPassword((s) => !s)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                setShowPassword((s) => !s);
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? "Hide" : "Show"}
           </span>
@@ -86,9 +168,14 @@ export default function SignUpForm({ showLogin }) {
           </span>
         </div>
 
-        <button type="submit" onClick={() => console.log("Button clicked")} className="send_button" disabled={isSigningUp}>
+        <button type="submit" className="send_button" disabled={isSigningUp}>
           {isSigningUp ? "Signing Up..." : "Sign Up"}
         </button>
+
+        {/* Optional: show allowed providers to users */}
+        <p style={{ marginTop: 10, fontSize: 12, color: "#666" }}>
+          Supported: Gmail, Outlook/Hotmail/Live, Yahoo, iCloud, Proton
+        </p>
       </form>
     </div>
   );

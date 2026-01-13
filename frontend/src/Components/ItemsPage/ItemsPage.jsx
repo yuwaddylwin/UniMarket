@@ -1,4 +1,3 @@
-// ItemsPage.jsx (scoped class names so it won't affect other components)
 import React, { useMemo, useRef } from "react";
 import "./ItemsPage.css";
 import { useItemsList } from "../Logics/useItemsList";
@@ -71,7 +70,7 @@ export default function ItemsPage() {
     const firstCard = el.querySelector(".ip-card");
     const cardW = firstCard?.getBoundingClientRect().width || 240;
 
-    // must match CSS gap (16px)
+    // match css gap 
     const gap = 16;
     const amount = (cardW + gap) * 5;
 

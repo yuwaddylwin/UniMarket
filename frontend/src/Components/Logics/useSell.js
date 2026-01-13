@@ -136,7 +136,7 @@ export function useSellLogic() {
       fd.append("price", String(Number(item.price) || 0));
       fd.append("description", item.description);
 
-      // ✅ Existing images (from DB). Only include ones with publicId.
+      // Existing images (from DB). only include ones with publicId.
       // This prevents sending publicId: "" which causes Mongoose validation error.
       const existing = item.images
         .filter((img) => !img.file) // not newly uploaded
@@ -147,12 +147,12 @@ export function useSellLogic() {
         fd.append("existingImages", JSON.stringify(existing));
       }
 
-      // ✅ New uploads
+      // New uploads
       item.images
         .filter((img) => img.file)
         .forEach((img) => fd.append("images", img.file));
 
-      // ✅ EDIT MODE -> PUT
+      // EDIT MODE -> PUT
       if (isEditMode) {
         if (!editingId) throw new Error("Missing item id for edit");
 
@@ -169,7 +169,7 @@ export function useSellLogic() {
         return;
       }
 
-      // ✅ CREATE MODE -> POST
+      // CREATE MODE -> POST
       const res = await fetch(`${API_BASE}/api/items`, {
         method: "POST",
         body: fd,

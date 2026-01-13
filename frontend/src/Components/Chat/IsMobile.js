@@ -1,4 +1,3 @@
-// hooks/useIsMobile.js
 import { useEffect, useState } from "react";
 
 export const useIsMobile = () => {

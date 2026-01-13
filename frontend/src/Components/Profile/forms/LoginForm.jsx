@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import "./SignUpForm.css"; // Reuse same CSS
+import "./SignUpForm.css";
 
-export default function LoginForm({ showSignup }) {
+export default function LoginForm() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,15 +19,26 @@ export default function LoginForm({ showSignup }) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       return toast.error("Invalid email format");
     if (!formData.password) return toast.error("Password is required");
-
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const clearForm = () => setFormData({ email: "", password: "" });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = validateForm();
-    if (success === true) {
-      login(formData);
+    const ok = validateForm();
+    if (ok !== true) return;
+
+    try {
+      // login should throw on error OR return a truthy success value
+      const res = await login(formData);
+
+      // If your login doesn't return anything, just rely on "no throw" = success
+      if (res === false) return;
+
+      clearForm();
+      navigate("/", { replace: true });
+    } catch (err) {
     }
   };
 
@@ -40,9 +51,7 @@ export default function LoginForm({ showSignup }) {
           type="email"
           placeholder="Enter your email"
           value={formData.email}
-          onChange={(e) =>
-            setFormData({ ...formData, email: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
 
         <div className="password-container">
@@ -56,7 +65,9 @@ export default function LoginForm({ showSignup }) {
           />
           <span
             className="password-toggle"
-            onClick={() => setShowPassword(!showPassword)}
+            onClick={() => setShowPassword((s) => !s)}
+            role="button"
+            tabIndex={0}
           >
             {showPassword ? "Hide" : "Show"}
           </span>
@@ -69,11 +80,7 @@ export default function LoginForm({ showSignup }) {
           </span>
         </div>
 
-        <button
-          type="submit"
-          className="send_button"
-          disabled={isLoggingIn}
-        >
+        <button type="submit" className="send_button" disabled={isLoggingIn}>
           {isLoggingIn ? "Logging In..." : "Login"}
         </button>
       </form>

@@ -78,7 +78,7 @@ const MessageInput = () => {
         )}
       </div>
 
-      {/* CAMERA INPUT (REAL-TIME CAMERA) */}
+      {/* CAMERA INPUT */}
       <input
         ref={cameraInputRef}
         type="file"

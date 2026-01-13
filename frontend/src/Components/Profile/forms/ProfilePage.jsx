@@ -80,9 +80,9 @@ export default function ProfilePage() {
   const handleCancelLogout = () => setShowLogoutConfirm(false);
 
   const handleConfirmLogout = async () => {
-    await logout();          // should set authUser=null in store
+    await logout();          
     setShowLogoutConfirm(false);
-    navigate("/login");      // optional: send to login page
+    navigate("/login");      
   };
 
   // LOGGED OUT VIEW (no data)
@@ -122,7 +122,7 @@ export default function ProfilePage() {
     );
   }
 
-  //  LOGGED IN VIEW (your original UI)
+  //  LOGGED IN VIEW 
   return (
     <div className="profile-container">
       <header className="profile-header">

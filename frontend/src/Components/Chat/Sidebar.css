@@ -85,7 +85,7 @@
   object-fit: cover;
 }
 
-/* 🟢 ONLINE DOT */
+/* ONLINE DOT */
 .online-dot {
   position: absolute;
   bottom: 3px;
@@ -109,7 +109,6 @@
 
 
 /* search bar */
-/* SEARCH BAR */
 .sidebar-search {
   margin-top: 20px;
   margin-right: 20px;
@@ -139,8 +138,8 @@
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 100vw;          /* FULL WIDTH */
-    height: 100vh;         /* FULL HEIGHT */
+    width: 100vw;          
+    height: 100vh;         
     padding: 12px;
     border-right: none;
   }
@@ -159,11 +158,11 @@
 
   .sidebar-search input {
     width: 80%;
-    font-size: 15px;          /* prevent iOS zoom */
+    font-size: 15px;          
     padding: 12px 14px;
-    border-radius: 999px;    /* pill shape */
+    border-radius: 999px;    
     border: 1px solid #e5e7eb;
-    background: #f9fafb;     /* subtle contrast */
+    background: #f9fafb;     
   }
 
   .sidebar-search input:focus {

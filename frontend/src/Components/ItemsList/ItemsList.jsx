@@ -1,4 +1,3 @@
-// ItemsList.jsx (adds arrows only on tablet/laptop/PC)
 import React, { useEffect, useRef, useState } from "react";
 import "./ItemsList.css";
 import { useItemsList } from "../Logics/useItemsList";
@@ -30,7 +29,7 @@ export default function ItemsList({ AddtoCart }) {
   const scrollerRef = useRef(null);
   const [showArrows, setShowArrows] = useState(false);
 
-  // show arrows only on tablet/laptop/PC (>= 600px)
+  // show arrows only on tablet/laptop/PC
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 600px)");
     const update = () => setShowArrows(mq.matches);
@@ -59,14 +58,14 @@ export default function ItemsList({ AddtoCart }) {
     const firstCard = el.querySelector(".item-card");
     const cardW = firstCard?.getBoundingClientRect().width || 280;
 
-    // match CSS gaps: 12 mobile, 14 tablet, 16 desktop
+    // CSS gaps: 12 mobile, 14 tablet, 16 desktop
     const gap = window.matchMedia("(min-width: 900px)").matches
       ? 16
       : window.matchMedia("(min-width: 600px)").matches
       ? 14
       : 12;
 
-    // scroll about 2 cards at a time for ItemsList (feels nice)
+    // scroll about 2 cards at a time for ItemsList 
     const amount = (cardW + gap) * 2;
 
     el.scrollBy({ left: dir * amount, behavior: "smooth" });
@@ -146,31 +145,45 @@ export default function ItemsList({ AddtoCart }) {
 
                   <div className="item-actions">
                     <button
-                      className="btn primary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        AddtoCart(item);
-                      }}
-                      type="button"
-                    >
-                      ADD TO CART 🛒
-                    </button>
+                        className="btn primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
 
-                    <button
-                      className="btn secondary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const sellerId = item?.seller?._id || item?.seller?.id;
-                        if (!sellerId) {
-                          alert("Seller info not available for this item.");
-                          return;
-                        }
-                        navigate(`/chat/${sellerId}`);
-                      }}
-                      type="button"
-                    >
-                      TALK TO SELLER 💬
-                    </button>
+                          if (!authUser) {
+                            navigate("/login");
+                            return; 
+                          }
+
+                          AddtoCart(item);
+                        }}
+                        type="button"
+                      >
+                        ADD TO CART 🛒
+                      </button>
+
+                      <button
+                        className="btn secondary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+
+                          if (!authUser) {
+                            navigate("/login");
+                            return; 
+                          }
+
+                          const sellerId = item?.seller?._id || item?.seller?.id;
+                          if (!sellerId) {
+                            alert("Seller info not available for this item.");
+                            return;
+                          }
+
+                          navigate(`/chat/${sellerId}`);
+                        }}
+                        type="button"
+                      >
+                        TALK TO SELLER 💬
+                      </button>
+
                   </div>
                 </div>
               </div>

@@ -1,12 +1,8 @@
-/* src/Components/ProductsDetails/ProductsDetails.css */
-/* Clean White UI (neutral, modern) + responsive */
-
-/* ====== Theme ====== */
 :root {
   --bg: #f6f7fb;
   --card: #ffffff;
-  --text: #111827;           /* gray-900 */
-  --muted: #6b7280;          /* gray-500 */
+  --text: #111827;          
+  --muted: #6b7280;          
   --line: rgba(17, 24, 39, 0.08);
 
   --shadow: 0 14px 40px rgba(17, 24, 39, 0.10);
@@ -19,7 +15,7 @@
 
   --success-bg: rgba(34, 197, 94, 0.10);
   --success-border: rgba(34, 197, 94, 0.22);
-  --success-text: #166534;   /* green-800 */
+  --success-text: #166534;   
 }
 
 /* Page background */
@@ -27,7 +23,7 @@ body {
   background: var(--bg);
 }
 
-/* ====== Card Container ====== */
+/* Card Container*/
 .item-post {
   width: min(920px, 100%);
   margin: 18px auto;
@@ -40,7 +36,7 @@ body {
   color: var(--text);
 }
 
-/* ====== Seller Header ====== */
+/*Seller Header*/
 .seller-info {
   display: flex;
   align-items: center;
@@ -73,7 +69,7 @@ body {
   margin-top: 2px;
 }
 
-/* If you want name + badge row */
+
 .seller-text {
   display: flex;
   flex-direction: column;
@@ -87,7 +83,7 @@ body {
   flex-wrap: wrap;
 }
 
-/* This is the badge you render now: <p className="seller-badge"> */
+
 .seller-badge {
   margin: 6px 0 0;
   font-size: 12px;
@@ -102,7 +98,7 @@ body {
   width: fit-content;
 }
 
-/* Optional generic badges (if you use them later) */
+
 .listing-badge {
   font-size: 12px;
   font-weight: 700;
@@ -124,7 +120,7 @@ body {
   color: #374151;
 }
 
-/* ====== Carousel ====== */
+/* Carousel */
 .carousel {
   position: relative;
   width: 100%;
@@ -214,7 +210,7 @@ body {
   background: rgba(17, 24, 39, 0.85);
 }
 
-/* ====== No Image Placeholder ====== */
+/*  No Image Placeholder */
 .no-image {
   width: 100%;
   height: 100%;
@@ -226,7 +222,7 @@ body {
   background: linear-gradient(180deg, #fafafa, #f3f4f6);
 }
 
-/* ====== Details ====== */
+/* Details  */
 .item-details {
   padding: 16px;
 }
@@ -264,7 +260,7 @@ body {
   margin: 0;
 }
 
-/* ====== Bottom Buttons ====== */
+/* Bottom Buttons*/
 .bottom-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -314,7 +310,7 @@ body {
   opacity: 0.95;
 }
 
-/* ====== Fullscreen overlay ====== */
+/* Fullscreen overlay*/
 .fullscreen-overlay {
   position: fixed;
   inset: 0;
@@ -389,7 +385,7 @@ body {
 .fs-left { left: 12px; }
 .fs-right { right: 12px; }
 
-/* ====== Responsive: all devices ====== */
+/* Responsive:*/
 @media (min-width: 900px) {
   .item-post {
     display: grid;
@@ -442,7 +438,7 @@ body {
   }
 }
 
-/* ====== Reduced motion ====== */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .carousel-image,
   .nav-btn,

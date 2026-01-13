@@ -22,7 +22,7 @@ export default function ItemCarousel({ items = [] }) {
     el.scrollBy({ left: amount, behavior: "smooth" });
   };
 
-  // ✅ This is ONLY for UI update after ItemCard deletes successfully
+  // UI update after ItemCard deletes successfully
   const handleDeleteItem = (id) => {
     setLocalItems((prev) => prev.filter((x) => (x._id || x.id) !== id));
   };

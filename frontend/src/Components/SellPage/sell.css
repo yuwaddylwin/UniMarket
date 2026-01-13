@@ -1,14 +1,34 @@
-/* ---------- Container ---------- */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* prevents clipping */
+.post-page,
+.sellpage-wrapper,
+.main-content,
+.app,
+.layout {
+  min-height: 100vh;
+  height: auto;
+  overflow-y: auto;
+}
+
+/* Container */
 .post-container {
   max-width: 600px;
-  margin: 80px auto;
+  margin: 40px auto;              
   padding: 32px;
+  padding-bottom: 60px;           
   background: linear-gradient(180deg, #ffffff, #f9fbff);
   border-radius: 20px;
   box-shadow: 0 12px 30px rgba(27, 74, 145, 0.12);
 }
 
-/* ---------- Title ---------- */
+
 .title {
   text-align: center;
   margin-bottom: 35px;
@@ -18,7 +38,7 @@
   letter-spacing: -0.6px;
 }
 
-/* ---------- Logo ---------- */
+
 .logo_sellpage {
   font-size: 36px;
   font-weight: 700;
@@ -29,7 +49,7 @@
   margin-bottom: 20px;
 }
 
-/* ---------- Form ---------- */
+
 .post-form {
   display: flex;
   flex-direction: column;
@@ -41,7 +61,7 @@
   flex-direction: column;
 }
 
-/* ---------- Labels ---------- */
+
 label {
   font-weight: 600;
   margin-bottom: 8px;
@@ -49,7 +69,7 @@ label {
   font-size: 14px;
 }
 
-/* ---------- Inputs ---------- */
+
 input[type="text"],
 input[type="number"],
 textarea,
@@ -75,7 +95,7 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(27, 74, 145, 0.15);
 }
 
-/* ---------- Image Upload ---------- */
+
 .image-upload-container {
   display: flex;
   gap: 12px;
@@ -102,7 +122,7 @@ select:focus {
   transform: translateY(-2px);
 }
 
-/* ---------- Image Preview ---------- */
+
 .image-preview {
   position: relative;
   width: 90px;
@@ -118,9 +138,9 @@ select:focus {
   object-fit: cover;
 }
 
-/* ---------- Remove Button ---------- */
+
 .remove-btn {
-  position:fixed;
+  position: absolute;             
   top: 6px;
   right: 6px;
   background: rgba(0, 0, 0, 0.65);
@@ -132,15 +152,19 @@ select:focus {
   height: 22px;
   cursor: pointer;
   transition: 0.2s;
+  display: grid;
+  place-items: center;
+  z-index: 2;
 }
 
 .remove-btn:hover {
   background: #ff4d4f;
 }
 
-/* ---------- Submit Button ---------- */
+
 .submit-btn {
   margin-top: 10px;
+  margin-bottom: 24px;           
   background: linear-gradient(135deg, #1b4a91, #1a62c6);
   color: white;
   padding: 14px;
@@ -157,13 +181,12 @@ select:focus {
   box-shadow: 0 8px 20px rgba(26, 98, 198, 0.35);
 }
 
-/* ============================= */
-/* 📱 Small devices (phones) */
-/* ============================= */
+
 @media (max-width: 480px) {
   .post-container {
     margin: 40px 12px;
     padding: 20px;
+    padding-bottom: 70px;
     border-radius: 16px;
   }
 
@@ -202,13 +225,12 @@ select:focus {
   }
 }
 
-/* ============================= */
-/* 📱📲 Medium devices (tablets) */
-/* ============================= */
+
 @media (max-width: 768px) {
   .post-container {
     margin: 60px 20px;
     padding: 26px;
+    padding-bottom: 70px;
   }
 
   .logo_sellpage {
@@ -226,11 +248,10 @@ select:focus {
   }
 }
 
-/* ============================= */
-/* 💻 Large screens */
-/* ============================= */
+
 @media (min-width: 1200px) {
   .post-container {
-    max-width: 680px;
+    max-width: 550px;
+    margin: 40px auto;            
   }
 }

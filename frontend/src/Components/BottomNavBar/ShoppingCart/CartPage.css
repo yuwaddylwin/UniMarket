@@ -57,20 +57,20 @@
   color: #333333;
 }
 
-/* 🛍 Price styling */
+/* Price styling */
 .cart-page li span + span {
   font-weight: 600;
   color: #0e8237;
 }
 
-/* 🧩 Button container */
+/* Button container */
 .cart-page-btns {
   display: flex;
   gap: 10px;
   margin-top: 8px;
 }
 
-/* 🛒 Buttons styling */
+/* Buttons styling */
 .cart-page-btns button {
   padding: 8px 14px;
   border: none;
@@ -81,14 +81,13 @@
   transition: all 0.2s ease-in-out;
 }
 
-/* 🧩 Button container */
+/* Button container */
 .cart-page-btns {
   display: flex;
   gap: 10px;
   margin-top: 8px;
 }
 
-/* ✅ Buttons base style (same feel as ItemsPage buttons) */
 .cart-page-btns button {
   padding: 8px 14px;
   border-radius: 12px;
@@ -108,7 +107,7 @@
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
 }
 
-/* 💬 Talk to Seller (Primary like ItemsPage) */
+/* Talk to Seller (Primary like ItemsPage) */
 .talk-btn {
   background: #1b4a91;
   color: #fff;
@@ -119,7 +118,7 @@
   background: #3e79ca;
 }
 
-/* ❌ Delete (Secondary like ItemsPage) */
+/* Delete (Secondary like ItemsPage) */
 .delete-btn {
   background: #fff;
   color: #111827;
@@ -161,7 +160,7 @@
 }
 
 
-/* 🪶 Responsive */
+/* Responsive */
 @media (max-width: 600px) {
   .cart-page {
     margin: 30px 15px;

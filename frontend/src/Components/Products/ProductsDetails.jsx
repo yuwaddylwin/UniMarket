@@ -91,7 +91,7 @@ export default function ItemPage({ AddtoCart }) {
     setIsFullscreen(false); // close modal when changing item
   }, [id]);
 
-  // Optional: close on ESC
+  // close on ESC
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.key === "Escape") setIsFullscreen(false);
@@ -192,7 +192,7 @@ export default function ItemPage({ AddtoCart }) {
 
       </div>
 
-      {/* Fullscreen Modal */}
+      {/* Fullscreen*/}
 {isFullscreen && images.length > 0 && (
   <div
     className="fullscreen-overlay"

@@ -78,7 +78,7 @@ export const createItem = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // ✅ upload new images to cloudinary
+    // upload new images to cloudinary
     const uploadedImages = [];
     for (const file of req.files || []) {
       const result = await uploadBufferToCloudinary(file.buffer, "items");
@@ -199,7 +199,7 @@ export const getItemById = async (req, res) => {
   }
 };
 
-// ✅ UPDATE (Cloudinary)
+// UPDATE (Cloudinary)
 export const updateItem = async (req, res) => {
   try {
     if (!req.user?._id) {
@@ -239,7 +239,7 @@ export const updateItem = async (req, res) => {
       return res.status(400).json({ message: "At least 1 image is required" });
     }
 
-    // delete removed cloudinary images (only those we know publicId for)
+    // delete removed cloudinary images ,only those we know publicId for
     const prevPublicIds = (item.images || [])
       .map((img) => img.publicId)
       .filter(Boolean);
@@ -278,7 +278,7 @@ export const deleteItem = async (req, res) => {
       return res.status(403).json({ message: "Forbidden" });
     }
 
-    // ✅ delete images from cloudinary too
+    // delete images from cloudinary too
     for (const img of item.images || []) {
       if (img.publicId) {
         await cloudinary.uploader.destroy(img.publicId).catch(() => {});

@@ -47,11 +47,11 @@
 }
 
 .online {
-  color: #22c55e; /* green */
+  color: #22c55e; 
 }
 
 .offline {
-  color: #9ca3af; /* gray */
+  color: #9ca3af; 
 }
 
 /* RIGHT SIDE */
@@ -79,7 +79,7 @@
   object-fit: cover;
 }
 
-/* 🟢 ONLINE DOT */
+/* ONLINE DOT */
 .chat-online-dot {
   position: absolute;
   bottom: 2px;

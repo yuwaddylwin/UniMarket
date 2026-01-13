@@ -28,6 +28,7 @@ export default function ItemCard({ item, onDeleteItem }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const menuRef = useRef(null);
 
   const coverSrc = getCoverSrc(item);
@@ -43,21 +44,29 @@ export default function ItemCard({ item, onDeleteItem }) {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
+  // Close modal on ESC
+  useEffect(() => {
+    if (!confirmOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setConfirmOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [confirmOpen]);
+
   const handleEdit = () => {
     setMenuOpen(false);
     navigate("/sell", { state: { mode: "edit", item } });
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
     setMenuOpen(false);
+    if (!itemId) return toast.error("Missing item id");
+    setConfirmOpen(true);
+  };
 
-    if (!itemId) {
-      toast.error("Missing item id");
-      return;
-    }
-
-    const ok = window.confirm("Delete this item?");
-    if (!ok) return;
+  const confirmDelete = async () => {
+    if (!itemId) return;
 
     try {
       setIsDeleting(true);
@@ -70,7 +79,8 @@ export default function ItemCard({ item, onDeleteItem }) {
       if (!res.ok) throw new Error(await getErrorMessage(res));
 
       toast.success("Item deleted");
-      onDeleteItem?.(itemId); // ✅ only UI update
+      setConfirmOpen(false);
+      onDeleteItem?.(itemId);
     } catch (err) {
       console.error(err);
       toast.error(err?.message || "Delete failed");
@@ -93,11 +103,21 @@ export default function ItemCard({ item, onDeleteItem }) {
 
         {menuOpen && (
           <div className="profile-kebab-menu" role="menu">
-            <button type="button" className="profile-kebab-item" onClick={handleEdit} disabled={isDeleting}>
+            <button
+              type="button"
+              className="profile-kebab-item"
+              onClick={handleEdit}
+              disabled={isDeleting}
+            >
               Edit
             </button>
-            <button type="button" className="profile-kebab-item danger" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? "Deleting..." : "Delete"}
+            <button
+              type="button"
+              className="profile-kebab-item danger"
+              onClick={handleDeleteClick}
+              disabled={isDeleting}
+            >
+              Delete
             </button>
           </div>
         )}
@@ -119,6 +139,45 @@ export default function ItemCard({ item, onDeleteItem }) {
           </p>
         </div>
       </div>
+
+      {/* Confirm Modal */}
+      {confirmOpen && (
+        <div
+          className="confirm-overlay"
+          onMouseDown={() => !isDeleting && setConfirmOpen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="confirm-modal"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <h3 className="confirm-title">Are you sure?</h3>
+            <p className="confirm-text">
+              This will permanently delete <b>{title}</b>.
+            </p>
+
+            <div className="confirm-actions">
+              <button
+                type="button"
+                className="confirm-btn"
+                onClick={() => setConfirmOpen(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="confirm-btn danger"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

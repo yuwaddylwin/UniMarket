@@ -1,5 +1,3 @@
-/* ItemsPage.css (all class names are unique: ip-*) */
-
 .ip-page {
   padding: 14px;
   max-width: 1200px;
@@ -68,13 +66,13 @@
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
 
-  padding: 10px 44px 14px; /* space for arrows */
+  padding: 10px 44px 14px; 
   align-items: flex-start;
 
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none; 
 }
 .ip-row::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none; 
 }
 
 /* Arrows */
@@ -187,7 +185,7 @@
   white-space: nowrap;
 }
 
-/* Responsive: still horizontal scrolling, fewer cards visible */
+/* still horizontal scrolling, fewer cards visible */
 @media (max-width: 1000px) {
   .ip-card {
     flex-basis: calc((100% - (var(--ip-gap) * 2)) / 3);

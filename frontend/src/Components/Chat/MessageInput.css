@@ -90,6 +90,6 @@
   }
 
   .chat-messages {
-    padding-bottom: 90px; /* prevent overlap */
+    padding-bottom: 90px; 
   }
 }

@@ -19,7 +19,7 @@ const ChatHeader = () => {
   const handleBack = () => {
     setSelectedUser(null);
 
-    // if we entered via /chat/:sellerId, remove param so it won't re-select
+    // when user enter /chat/:sellerId, remove param so it won't reselect
     if (sellerId) {
       navigate("/chat");
     }
