@@ -6,7 +6,7 @@ import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL;
+const API_BASE = "http://localhost:8000";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function ProfilePage() {
       setLoadingItems(true);
       setItemsError("");
 
-      const res = await axios.get(`http://${API_BASE}/api/items/mine`, {
+      const res = await axios.get(`${API_BASE}/api/items/mine`, {
         withCredentials: true,
       });
 
@@ -177,8 +177,9 @@ export default function ProfilePage() {
       </section>
 
       <div className="menu-section">
-        <button className="menu-btn">Purchase History</button>
-        <button className="menu-btn">Language</button>
+        {/* Upcoming Features */}
+        {/* <button className="menu-btn">Purchase History</button>
+        <button className="menu-btn">Language</button> */}
 
         <button className="menu-btn logout" onClick={handleLogoutClick}>
           <LogOut size={18} style={{ marginRight: "6px" }} />

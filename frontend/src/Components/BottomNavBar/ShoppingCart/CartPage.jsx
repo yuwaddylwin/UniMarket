@@ -3,7 +3,7 @@ import "./CartPage.css";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL;
+const API_BASE = "http://localhost:8000";
 
 
 function getFirstImageSrc(item) {

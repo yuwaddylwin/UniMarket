@@ -58,7 +58,7 @@
   --ip-gap: 16px;
 
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: var(--ip-gap);
 
   overflow-x: auto;
@@ -67,7 +67,7 @@
   scroll-snap-type: x mandatory;
 
   padding: 10px 44px 14px; 
-  align-items: flex-start;
+  align-items: flex-start; 
 
   scrollbar-width: none; 
 }
@@ -116,7 +116,7 @@
   cursor: pointer;
 
   /* 5 cards visible */
-  flex: 0 0 calc((100% - (var(--ip-gap) * 4)) / 5);
+  flex: 0 0 calc((100% - (var(--ip-gap) * 9)) / 10);
   box-sizing: border-box;
   position: relative;
 }
