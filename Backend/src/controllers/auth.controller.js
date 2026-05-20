@@ -34,9 +34,10 @@ const signup = async (req, res) => {
 
     await newUser.save();
 
-    generateToken(newUser._id, res);
+    const token = generateToken(newUser._id);
 
     res.status(201).json({
+      token,
       _id: newUser._id,
       fullName: newUser.fullName,
       email: newUser.email,
@@ -62,9 +63,10 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    generateToken(user._id, res);
+    const token = generateToken(user._id);
 
     res.status(200).json({
+      token,
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
@@ -78,7 +80,6 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);

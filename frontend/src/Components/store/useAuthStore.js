@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios.js";
+import { axiosInstance, setAuthToken, removeAuthToken, getAuthToken } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
@@ -20,9 +20,15 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
+      const token = getAuthToken();
+      if (!token) {
+        set({ authUser: null });
+        return;
+      }
+
       const res = await axiosInstance.get("/auth/check"); // http://localhost:3000/api
       set({ authUser: res.data });
-      get().connectSocket()
+      get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
       set({ authUser: null });
@@ -35,11 +41,13 @@ export const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
+      const { token, ...user } = res.data;
+      setAuthToken(token);
+      set({ authUser: user });
       console.log("Signup response:", res.data);
       toast.success("Account created successfully");
 
-      get().connectSocket()
+      get().connectSocket();
     } catch (error) {
       console.log("Signup error:", error);
       toast.error(error.response?.data?.message || "Sign Up Failed!");
@@ -52,11 +60,13 @@ export const useAuthStore = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      set({ authUser: res.data });
+      const { token, ...user } = res.data;
+      setAuthToken(token);
+      set({ authUser: user });
       toast.success("Logged in successfully");
 
       // Socket
-      get().connectSocket()
+      get().connectSocket();
     } catch (error) {
       toast.error(error.response?.data?.message || "Login Failed!");
     } finally {
@@ -67,7 +77,8 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
-      set({ authUser: null});
+      removeAuthToken();
+      set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {

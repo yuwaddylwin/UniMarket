@@ -19,7 +19,8 @@ app.use(cors({
     'http://localhost:3000',
     'https://unimarket-1-55jg.onrender.com'
   ],
-  credentials: true, // to allow cookies
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json({ limit: "20mb" }));

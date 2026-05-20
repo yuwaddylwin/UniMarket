@@ -7,5 +7,24 @@ const BASE_URL =
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+});
+
+export const setAuthToken = (token) => {
+  if (token) {
+    localStorage.setItem("authToken", token);
+  }
+};
+
+export const removeAuthToken = () => {
+  localStorage.removeItem("authToken");
+};
+
+export const getAuthToken = () => localStorage.getItem("authToken");
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = getAuthToken();
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
