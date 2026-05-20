@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
 import "./ProductsDetails.css";
-
-const API_BASE = "http://localhost:8000";
+import { axiosInstance } from "../lib/axios";
 
 function extractId(value) {
   if (!value) return null;
@@ -41,9 +39,7 @@ export default function ItemPage({ AddtoCart }) {
     let mounted = true;
     (async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/auth/me`, {
-          withCredentials: true,
-        });
+        const res = await axiosInstance.get("/auth/me");
         if (mounted) setMe(res.data);
       } catch (e) {
         if (mounted) setMe(null);

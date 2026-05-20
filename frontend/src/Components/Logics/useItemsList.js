@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
-
-const API_BASE = "http://localhost:8000";
+import { axiosInstance } from "../lib/axios";
 
 function normalizeSeller(it) {
   // If backend sends seller snapshot
@@ -47,9 +45,7 @@ export function useItemsList() {
       setLoading(true);
       setError("");
 
-      const res = await axios.get(`${API_BASE}/api/items`, {
-            withCredentials: true,
-});
+      const res = await axiosInstance.get("/items");
 
       const list = Array.isArray(res.data) ? res.data : res.data?.items || [];
       if (mountedRef.current) setRawItems(list);

@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import { Camera, LogOut, LogIn } from "lucide-react";
 import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
-
-const API_BASE = "http://localhost:8000";
+import { axiosInstance } from "../../lib/axios";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -48,9 +46,7 @@ export default function ProfilePage() {
       setLoadingItems(true);
       setItemsError("");
 
-      const res = await axios.get(`${API_BASE}/api/items/mine`, {
-        withCredentials: true,
-      });
+      const res = await axiosInstance.get("/items/mine");
 
       const list = Array.isArray(res.data) ? res.data : res.data?.items || [];
       setMyItems(list);
