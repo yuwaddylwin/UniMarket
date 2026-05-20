@@ -15,7 +15,10 @@ import { app, server } from "./src/lib/socket.js";
 
 //Middleware
 app.use(cors({
-  origin: "http://localhost:3000", 
+  origin: [
+    'http://localhost:3000',
+    'https://unimarket-1-55jg.onrender.com'
+  ],
   credentials: true, // to allow cookies
 }));
 
