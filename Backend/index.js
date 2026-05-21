@@ -17,7 +17,7 @@ import { app, server } from "./src/lib/socket.js";
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://unimarket-1-55jg.onrender.com'
+    'https://unimarket-web.onrender.com'
   ],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],

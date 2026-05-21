@@ -10,9 +10,6 @@ export const generateToken = (userId) => {
     );
 };
 
-
-
-
 // import jwt from "jsonwebtoken";
 
 // export const generateToken = (userId, res ) =>{
