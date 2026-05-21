@@ -14,7 +14,7 @@ UniMarket enables students to:
 - Access the platform securely with authentication and protected routes
 This project focuses on real-world full-stack development using RESTful APIs and real-time communication.
   
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - React
@@ -33,10 +33,10 @@ This project focuses on real-world full-stack development using RESTful APIs and
 - Protected routes
 ---
 ## ✨ Features
-- 🔐 Secure authentication and authorization
-- 📦 Create, edit, and delete item listings
-- 🔍 Search and filter marketplace items
-- 💬 Real-time chat using Socket.io
-- ⚡ Optimized MongoDB CRUD operations
-- 🧑‍🎓 Student-focused marketplace
----
+- Secure authentication and authorization
+- Create, edit, and delete item listings
+- Search and filter marketplace items
+- Real-time chat using Socket.io
+- Optimized MongoDB CRUD operations
+- Student-focused marketplace
+
