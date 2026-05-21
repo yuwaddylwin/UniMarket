@@ -6,11 +6,10 @@ import { useAuthStore } from "../store/useAuthStore";
 import { MessageCircle } from "lucide-react";
 
 
-
 export default function BottomNav({ cartCount = 0 }) {
   
   const navigate = useNavigate();
-  const { authUser } = useAuthStore();
+  const { authUser, totalUnread } = useAuthStore();
   
   const handleChatClick = () => {
     if (!authUser) navigate("/login");
@@ -22,8 +21,13 @@ export default function BottomNav({ cartCount = 0 }) {
     <div className="bottom-nav">
       
       <Home onClick={() => navigate("/")} />
-      <div onClick={handleChatClick}>
+      <div className="chat-icon-wrapper" onClick={handleChatClick}>
         <MessageCircle className="bn-chat-icon"/>
+        {totalUnread > 0 && (
+          <div className="message-badge">
+            {totalUnread > 99 ? "99+" : totalUnread}
+          </div>
+        )}
       </div>
       <div
           className="plus-btn"

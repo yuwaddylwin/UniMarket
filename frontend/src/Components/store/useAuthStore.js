@@ -17,6 +17,8 @@ export const useAuthStore = create((set, get) => ({
   isUpdatingProfile: false,
   isCheckingAuth: true,
   socket: null,
+  unreadCount: {}, // { userId: count }
+  totalUnread: 0,
 
   checkAuth: async () => {
     try {
@@ -119,11 +121,75 @@ export const useAuthStore = create((set, get) => ({
     newSocket.on("getOnlineUsers", (userId) => {
       set({onlineUsers: userId})
     });
+
+    newSocket.on("newMessage", (message) => {
+      if (!message?.senderName) return;
+      toast.success(`${message.senderName} sent you a message`);
+    });
+
+    // Initialize unread count and subscribe to updates
+    get().getUnreadCount();
+    get().subscribeToUnreadUpdates();
   },
 
   disconnectSocket: () => {
     const socket = get().socket;
-    if (socket) socket.disconnect();
+    if (socket) {
+      socket.disconnect();
+    }
+    get().unsubscribeFromUnreadUpdates();
+  },
+
+  getUnreadCount: async () => {
+    try {
+      const { axiosInstance } = await import("../lib/axios.js");
+      const res = await axiosInstance.get("/messages/unread/count");
+      const unreadMap = {};
+      res.data.byUser.forEach(item => {
+        unreadMap[item.userId] = item.count;
+      });
+      set({ unreadCount: unreadMap, totalUnread: res.data.total });
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  },
+
+  subscribeToUnreadUpdates: () => {
+    const socket = get().socket;
+    if (!socket) return;
+
+    socket.on("unreadCountUpdate", ({ senderId, unreadCount }) => {
+      set((state) => {
+        const newUnreadCount = { ...state.unreadCount };
+        newUnreadCount[senderId] = (newUnreadCount[senderId] || 0) + unreadCount;
+        const totalUnread = Object.values(newUnreadCount).reduce((sum, count) => sum + count, 0);
+        
+        return {
+          unreadCount: newUnreadCount,
+          totalUnread,
+        };
+      });
+    });
+
+    socket.on("messagesSeen", ({ userId }) => {
+      set((state) => {
+        const newUnreadCount = { ...state.unreadCount };
+        delete newUnreadCount[userId];
+        const totalUnread = Object.values(newUnreadCount).reduce((sum, count) => sum + count, 0);
+        
+        return {
+          unreadCount: newUnreadCount,
+          totalUnread,
+        };
+      });
+    });
+  },
+
+  unsubscribeFromUnreadUpdates: () => {
+    const socket = get().socket;
+    if (!socket) return;
+    socket.off("unreadCountUpdate");
+    socket.off("messagesSeen");
   },
   
 }));

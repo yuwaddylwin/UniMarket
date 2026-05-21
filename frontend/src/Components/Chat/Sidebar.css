@@ -26,6 +26,7 @@
   border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
+  position: relative;
 }
 
 .user-item:hover {
@@ -134,6 +135,24 @@
   font-size: 13px;
   color: gray;
   text-align: center;
+}
+
+/* USER UNREAD BADGE */
+.user-unread-badge {
+  position: absolute;
+  right: 10px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
 }
 
 @media (max-width: 768px) {

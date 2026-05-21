@@ -15,11 +15,10 @@ const ChatHomePage = () => {
   const {
     selectedUser,
     setSelectedUser,   
-    getUsers,          
+    getUsers,
   } = useChatStore();
 
   useEffect(() => {
-  if (!sellerId) return;
 
   let cancelled = false; 
 

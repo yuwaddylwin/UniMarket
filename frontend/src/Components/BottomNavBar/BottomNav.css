@@ -74,26 +74,8 @@ body {
   height: 28px;
   background: none;
   box-shadow: none;
-}
-
-/* Badge adjust */
-.bottom-nav .cart-badge {
-  top: -4px;
-  right: -6px;
-  transform: scale(0.85);
-}
-
-/* Ensure badge shows inside bottom nav version */
-.bottom-nav .cart-icon {
-    position: relative;
-    overflow: visible;   
-}
-
-/* Fix badge position */
-.bottom-nav .cart-badge {
-    top: -6px;
-    right: -6px;
-    transform: scale(0.8);
+  position: relative;
+  overflow: visible;
 }
 
 .cart-icon {
@@ -103,13 +85,56 @@ body {
 
 .cart-badge {
   position: absolute;
-  top: -4px;
-  right: -6px;
-  background: rgb(183, 44, 44);
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
   color: #fff;
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 11px;
   font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* MESSAGE BADGE */
+.chat-icon-wrapper {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: badge-pulse 2s infinite;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 

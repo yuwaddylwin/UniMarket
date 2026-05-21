@@ -14,7 +14,7 @@ const Sidebar = () => {
     isUsersLoading,
   } = useChatStore();
 
-  const { authUser, onlineUsers } = useAuthStore();
+  const { authUser, onlineUsers, unreadCount } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -48,6 +48,7 @@ const Sidebar = () => {
           filteredUsers.map((user) => {
             const isOnline = onlineUsers.includes(user._id);
             const isSelected = selectedUser?._id === user._id;
+            const userUnreadCount = unreadCount[user._id] || 0;
 
             return (
               <div
@@ -71,6 +72,12 @@ const Sidebar = () => {
                     {isOnline ? "Online" : "Offline"}
                   </span>
                 </div>
+
+                {userUnreadCount > 0 && (
+                  <div className="user-unread-badge">
+                    {userUnreadCount > 99 ? "99+" : userUnreadCount}
+                  </div>
+                )}
               </div>
             );
           })

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { axiosInstance } from "../lib/axios";
 
 const emptyItem = {
   images: [], // [{ url: string, publicId?: string, file?: File, isNew?: boolean }]
@@ -113,19 +114,6 @@ export function useSellLogic() {
 
   const handleCancel = () => navigate(-1);
 
-  async function getErrorMessage(res) {
-    const contentType = res.headers.get("content-type") || "";
-    if (contentType.includes("application/json")) {
-      const data = await res.json().catch(() => null);
-      return data?.message || "Request failed";
-    }
-    const text = await res.text().catch(() => "");
-    return text || "Request failed";
-  }
-
-  const API_BASE = "http://localhost:8000";
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -157,13 +145,7 @@ export function useSellLogic() {
       if (isEditMode) {
         if (!editingId) throw new Error("Missing item id for edit");
 
-        const res = await fetch(`${API_BASE}/api/items/${editingId}`, {
-          method: "PUT",
-          body: fd,
-          credentials: "include",
-        });
-
-        if (!res.ok) throw new Error(await getErrorMessage(res));
+        const res = await axiosInstance.put(`/items/${editingId}`, fd);
 
         toast.success("Item updated successfully");
         navigate(-1);
@@ -171,19 +153,13 @@ export function useSellLogic() {
       }
 
       // CREATE MODE -> POST
-      const res = await fetch(`${API_BASE}/api/items`, {
-        method: "POST",
-        body: fd,
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error(await getErrorMessage(res));
+      const res = await axiosInstance.post(`/items`, fd);
 
       toast.success("Item posted successfully");
       setItem(emptyItem);
     } catch (err) {
       console.error(err);
-      toast.error(err?.message || "Something went wrong.");
+      toast.error(err?.response?.data?.message || err?.message || "Something went wrong.");
     }
   };
 
