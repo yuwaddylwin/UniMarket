@@ -1,21 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { axiosInstance } from "../lib/axios";
 import "./ItemCardfromProfile.css";
 
 const API_BASE = "http://localhost:8000";
-
-
-async function getErrorMessage(res) {
-  const contentType = res.headers.get("content-type") || "";
-  if (res.status === 204) return "";
-  if (contentType.includes("application/json")) {
-    const data = await res.json().catch(() => null);
-    return data?.message || "Request failed";
-  }
-  const text = await res.text().catch(() => "");
-  return text || "Request failed";
-}
 
 function getCoverSrc(item) {
   const first = item?.images?.[0];
@@ -72,19 +61,16 @@ export default function ItemCard({ item, onDeleteItem }) {
     try {
       setIsDeleting(true);
 
-      const res = await fetch(`${API_BASE}/api/items/${itemId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error(await getErrorMessage(res));
+      await axiosInstance.delete(`/items/${itemId}`);
 
       toast.success("Item deleted");
       setConfirmOpen(false);
       onDeleteItem?.(itemId);
     } catch (err) {
       console.error(err);
-      toast.error(err?.message || "Delete failed");
+      toast.error(
+        err?.response?.data?.message || err?.message || "Delete failed"
+      );
     } finally {
       setIsDeleting(false);
     }
