@@ -3,7 +3,7 @@
 UniMarket is a full-stack web application built for university students to buy and sell second-hand items in a secure, real-time marketplace.
 
 ## Project Demo
-[Demo Video](https://www.linkedin.com/posts/yuwaddylwin_mern-reactjs-nodejs-ugcPost-7463546324861472769-kh_o?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF0W0zcBYgZLv3GKti5jmF3By9n0mvFIlsE)
+[Website Link](https://unimarket-web.onrender.com)
 
 ## 📸 App Screenshots
 ![image](https://github.com/yuwaddylwin/UniMarket/blob/867d23665e9172d9cc7aca0fb9ce969d6e6f512b/Student-exclusive%20marketplace.jpg)
