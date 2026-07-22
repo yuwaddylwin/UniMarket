@@ -5,6 +5,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Toaster } from "react-hot-toast";
 import { Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ProfileAvatar from "../common/ProfileAvatar";
 
 
 import SignUpForm from "./forms/SignUpForm";
@@ -52,7 +53,7 @@ export default function Profile() {
           authUser ? navigate("/profile") : showLogin();
         }}
       >
-        <img src={authUser?.profilePic || "/Images/user.png"} />
+        <ProfileAvatar profilePic={authUser?.profilePic} alt="Profile" />
 
       </div>
 

@@ -1,12 +1,13 @@
 import "./MessageBubble.css";
+import ProfileAvatar from "../common/ProfileAvatar";
 
 const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
   return (
     <div className={`message-row ${isOwn ? "own" : "other"}`}>
       {!isOwn && (
-        <img
+        <ProfileAvatar
           className="message-avatar"
-          src={selectedUser.profilePic || "/Image/user.png"}
+          profilePic={selectedUser.profilePic}
           alt=""
         />
       )}
@@ -41,9 +42,9 @@ const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
       </div>
 
       {isOwn && (
-        <img
+        <ProfileAvatar
           className="message-avatar"
-          src={authUser.profilePic || "/Image/user.png"}
+          profilePic={authUser.profilePic}
           alt=""
         />
       )}

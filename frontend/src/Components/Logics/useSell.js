@@ -145,7 +145,7 @@ export function useSellLogic() {
       if (isEditMode) {
         if (!editingId) throw new Error("Missing item id for edit");
 
-        const res = await axiosInstance.put(`/items/${editingId}`, fd);
+        await axiosInstance.put(`/items/${editingId}`, fd);
 
         toast.success("Item updated successfully");
         navigate(-1);
@@ -153,7 +153,7 @@ export function useSellLogic() {
       }
 
       // CREATE MODE -> POST
-      const res = await axiosInstance.post(`/items`, fd);
+      await axiosInstance.post(`/items`, fd);
 
       toast.success("Item posted successfully");
       setItem(emptyItem);

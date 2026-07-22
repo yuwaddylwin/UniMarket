@@ -4,6 +4,7 @@ import "./BottomNav.css";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { MessageCircle } from "lucide-react";
+import ProfileAvatar from "../common/ProfileAvatar";
 
 
 export default function BottomNav({ cartCount = 0 }) {
@@ -59,8 +60,8 @@ export default function BottomNav({ cartCount = 0 }) {
           }
         }}
       >
-        <img 
-          src={authUser?.profilePic || "/Images/user.png"} 
+        <ProfileAvatar
+          profilePic={authUser?.profilePic}
           alt="profile" 
         />
       </div>

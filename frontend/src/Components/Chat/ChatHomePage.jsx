@@ -16,6 +16,7 @@ const ChatHomePage = () => {
     selectedUser,
     setSelectedUser,   
     getUsers,
+    getUserById,
   } = useChatStore();
 
   useEffect(() => {
@@ -43,8 +44,14 @@ const ChatHomePage = () => {
       return;
     }
 
-    // 3) fallback
-    if (!cancelled) setSelectedUser({ _id: sellerId });
+    // 3) Direct seller links can begin a new conversation, so resolve the
+    // user without adding everyone to the sidebar.
+    try {
+      const user = await getUserById(sellerId);
+      if (!cancelled) setSelectedUser(user);
+    } catch {
+      if (!cancelled) setSelectedUser(null);
+    }
   };
 
   pickUser();
@@ -52,7 +59,7 @@ const ChatHomePage = () => {
   return () => {
     cancelled = true; // prevents late setSelectedUser after back navigation
   };
-}, [sellerId, getUsers, setSelectedUser]);
+}, [sellerId, getUsers, getUserById, setSelectedUser]);
 
 
   // MOBILE: show ONE page at a time

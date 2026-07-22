@@ -5,6 +5,7 @@ import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
 import { axiosInstance } from "../../lib/axios";
+import ProfileAvatar from "../../common/ProfileAvatar";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -93,8 +94,7 @@ export default function ProfilePage() {
 
         <div className="photo-section">
           <div className="photo-wrapper">
-            <img
-              src="/Images/user1.png"
+            <ProfileAvatar
               alt="profile"
               className="profile-photo"
             />
@@ -129,8 +129,8 @@ export default function ProfilePage() {
 
       <div className="photo-section">
         <div className="photo-wrapper">
-          <img
-            src={preview || authUser?.profilePic || "Images/user1.png"}
+          <ProfileAvatar
+            profilePic={preview || authUser?.profilePic}
             alt="profile"
             className="profile-photo"
           />

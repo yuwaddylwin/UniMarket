@@ -3,6 +3,7 @@ import "./ItemsList.css";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import ProfileAvatar from "../common/ProfileAvatar";
 
 const API_BASE = "http://localhost:8000";
 
@@ -121,21 +122,12 @@ export default function ItemsList({ AddtoCart }) {
 
                   {item?.seller?.fullName && (
                     <div className="seller-row">
-                      {item?.seller?.profilePic && (
-                        <img
-                          className="seller-pic"
-                          src={
-                            item.seller.profilePic.startsWith("/uploads/")
-                              ? `${API_BASE}${item.seller.profilePic}`
-                              : item.seller.profilePic
-                          }
-                          alt={item.seller.fullName}
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      )}
+                      <ProfileAvatar
+                        className="seller-pic"
+                        profilePic={item.seller.profilePic}
+                        alt={item.seller.fullName}
+                        loading="lazy"
+                      />
                       <span className="seller-name">
                         Seller: {item.seller.fullName}
                       </span>

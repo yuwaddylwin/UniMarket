@@ -7,14 +7,54 @@ import { getReceiverSocketId, io } from "../lib/socket.js";
 export const getUsersForSidebar = async (req,res) => {
     try{
         const loggedInUserId = req.user._id;
-        const filteredUsers = await User.find({_id: {$ne: loggedInUserId}}).select("-password");
+        const conversations = await Message.aggregate([
+            {
+                $match: {
+                    $or: [{ senderId: loggedInUserId }, { receivedId: loggedInUserId }],
+                },
+            },
+            { $sort: { createdAt: -1 } },
+            {
+                $project: {
+                    partnerId: {
+                        $cond: [
+                            { $eq: ["$senderId", loggedInUserId] },
+                            "$receivedId",
+                            "$senderId",
+                        ],
+                    },
+                },
+            },
+            { $group: { _id: "$partnerId", latestMessageAt: { $first: "$createdAt" } } },
+            { $sort: { latestMessageAt: -1 } },
+        ]);
 
-        res.status(200).json(filteredUsers);
+        const partnerIds = conversations.map((conversation) => conversation._id);
+        const users = await User.find({ _id: { $in: partnerIds } }).select("-password");
+        const userById = new Map(users.map((user) => [user._id.toString(), user]));
+
+        // Keep the most recently active conversation at the top.
+        const orderedUsers = partnerIds
+            .map((id) => userById.get(id.toString()))
+            .filter(Boolean);
+
+        res.status(200).json(orderedUsers);
     }catch(error){
         console.log("Error in getUsersForSidebar: ", error.message);
         res.status(500).json({error: "Internal server error"});
     }
 }
+
+export const getUserForChat = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select("-password");
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.status(200).json(user);
+    } catch (error) {
+        console.log("Error in getUserForChat: ", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
 
 export const getMessage = async (req, res) => {
     try{

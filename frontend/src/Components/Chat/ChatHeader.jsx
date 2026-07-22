@@ -4,6 +4,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useIsMobile } from "./IsMobile";
 import { useNavigate, useParams } from "react-router-dom";
 import "./ChatHeader.css";
+import ProfileAvatar from "../common/ProfileAvatar";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
@@ -37,8 +38,8 @@ const ChatHeader = () => {
         )}
 
         <div className="chat-header-avatar-wrapper">
-          <img
-            src={selectedUser.profilePic || "/Images/user.png"}
+          <ProfileAvatar
+            profilePic={selectedUser.profilePic}
             alt={selectedUser.fullName}
             className="chat-header-avatar"
           />

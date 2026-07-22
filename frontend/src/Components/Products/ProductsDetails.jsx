@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
 import "./ProductsDetails.css";
 import { axiosInstance } from "../lib/axios";
+import ProfileAvatar from "../common/ProfileAvatar";
 
 function extractId(value) {
   if (!value) return null;
@@ -79,10 +80,10 @@ export default function ItemPage({ AddtoCart }) {
     ? ""
     : seller?.fullName || seller?.name || seller?.username || "Seller Account";
 
-  const sellerPic = seller?.profilePic || "/default-avatar.png";
-
   const [currentImg, setCurrentImg] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const touchStartX = useRef(null);
+  const didSwipe = useRef(false);
 
   useEffect(() => {
     setCurrentImg(0);
@@ -103,22 +104,52 @@ export default function ItemPage({ AddtoCart }) {
 
   const nextImage = () => {
     if (images.length <= 1) return;
-    setCurrentImg((prev) => (prev + 1) % images.length);
+    setCurrentImg((prev) => Math.min(prev + 1, images.length - 1));
   };
 
   const prevImage = () => {
     if (images.length <= 1) return;
-    setCurrentImg((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImg((prev) => Math.max(prev - 1, 0));
   };
 
+  const handleTouchStart = (event) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+    didSwipe.current = false;
+  };
+
+  const handleTouchEnd = (event) => {
+    const startX = touchStartX.current;
+    const endX = event.changedTouches[0]?.clientX;
+    touchStartX.current = null;
+
+    if (startX === null || endX === undefined) return;
+    const distance = endX - startX;
+    if (Math.abs(distance) < 48) return;
+
+    didSwipe.current = true;
+    if (distance < 0) nextImage();
+    else prevImage();
+  };
+
+  const hasMultipleImages = images.length > 1;
+
   return (
-    <div className="item-post">
+    <main className="item-details-page">
+      <div className="item-post">
+      <button
+        className="item-back-button"
+        type="button"
+        aria-label="Go back"
+        onClick={() => navigate(-1)}
+      >
+        <span aria-hidden="true">←</span>
+        <span>Back</span>
+      </button>
       <div className="seller-info">
-        <img
-          src={sellerPic}
+        <ProfileAvatar
+          profilePic={seller?.profilePic}
           alt="Seller"
           className="seller-avatar"
-          onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
         />
         <div>
           <p className="seller-name">{sellerName}</p>
@@ -126,22 +157,33 @@ export default function ItemPage({ AddtoCart }) {
         </div>
       </div>
 
-      <div className="carousel">
-        <button
-          className="nav-btn left"
-          onClick={prevImage}
-          disabled={images.length <= 1}
-          type="button"
-        >
-          ‹
-        </button>
+      <div
+        className="carousel"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {hasMultipleImages && (
+          <button
+            className="nav-btn left"
+            onClick={prevImage}
+            disabled={currentImg === 0}
+            type="button"
+            aria-label="Previous image"
+          >
+            ‹
+          </button>
+        )}
 
         {images.length > 0 ? (
           <img
+            key={currentImg}
             src={images[currentImg]}
             alt={item.title}
             className="carousel-image"
-            onClick={() => setIsFullscreen(true)}
+            onClick={() => {
+              if (!didSwipe.current) setIsFullscreen(true);
+              didSwipe.current = false;
+            }}
             style={{ cursor: "zoom-in" }}
             onError={(e) => (e.currentTarget.src = "/no-image.png")}
           />
@@ -149,14 +191,17 @@ export default function ItemPage({ AddtoCart }) {
           <div className="no-image">No Image</div>
         )}
 
-        <button
-          className="nav-btn right"
-          onClick={nextImage}
-          disabled={images.length <= 1}
-          type="button"
-        >
-          ›
-        </button>
+        {hasMultipleImages && (
+          <button
+            className="nav-btn right"
+            onClick={nextImage}
+            disabled={currentImg === images.length - 1}
+            type="button"
+            aria-label="Next image"
+          >
+            ›
+          </button>
+        )}
       </div>
 
       <div className="item-details">
@@ -210,17 +255,20 @@ export default function ItemPage({ AddtoCart }) {
       ×
     </button>
 
-    <button
-      className="nav-btn left"
-      type="button"
-      disabled={images.length <= 1}
-      onClick={(e) => {
-        e.stopPropagation();
-        prevImage();
-      }}
-    >
-      ‹
-    </button>
+    {hasMultipleImages && (
+      <button
+        className="nav-btn left"
+        type="button"
+        disabled={currentImg === 0}
+        aria-label="Previous image"
+        onClick={(e) => {
+          e.stopPropagation();
+          prevImage();
+        }}
+      >
+        ‹
+      </button>
+    )}
 
     <img
       src={images[currentImg]}
@@ -230,18 +278,22 @@ export default function ItemPage({ AddtoCart }) {
       onError={(e) => (e.currentTarget.src = "/no-image.png")}
     />
 
-    <button
-      className="nav-btn right"
-      type="button"
-      disabled={images.length <= 1}
-      onClick={(e) => {
-        e.stopPropagation();
-        nextImage();
-      }}
-    >
-      ›
-    </button>
+    {hasMultipleImages && (
+      <button
+        className="nav-btn right"
+        type="button"
+        disabled={currentImg === images.length - 1}
+        aria-label="Next image"
+        onClick={(e) => {
+          e.stopPropagation();
+          nextImage();
+        }}
+      >
+        ›
+      </button>
+    )}
   </div>
 )}
 </div>
+    </main>
 )}

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import "./ItemsPage.css";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -27,8 +27,6 @@ export default function ItemsPage() {
   const { authUser } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  const scrollerRef = useRef(null);
 
   const rawSearch = searchParams.get("search") || "";
   const searchQuery = rawSearch.trim().toLowerCase();
@@ -64,20 +62,6 @@ export default function ItemsPage() {
     };
   }, [baseItems, searchQuery]);
 
-  const scrollByFive = (dir) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-
-    const firstCard = el.querySelector(".ip-card");
-    const cardW = firstCard?.getBoundingClientRect().width || 240;
-
-    // match css gap 
-    const gap = 16;
-    const amount = (cardW + gap) * 5;
-
-    el.scrollBy({ left: dir * amount, behavior: "smooth" });
-  };
-
   return (
     <div className="ip-page">
       <div className="ip-header">
@@ -100,16 +84,7 @@ export default function ItemsPage() {
       )}
 
       <div className="ip-wrap">
-        <button
-          className="ip-arrow ip-left"
-          type="button"
-          aria-label="Scroll left"
-          onClick={() => scrollByFive(-1)}
-        >
-          ←
-        </button>
-
-        <div className="ip-row" ref={scrollerRef}>
+        <div className="ip-row">
           {orderedItems.length === 0 ? (
             <p style={{ padding: 12 }}>No items to show.</p>
           ) : (
@@ -130,43 +105,10 @@ export default function ItemsPage() {
                   />
                 </div>
 
-                <div className="ip-body">
-                  <h3 className="ip-card-title">{item.title}</h3>
-
-                  {item?.seller?.fullName && (
-                    <div className="ip-seller">
-                      {item?.seller?.profilePic && (
-                        <img
-                          className="ip-seller-pic"
-                          src={
-                            item.seller.profilePic.startsWith("/uploads/")
-                              ? `${API_BASE}${item.seller.profilePic}`
-                              : item.seller.profilePic
-                          }
-                          alt={item.seller.fullName}
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      )}
-                      <span className="ip-seller-name">{item.seller.fullName}</span>
-                    </div>
-                  )}
-                </div>
               </div>
             ))
           )}
         </div>
-
-        <button
-          className="ip-arrow ip-right"
-          type="button"
-          aria-label="Scroll right"
-          onClick={() => scrollByFive(1)}
-        >
-          →
-        </button>
       </div>
     </div>
   );

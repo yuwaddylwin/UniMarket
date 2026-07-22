@@ -32,7 +32,10 @@ const ChatContainer = () => {
     <div className="chat-container">
       <ChatHeader />
 
-      <div className="chat-messages">
+      <div className="chat-messages" aria-live="polite">
+        {messages.length === 0 && (
+          <div className="conversation-empty">Send a message to start the conversation.</div>
+        )}
         {messages.map((message) => (
           <MessageBubble
             key={message._id}

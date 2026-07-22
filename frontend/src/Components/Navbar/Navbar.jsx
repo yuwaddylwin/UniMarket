@@ -1,6 +1,7 @@
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Search as SearchIcon } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ function Logo() {
 function Search({ value, onChange, onSubmit }) {
   return (
     <form className="search-form" onSubmit={onSubmit}>
+      <SearchIcon className="search-icon" size={18} aria-hidden="true" />
       <input
         type="text"
         placeholder="Search by title or seller..."

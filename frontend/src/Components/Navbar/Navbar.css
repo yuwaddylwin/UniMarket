@@ -43,7 +43,7 @@
   gap: 10px;
 
   height: 48px;
-  padding: 0 10px 0 14px;
+  padding: 0 10px 0 16px;
 
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -51,6 +51,11 @@
 
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
   transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.search-icon {
+  color: #6b7280;
+  flex: 0 0 auto;
 }
 
 .search-form:focus-within {
@@ -168,3 +173,7 @@
   }
 }
 
+@media (max-width: 380px) {
+  .search-button { padding: 0 12px; font-size: 11px; }
+  .search-form input { font-size: 13px; }
+}

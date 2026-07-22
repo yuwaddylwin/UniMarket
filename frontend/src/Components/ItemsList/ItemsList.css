@@ -63,6 +63,7 @@
   width: 82vw;
   max-width: 360px;
   flex: 0 0 auto;
+  height: 430px;
 }
 
 .item-card:hover {
@@ -89,6 +90,8 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Price */
@@ -153,6 +156,7 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  min-height: 34px;
 }
 
 /* Buttons */
@@ -160,6 +164,7 @@
   display: flex;
   gap: 10px;
   margin-top: 6px;
+  margin-top: auto;
 }
 
 .btn {
@@ -274,6 +279,7 @@
     width: 320px;       
     max-width: none;
     border-radius: 16px;
+    height: 416px;
   }
 
   .item-img {
@@ -310,6 +316,7 @@
 
   .item-card {
     width: 280px; 
+    height: 404px;
   }
 
   .item-img {
@@ -339,6 +346,7 @@
 @media (min-width: 1200px) {
   .item-card {
     width: 300px;
+    height: 414px;
   }
 
   .item-img {
