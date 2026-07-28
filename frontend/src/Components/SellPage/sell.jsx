@@ -6,6 +6,7 @@ function Sell() {
   const {
     item,
     isEditMode,
+    isSubmitting,
     handleChange,
     handleImageUpload,
     removeImage,
@@ -21,7 +22,7 @@ function Sell() {
 
       <form className="post-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Item Images (max 6)</label>
+          <label>Item Images (required, max 6)</label>
           <div className="image-upload-container">
             {/* Image Previews */}
             {item.images.map((img, index) => (
@@ -92,8 +93,10 @@ function Sell() {
             onChange={handleChange}
             placeholder="Enter price"
             min="0"
+            step="1"
+            inputMode="numeric"
             onKeyDown={(e) => {
-              if (e.key === "-" || e.key === "e") {
+              if (["-", "+", "e", "E", ".", ","].includes(e.key)) {
                 e.preventDefault();
               }
             }}
@@ -116,16 +119,31 @@ function Sell() {
         {/* Buttons */}
         {isEditMode ? (
           <div style={{ display: "flex", gap: "10px" }}>
-            <button type="submit" className="submit-btn">
-              Save
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Save"}
             </button>
-            <button type="button" className="submit-btn" onClick={handleCancel}>
+            <button
+              type="button"
+              className="submit-btn"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
           </div>
         ) : (
-          <button type="submit" className="submit-btn">
-            Post Item
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+          >
+            {isSubmitting ? "Posting..." : "Post Item"}
           </button>
         )}
       </form>

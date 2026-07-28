@@ -181,6 +181,13 @@ select:focus {
   box-shadow: 0 8px 20px rgba(26, 98, 198, 0.35);
 }
 
+.submit-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
+}
+
 
 @media (max-width: 480px) {
   .post-container {

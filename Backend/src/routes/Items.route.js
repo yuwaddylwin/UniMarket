@@ -12,12 +12,23 @@ import {
 
 const router = express.Router();
 
+const uploadItemImages = (req, res, next) => {
+  upload.array("images", 6)(req, res, (error) => {
+    if (!error) return next();
+
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Image upload failed",
+    });
+  });
+};
+
 router.get("/", getItems);
 router.get("/mine", ProtectRoute, getMyItems);
 router.get("/:id", getItemById);
 
-router.post("/", ProtectRoute, upload.array("images", 6), createItem);
-router.put("/:id", ProtectRoute, upload.array("images", 6), updateItem);
+router.post("/", ProtectRoute, uploadItemImages, createItem);
+router.put("/:id", ProtectRoute, uploadItemImages, updateItem);
 
 router.delete("/:id", ProtectRoute, deleteItem);
 

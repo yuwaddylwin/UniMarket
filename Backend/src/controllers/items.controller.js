@@ -66,16 +66,64 @@ function uploadBufferToCloudinary(buffer, folder = "items") {
 export const createItem = async (req, res) => {
   try {
     const title = (req.body.title ?? req.body.name ?? "").trim();
-    const category = req.body.category;
+    const category = (req.body.category ?? "").trim();
     const description = (req.body.description ?? "").trim();
     const price = req.body.price;
 
-    if (!title || !category || !description || price === undefined) {
-      return res.status(400).json({ message: "Missing required fields" });
+    const requiredFields = [
+      ["Title", title],
+      ["Category", category],
+      ["Description", description],
+      ["Price", price],
+    ];
+    const missingField = requiredFields.find(
+      ([, value]) =>
+        value === undefined ||
+        value === null ||
+        (typeof value === "string" && value.trim() === "")
+    );
+
+    if (missingField) {
+      return res.status(400).json({
+        success: false,
+        message: `${missingField[0]} is required`,
+      });
+    }
+
+    const numericPrice = Number(price);
+    if (!Number.isFinite(numericPrice)) {
+      return res.status(400).json({
+        success: false,
+        message: "Price must be a valid number",
+      });
+    }
+
+    if (numericPrice < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Price must be greater than or equal to 0",
+      });
+    }
+
+    if (!Number.isInteger(numericPrice)) {
+      return res.status(400).json({
+        success: false,
+        message: "Price must be a whole number",
+      });
     }
 
     if (!req.user?._id) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    if (!req.files?.length) {
+      return res.status(400).json({
+        success: false,
+        message: "At least 1 image is required",
+      });
     }
 
     // upload new images to cloudinary
@@ -88,13 +136,9 @@ export const createItem = async (req, res) => {
       });
     }
 
-    if (uploadedImages.length === 0) {
-      return res.status(400).json({ message: "At least 1 image is required" });
-    }
-
     const newItem = await Item.create({
       title,
-      price: Number(price),
+      price: numericPrice,
       images: uploadedImages.slice(0, 6),
       category,
       description,
@@ -104,7 +148,11 @@ export const createItem = async (req, res) => {
 
     return res.status(201).json(newItem);
   } catch (err) {
-    return res.status(400).json({ message: err.message || "Error creating item" });
+    console.error("Error creating item:", err);
+    return res.status(400).json({
+      success: false,
+      message: err.message || "Error creating item",
+    });
   }
 };
 
@@ -218,8 +266,28 @@ export const updateItem = async (req, res) => {
     const description = (req.body.description ?? "").trim();
     const price = req.body.price;
 
-    if (!title || !category || !description || price === undefined) {
+    if (
+      !title ||
+      !category ||
+      !description ||
+      price === undefined ||
+      price === null ||
+      String(price).trim() === ""
+    ) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const numericPrice = Number(price);
+    if (!Number.isFinite(numericPrice)) {
+      return res.status(400).json({ message: "Price must be a valid number" });
+    }
+    if (numericPrice < 0) {
+      return res
+        .status(400)
+        .json({ message: "Price must be greater than or equal to 0" });
+    }
+    if (!Number.isInteger(numericPrice)) {
+      return res.status(400).json({ message: "Price must be a whole number" });
     }
 
     // kept existing cloudinary images from frontend
@@ -252,7 +320,7 @@ export const updateItem = async (req, res) => {
     }
 
     item.title = title;
-    item.price = Number(price);
+    item.price = numericPrice;
     item.category = category;
     item.description = description;
     item.images = nextImages;

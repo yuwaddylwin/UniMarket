@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
@@ -7,7 +7,7 @@ const emptyItem = {
   images: [], // [{ url: string, publicId?: string, file?: File, isNew?: boolean }]
   name: "",
   category: "",
-  price: 0,
+  price: "",
   description: "",
 };
 
@@ -48,6 +48,8 @@ export function useSellLogic() {
   );
 
   const [item, setItem] = useState(emptyItem);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submissionLockRef = useRef(false);
 
   useEffect(() => {
     if (!editPayload) {
@@ -71,6 +73,21 @@ export function useSellLogic() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "price") {
+      if (value === "") {
+        setItem((prev) => ({ ...prev, price: "" }));
+        return;
+      }
+
+      // Prices are whole THB amounts. Ignore invalid input and remove leading
+      // zeroes while preserving a single zero as a valid value.
+      if (!/^\d+$/.test(value)) return;
+      const normalizedPrice = value.replace(/^0+(?=\d)/, "");
+      setItem((prev) => ({ ...prev, price: normalizedPrice }));
+      return;
+    }
+
     setItem((prev) => ({
       ...prev,
       [name]: value,
@@ -117,12 +134,51 @@ export function useSellLogic() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // State updates are asynchronous, so use a ref as an immediate lock to
+    // prevent rapid submit events from starting more than one request.
+    if (submissionLockRef.current) return;
+
+    const priceValue = String(item.price).trim();
+    if (priceValue === "") {
+      toast.error("Price is required.");
+      return;
+    }
+
+    if (priceValue.startsWith("-")) {
+      toast.error("Price must be greater than or equal to 0.");
+      return;
+    }
+
+    if (!/^\d+$/.test(priceValue)) {
+      toast.error("Price must be a valid whole number.");
+      return;
+    }
+
+    const numericPrice = Number(priceValue);
+    if (!Number.isFinite(numericPrice)) {
+      toast.error("Price must be a valid number.");
+      return;
+    }
+
+    // The API requires at least one image. Check for an image that will
+    // actually be included in the request so an invalid request is not sent.
+    const hasImageToSubmit = item.images.some(
+      (image) => image.file || (isEditMode && image.publicId)
+    );
+    if (!hasImageToSubmit) {
+      toast.error("Please upload at least one image.");
+      return;
+    }
+
+    submissionLockRef.current = true;
+    setIsSubmitting(true);
+
     try {
       const fd = new FormData();
       fd.append("title", item.name);
       fd.append("name", item.name);
       fd.append("category", item.category);
-      fd.append("price", String(Number(item.price) || 0));
+      fd.append("price", String(numericPrice));
       fd.append("description", item.description);
 
       // Existing images (from DB). only include ones with publicId.
@@ -159,13 +215,24 @@ export function useSellLogic() {
       setItem(emptyItem);
     } catch (err) {
       console.error(err);
-      toast.error(err?.response?.data?.message || err?.message || "Something went wrong.");
+      const responseData = err?.response?.data;
+      const message =
+        responseData?.message ||
+        responseData?.error ||
+        (typeof responseData === "string" ? responseData : null) ||
+        err?.message ||
+        "Something went wrong.";
+      toast.error(message);
+    } finally {
+      submissionLockRef.current = false;
+      setIsSubmitting(false);
     }
   };
 
   return {
     item,
     isEditMode,
+    isSubmitting,
     handleChange,
     handleImageUpload,
     removeImage,
