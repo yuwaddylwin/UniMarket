@@ -35,35 +35,52 @@ function normalizeSeller(it) {
 
 export function useItemsList() {
   const [rawItems, setRawItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const mountedRef = useRef(true);
+  const requestRef = useRef({ id: 0, controller: null });
 
   const fetchItems = useCallback(async () => {
+    requestRef.current.controller?.abort();
+
+    const requestId = requestRef.current.id + 1;
+    const controller = new AbortController();
+    requestRef.current = { id: requestId, controller };
+
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError("");
 
-      const res = await axiosInstance.get("/items");
+      const res = await axiosInstance.get("/items", {
+        signal: controller.signal,
+      });
 
       const list = Array.isArray(res.data) ? res.data : res.data?.items || [];
-      if (mountedRef.current) setRawItems(list);
+      if (requestRef.current.id === requestId) {
+        setRawItems(list);
+      }
     } catch (err) {
+      if (controller.signal.aborted) return;
+
       console.error("Fetch items error:", err);
-      if (mountedRef.current)
-        setError(err?.response?.data?.message || err.message || "Fetch failed");
+      if (requestRef.current.id === requestId) {
+        setError(
+          err?.response?.data?.message ||
+            "Unable to load items. Please try again."
+        );
+      }
     } finally {
-      if (mountedRef.current) setLoading(false);
+      if (requestRef.current.id === requestId) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    mountedRef.current = true;
     fetchItems();
 
     return () => {
-      mountedRef.current = false;
+      requestRef.current.controller?.abort();
+      requestRef.current.id += 1;
     };
   }, [fetchItems]);
 
@@ -90,5 +107,11 @@ export function useItemsList() {
     });
   }, [rawItems]);
 
-  return { items, loading, error, refetch: fetchItems };
+  return {
+    items,
+    isLoading,
+    loading: isLoading,
+    error,
+    refetch: fetchItems,
+  };
 }

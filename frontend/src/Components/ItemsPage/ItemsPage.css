@@ -61,6 +61,32 @@
   align-items: stretch;
 }
 
+.ip-loading,
+.ip-state {
+  grid-column: 1 / -1;
+  min-height: clamp(280px, 48vh, 520px);
+}
+
+.ip-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 24px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.ip-state--error {
+  color: #991b1b;
+}
+
+.ip-state--error span {
+  font-size: 0.9rem;
+}
+
 /* Arrows */
 .ip-arrow {
   position: absolute;
@@ -102,6 +128,7 @@
   position: relative;
   min-width: 0;
   aspect-ratio: 1 / 1;
+  animation: ip-fade-in 0.24s ease-out both;
 }
 
 .ip-card:hover {
@@ -121,6 +148,23 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@keyframes ip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ip-card {
+    animation: none;
+  }
 }
 
 @media (max-width: 600px) {

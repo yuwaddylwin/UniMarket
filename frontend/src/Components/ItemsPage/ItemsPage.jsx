@@ -3,6 +3,7 @@ import "./ItemsPage.css";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const API_BASE = "http://localhost:8000";
 
@@ -23,7 +24,7 @@ function getFirstImageSrc(item) {
 }
 
 export default function ItemsPage() {
-  const { items } = useItemsList();
+  const { items, isLoading, error } = useItemsList();
   const { authUser } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -74,7 +75,7 @@ export default function ItemsPage() {
         )}
       </div>
 
-      {searchQuery && matchedCount === 0 && (
+      {!isLoading && !error && searchQuery && matchedCount === 0 && (
         <div className="ip-result">
           <p className="ip-notfound">No matched item :(</p>
           <p className="ip-notfound-sub">
@@ -85,8 +86,15 @@ export default function ItemsPage() {
 
       <div className="ip-wrap">
         <div className="ip-row">
-          {orderedItems.length === 0 ? (
-            <p style={{ padding: 12 }}>No items to show.</p>
+          {isLoading ? (
+            <LoadingSpinner className="ip-loading" label="Loading items…" />
+          ) : error ? (
+            <div className="ip-state ip-state--error" role="alert">
+              <strong>We couldn't load the items.</strong>
+              <span>{error}</span>
+            </div>
+          ) : orderedItems.length === 0 ? (
+            <p className="ip-state">No items found.</p>
           ) : (
             orderedItems.map((item) => (
               <div

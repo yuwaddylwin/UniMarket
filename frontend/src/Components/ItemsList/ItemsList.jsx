@@ -4,6 +4,7 @@ import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import ProfileAvatar from "../common/ProfileAvatar";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const API_BASE = "http://localhost:8000";
 
@@ -24,7 +25,7 @@ function getFirstImageSrc(item) {
 }
 
 export default function ItemsList({ AddtoCart }) {
-  const { items } = useItemsList();
+  const { items, isLoading, error } = useItemsList();
   const { authUser } = useAuthStore();
   const navigate = useNavigate();
 
@@ -83,7 +84,7 @@ export default function ItemsList({ AddtoCart }) {
       </div>
 
       <div className="il-wrap">
-        {showArrows && (
+        {showArrows && !isLoading && !error && filteredItems.length > 0 && (
           <button
             className="il-arrow il-left"
             type="button"
@@ -94,9 +95,26 @@ export default function ItemsList({ AddtoCart }) {
           </button>
         )}
 
-        <div className="items-grid" ref={scrollerRef}>
-          {filteredItems.length === 0 ? (
-            <p>No items to show.</p>
+        <div
+          className={`items-grid ${
+            isLoading || error || filteredItems.length === 0
+              ? "items-grid--state"
+              : ""
+          }`}
+          ref={scrollerRef}
+        >
+          {isLoading ? (
+            <LoadingSpinner
+              className="items-loading"
+              label="Loading items…"
+            />
+          ) : error ? (
+            <div className="items-state items-state--error" role="alert">
+              <strong>We couldn't load the items.</strong>
+              <span>{error}</span>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <p className="items-state">No items found.</p>
           ) : (
             filteredItems.map((item) => (
               <div
@@ -184,7 +202,7 @@ export default function ItemsList({ AddtoCart }) {
           )}
         </div>
 
-        {showArrows && (
+        {showArrows && !isLoading && !error && filteredItems.length > 0 && (
           <button
             className="il-arrow il-right"
             type="button"

@@ -29,6 +29,23 @@ body {
   padding-bottom: calc(92px + env(safe-area-inset-bottom));
 }
 
+.item-load-error {
+  display: flex;
+  min-height: clamp(280px, 50vh, 520px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 24px;
+  color: #991b1b;
+  text-align: center;
+}
+
+.item-details-loading {
+  min-height: clamp(360px, 65vh, 720px);
+}
+
 /* Card Container*/
 .item-post {
   width: min(1040px, calc(100% - 32px));

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
 import { axiosInstance } from "../../lib/axios";
 import ProfileAvatar from "../../common/ProfileAvatar";
+import LoadingSpinner from "../../common/LoadingSpinner";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -41,27 +42,39 @@ export default function ProfilePage() {
     reader.readAsDataURL(selectedFile);
   }, [selectedFile]);
 
-  // Fetch "my items" from DB
-  const fetchMyItems = async () => {
-    try {
-      setLoadingItems(true);
-      setItemsError("");
-
-      const res = await axiosInstance.get("/items/mine");
-
-      const list = Array.isArray(res.data) ? res.data : res.data?.items || [];
-      setMyItems(list);
-    } catch (err) {
-      console.error("Fetch my items error:", err);
-      setItemsError(err?.response?.data?.message || err.message || "Failed to load items");
-    } finally {
-      setLoadingItems(false);
-    }
-  };
-
   useEffect(() => {
-    if (authUser?._id || authUser?.id) fetchMyItems();
-  }, [authUser]);
+    const userId = authUser?._id || authUser?.id;
+    if (!userId) return undefined;
+
+    const controller = new AbortController();
+
+    const fetchMyItems = async () => {
+      try {
+        setLoadingItems(true);
+        setItemsError("");
+
+        const res = await axiosInstance.get("/items/mine", {
+          signal: controller.signal,
+        });
+
+        const list = Array.isArray(res.data) ? res.data : res.data?.items || [];
+        if (!controller.signal.aborted) setMyItems(list);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+
+        console.error("Fetch my items error:", err);
+        setItemsError(
+          err?.response?.data?.message ||
+            "Unable to load your items. Please try again."
+        );
+      } finally {
+        if (!controller.signal.aborted) setLoadingItems(false);
+      }
+    };
+
+    fetchMyItems();
+    return () => controller.abort();
+  }, [authUser?._id, authUser?.id]);
 
   // Upload photo
   const handleUploadPhoto = async () => {
@@ -162,9 +175,14 @@ export default function ProfilePage() {
         <h2>Your Sell Items</h2>
 
         {loadingItems ? (
-          <p style={{ opacity: 0.7 }}>Loading...</p>
+          <LoadingSpinner
+            className="profile-items-loading"
+            label="Loading your items…"
+          />
         ) : itemsError ? (
-          <p style={{ color: "crimson" }}>{itemsError}</p>
+          <p className="profile-items-error" role="alert">
+            {itemsError}
+          </p>
         ) : myItems.length === 0 ? (
           <p style={{ opacity: 0.7 }}>No items posted yet.</p>
         ) : (

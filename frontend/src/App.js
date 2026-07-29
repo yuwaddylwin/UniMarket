@@ -13,6 +13,7 @@ import ItemsPage from "./Components/ItemsPage/ItemsPage";
 
 import { useHomeLogic } from "./Components/Logics/useHome";
 import { useAuthStore } from "./Components/store/useAuthStore";
+import LoadingSpinner from "./Components/common/LoadingSpinner";
 
 import MainLayout from "./Components/layouts/MainLayout";
 import { Toaster } from "react-hot-toast";
@@ -30,7 +31,12 @@ export default function App() {
   }, [checkAuth]);
 
   if (isCheckingAuth) {
-    return <div>Loading...</div>;
+    return (
+      <LoadingSpinner
+        className="loading-spinner--page"
+        label="Loading UniMarket…"
+      />
+    );
   }
 
   return (
@@ -79,4 +85,3 @@ export default function App() {
 //   }
   
 //   export default App;
-  

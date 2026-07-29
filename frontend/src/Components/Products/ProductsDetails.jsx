@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./ProductsDetails.css";
 import { axiosInstance } from "../lib/axios";
 import ProfileAvatar from "../common/ProfileAvatar";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 function extractId(value) {
   if (!value) return null;
@@ -14,7 +15,7 @@ function extractId(value) {
 
 export default function ItemPage({ AddtoCart }) {
   const { id } = useParams();
-  const { items, loading } = useItemsList();
+  const { items, isLoading, error } = useItemsList();
   const navigate = useNavigate();
 
   
@@ -99,8 +100,23 @@ export default function ItemPage({ AddtoCart }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isFullscreen]);
 
-  if (loading && !item) return <p>Loading...</p>;
-  if (!item) return <p>Item not found.</p>;
+  if (isLoading) {
+    return (
+      <LoadingSpinner
+        className="item-details-loading"
+        label="Loading item details…"
+      />
+    );
+  }
+  if (error) {
+    return (
+      <div className="item-load-error" role="alert">
+        <strong>We couldn't load this item.</strong>
+        <span>{error}</span>
+      </div>
+    );
+  }
+  if (!item) return <p className="item-load-error">Item not found.</p>;
 
   const nextImage = () => {
     if (images.length <= 1) return;
