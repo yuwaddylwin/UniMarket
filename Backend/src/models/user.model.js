@@ -19,6 +19,21 @@ const userSchema = new mongoose.Schema(
     profilePic:{
         type: String,
         default: "",
+    },
+    verified: {
+        type: Boolean,
+        default: false,
+    },
+    verificationToken: {
+        type: String,
+        default: null,
+        select: false,
+        index: true,
+    },
+    verificationTokenExpires: {
+        type: Date,
+        default: null,
+        select: false,
     }
   },
   { timestamps: true }

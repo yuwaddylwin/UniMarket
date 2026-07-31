@@ -11,6 +11,7 @@ export default function LoginForm() {
     email: "",
     password: "",
   });
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   const { login, isLoggingIn } = useAuthStore();
 
@@ -26,19 +27,25 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setNeedsVerification(false);
     const ok = validateForm();
     if (ok !== true) return;
 
     try {
-      // login should throw on error OR return a truthy success value
-      const res = await login(formData);
-
-      // If your login doesn't return anything, just rely on "no throw" = success
-      if (res === false) return;
-
+      await login({
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
       clearForm();
       navigate("/", { replace: true });
     } catch (err) {
+      if (
+        err.response?.status === 401 &&
+        err.response?.data?.message ===
+          "Please verify your email before logging in."
+      ) {
+        setNeedsVerification(true);
+      }
     }
   };
 
@@ -83,6 +90,20 @@ export default function LoginForm() {
         <button type="submit" className="send_button" disabled={isLoggingIn}>
           {isLoggingIn ? "Logging In..." : "Login"}
         </button>
+
+        {needsVerification && (
+          <button
+            type="button"
+            className="secondary_button"
+            onClick={() =>
+              navigate("/resend-verification", {
+                state: { email: formData.email.trim().toLowerCase() },
+              })
+            }
+          >
+            Resend Verification Email
+          </button>
+        )}
       </form>
     </div>
   );

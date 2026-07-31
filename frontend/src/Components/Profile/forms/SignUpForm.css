@@ -154,6 +154,25 @@
   box-shadow: none;
 }
 
+.secondary_button {
+  height: 44px;
+  border: 1px solid #1b4a91;
+  border-radius: 12px;
+  background: #fff;
+  color: #1b4a91;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.secondary_button:hover {
+  background: rgba(27, 74, 145, 0.08);
+}
+
+.verification-result {
+  text-align: center;
+}
+
 .login-form p {
   margin: 0;
   text-align: center;

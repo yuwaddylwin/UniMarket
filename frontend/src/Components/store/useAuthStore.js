@@ -33,6 +33,7 @@ export const useAuthStore = create((set, get) => ({
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
+      removeAuthToken();
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -43,16 +44,12 @@ export const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      const { token, ...user } = res.data;
-      setAuthToken(token);
-      set({ authUser: user });
-      console.log("Signup response:", res.data);
-      toast.success("Account created successfully");
-
-      get().connectSocket();
+      toast.success(res.data.message);
+      return res.data;
     } catch (error) {
       console.log("Signup error:", error);
       toast.error(error.response?.data?.message || "Sign Up Failed!");
+      throw error;
     } finally {
       set({ isSigningUp: false });
     }
@@ -69,8 +66,10 @@ export const useAuthStore = create((set, get) => ({
 
       // Socket
       get().connectSocket();
+      return res.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Login Failed!");
+      throw error;
     } finally {
       set({ isLoggingIn: false });
     }

@@ -60,6 +60,7 @@ export default function SignUpForm() {
     email: "",
     password: "",
   });
+  const [registrationComplete, setRegistrationComplete] = useState(false);
 
   const { signup, isSigningUp } = useAuthStore();
 
@@ -100,16 +101,39 @@ export default function SignUpForm() {
         password: formData.password,
       };
 
-      // signup should throw on error OR return false on failure
-      const res = await signup(payload);
-      if (res === false) return;
-
+      await signup(payload);
       clearForm();
-      navigate("/", { replace: true });
+      setRegistrationComplete(true);
     } catch (err) {
-      // toast.error(err?.message || "Signup failed");
+      // The account exists when SMTP delivery fails, so guide the user to retry
+      // delivery instead of letting them submit a duplicate registration.
+      if (err.response?.status === 502) {
+        navigate("/resend-verification", {
+          state: { email: formData.email.trim().toLowerCase() },
+        });
+      }
     }
   };
+
+  if (registrationComplete) {
+    return (
+      <div className="profile">
+        <section className="login-form verification-result" aria-live="polite">
+          <div className="verification-icon" aria-hidden="true">✓</div>
+          <h1>Registration successful!</h1>
+          <p>We've sent a verification email to your inbox.</p>
+          <p>Please verify your email before logging in.</p>
+          <button
+            type="button"
+            className="send_button"
+            onClick={() => navigate("/login", { replace: true })}
+          >
+            Go to Login
+          </button>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="profile">

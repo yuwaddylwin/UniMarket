@@ -10,6 +10,8 @@ import LoginForm from "./Components/Profile/forms/LoginForm";
 import SignUpForm from "./Components/Profile/forms/SignUpForm";
 import ChatHomePage from "./Components/Chat/ChatHomePage";
 import ItemsPage from "./Components/ItemsPage/ItemsPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+import ResendVerificationPage from "./pages/ResendVerificationPage";
 
 import { useHomeLogic } from "./Components/Logics/useHome";
 import { useAuthStore } from "./Components/store/useAuthStore";
@@ -68,6 +70,8 @@ export default function App() {
         {/* ROUTES WITHOUT BottomNav */}
             <Route path="/chat" element={<ChatHomePage />} />
             <Route path="/chat/:sellerId" element={<ChatHomePage />} />
+            <Route path="/verify/:token" element={<VerifyEmailPage />} />
+            <Route path="/resend-verification" element={<ResendVerificationPage />} />
 
       </Routes>
     </Router>
