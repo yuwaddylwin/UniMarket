@@ -9,6 +9,13 @@ const requiredSmtpVariables = [
   "CLIENT_URL",
 ];
 
+const SMTP_CONNECTION_TIMEOUT_MS = 10_000;
+const SMTP_SOCKET_TIMEOUT_MS = 20_000;
+
+let transporter;
+let transporterConfigKey;
+let transporterVerification;
+
 const getEmailConfig = () => {
   const missing = requiredSmtpVariables.filter(
     (variable) => !process.env[variable]?.trim()
@@ -26,28 +33,93 @@ const getEmailConfig = () => {
   }
 
   return {
+    host: process.env.SMTP_HOST.trim(),
     port,
-    clientUrl: process.env.CLIENT_URL.replace(/\/+$/, ""),
+    user: process.env.SMTP_USER.trim(),
+    pass: process.env.SMTP_PASS,
+    from: process.env.EMAIL_FROM.trim(),
+    clientUrl: process.env.CLIENT_URL.trim().replace(/\/+$/, ""),
   };
 };
 
-const createTransporter = (port) =>
+const createTransporter = ({ host, port, user, pass }) =>
   nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host,
     port,
     secure: port === 465,
+    pool: true,
+    maxConnections: 3,
+    connectionTimeout: SMTP_CONNECTION_TIMEOUT_MS,
+    socketTimeout: SMTP_SOCKET_TIMEOUT_MS,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user,
+      pass,
     },
   });
 
-export const sendVerificationEmail = async (email, token) => {
-  const { port, clientUrl } = getEmailConfig();
-  const verificationUrl = `${clientUrl}/verify/${encodeURIComponent(token)}`;
+const getTransporter = async (config) => {
+  const configKey = `${config.host}:${config.port}:${config.user}`;
 
-  await createTransporter(port).sendMail({
-    from: process.env.EMAIL_FROM,
+  if (!transporter || transporterConfigKey !== configKey) {
+    transporter?.close();
+    transporter = createTransporter(config);
+    transporterConfigKey = configKey;
+
+    // Verify the connection before the first message. This prevents the first
+    // signup request from also being the SMTP connection/authentication probe.
+    transporterVerification = transporter.verify().catch((error) => {
+      transporter?.close();
+      transporter = undefined;
+      transporterConfigKey = undefined;
+      transporterVerification = undefined;
+      throw error;
+    });
+  }
+
+  await transporterVerification;
+  return transporter;
+};
+
+const resetTransporter = () => {
+  transporter?.close();
+  transporter = undefined;
+  transporterConfigKey = undefined;
+  transporterVerification = undefined;
+};
+
+const sendMail = async (config, message) => {
+  let lastError;
+
+  // A cold SMTP connection can fail once while the provider is waking up.
+  // Recreate and re-verify it once rather than making the user press resend.
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      const smtpTransporter = await getTransporter(config);
+      const delivery = await smtpTransporter.sendMail(message);
+      const recipientAccepted = delivery.accepted?.some(
+        (accepted) => accepted.toLowerCase() === message.to.toLowerCase()
+      );
+
+      if (!recipientAccepted || delivery.rejected?.length > 0) {
+        throw new Error("SMTP server did not accept the verification recipient");
+      }
+
+      return delivery;
+    } catch (error) {
+      lastError = error;
+      resetTransporter();
+    }
+  }
+
+  throw lastError;
+};
+
+export const sendVerificationEmail = async (email, token) => {
+  const config = getEmailConfig();
+  const verificationUrl = `${config.clientUrl}/verify/${encodeURIComponent(token)}`;
+
+  return sendMail(config, {
+    from: config.from,
     to: email,
     subject: "Verify your UniMarket account",
     text: `Welcome to UniMarket!\n\nVerify your email by visiting this link:\n${verificationUrl}\n\nThis link expires in 24 hours.`,

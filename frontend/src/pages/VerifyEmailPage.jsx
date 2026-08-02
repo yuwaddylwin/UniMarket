@@ -11,13 +11,9 @@ const verificationRequests = new Map();
 const getVerificationRequest = (token) => {
   const existingRequest = verificationRequests.get(token);
   if (existingRequest) {
-    console.log("[email-verification] reusing in-flight/successful request", {
-      token,
-    });
     return existingRequest;
   }
 
-  console.log("[email-verification] sending verification request", { token });
   const request = axiosInstance.get(
     `/auth/verify/${encodeURIComponent(token)}`
   );
@@ -43,33 +39,20 @@ export default function VerifyEmailPage() {
     let active = true;
 
     const verifyEmail = async () => {
-      console.log("[email-verification] effect started", { token });
       try {
         const response = await getVerificationRequest(token);
-        console.log("[email-verification] axios response", {
-          status: response.status,
-          data: response.data,
-        });
 
         if (active && response.status === 200) {
-          console.log("[email-verification] displaying success");
           setStatus("success");
         }
       } catch (error) {
         const responseStatus = error.response?.status;
-        console.error("[email-verification] axios error", {
-          message: error.message,
-          status: responseStatus,
-          data: error.response?.data,
-        });
 
         if (!active) return;
 
         if (responseStatus === 400 || responseStatus === 404) {
-          console.log("[email-verification] displaying invalid/expired state");
           setStatus("invalid");
         } else {
-          console.log("[email-verification] displaying unexpected error state");
           setStatus("error");
         }
       }
@@ -78,7 +61,6 @@ export default function VerifyEmailPage() {
     if (token) {
       verifyEmail();
     } else {
-      console.error("[email-verification] no token present in URL");
       setStatus("error");
     }
 

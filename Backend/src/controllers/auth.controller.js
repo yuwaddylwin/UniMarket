@@ -146,7 +146,7 @@ const verifyEmail = async (req, res) => {
   const incomingToken = req.params.token;
   let saveCompleted = false;
 
-  logVerificationStep("request received", { incomingToken });
+  logVerificationStep("request received");
 
   try {
     const user = await User.findOne({
@@ -179,7 +179,6 @@ const verifyEmail = async (req, res) => {
       tokenMatches,
       tokenExpired,
       verifiedBeforeUpdate: user.verified,
-      verificationTokenBeforeClearing: user.verificationToken,
     });
 
     if (!tokenMatches || tokenExpired) {
