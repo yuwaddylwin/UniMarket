@@ -68,6 +68,13 @@ const getTransporter = async (config) => {
     // Verify the connection before the first message. This prevents the first
     // signup request from also being the SMTP connection/authentication probe.
     transporterVerification = transporter.verify().catch((error) => {
+      console.error("========== SMTP VERIFY ERROR ==========");
+      console.error(error);
+      console.error("message:", error.message);
+      console.error("code:", error.code);
+      console.error("command:", error.command);
+      console.error("stack:", error.stack);
+      console.error("=======================================");
       transporter?.close();
       transporter = undefined;
       transporterConfigKey = undefined;
