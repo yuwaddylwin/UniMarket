@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import "./SignUpForm.css";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -37,7 +39,7 @@ export default function LoginForm() {
         password: formData.password,
       });
       clearForm();
-      navigate("/", { replace: true });
+      navigate(location.state?.from || "/", { replace: true });
     } catch (err) {
       if (
         err.response?.status === 401 &&
@@ -54,37 +56,49 @@ export default function LoginForm() {
       <form className="login-form" onSubmit={handleSubmit}>
         <h1>Login</h1>
 
+        <label htmlFor="login-email">Email address</label>
         <input
+          id="login-email"
           type="email"
           placeholder="Enter your email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          autoComplete="email"
+          required
         />
 
+        <label htmlFor="login-password">Password</label>
         <div className="password-container">
           <input
+            id="login-password"
             type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
             value={formData.password}
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
             }
+            autoComplete="current-password"
+            required
           />
-          <span
+          <button
+            type="button"
             className="password-toggle"
             onClick={() => setShowPassword((s) => !s)}
-            role="button"
-            tabIndex={0}
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? "Hide" : "Show"}
-          </span>
+            {showPassword ? (
+              <EyeOff size={18} aria-hidden="true" />
+            ) : (
+              <Eye size={18} aria-hidden="true" />
+            )}
+          </button>
         </div>
 
         <div className="links">
           <span className="span">Don't have an account?</span>
-          <span className="link" onClick={() => navigate("/signup")}>
+          <button type="button" className="link" onClick={() => navigate("/signup")}>
             Sign Up
-          </span>
+          </button>
         </div>
 
         <button type="submit" className="send_button" disabled={isLoggingIn}>

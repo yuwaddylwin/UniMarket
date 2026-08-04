@@ -47,10 +47,10 @@ export default function ItemCarousel({ items = [] }) {
         ))}
       </div>
 
-      <button className="carousel-btn left" type="button" onClick={() => scrollByOneCard(-1)}>
+      <button className="carousel-btn left" type="button" aria-label="Previous listing" onClick={() => scrollByOneCard(-1)}>
         ‹
       </button>
-      <button className="carousel-btn right" type="button" onClick={() => scrollByOneCard(1)}>
+      <button className="carousel-btn right" type="button" aria-label="Next listing" onClick={() => scrollByOneCard(1)}>
         ›
       </button>
     </div>

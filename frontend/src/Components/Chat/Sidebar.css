@@ -26,6 +26,7 @@
 }
 
 .user-item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -34,6 +35,10 @@
   cursor: pointer;
   transition: background 0.2s;
   position: relative;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
 }
 
 .user-item:hover {
@@ -73,7 +78,7 @@
   gap: 2px;
 }
 
-.username {
+.sidebar .username {
   font-size: 15px;
   font-weight: 500;
   margin: 0;
@@ -82,7 +87,7 @@
   white-space: nowrap;
 }
 
-.status {
+.sidebar .status {
   font-size: 12px;
   color: #6b7280;
 }
@@ -112,12 +117,12 @@
 }
 
 /* status text */
-.status {
+.sidebar .status {
   font-size: 12px;
   color: #9ca3af;
 }
 
-.status.online {
+.sidebar .status.online {
   color: #22c55e;
 }
 

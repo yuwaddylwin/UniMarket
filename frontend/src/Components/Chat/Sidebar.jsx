@@ -63,7 +63,8 @@ const Sidebar = () => {
             const userUnreadCount = unreadCount[user._id] || 0;
 
             return (
-              <div
+              <button
+                type="button"
                 key={user._id}
                 onClick={() => setSelectedUser(user)}
                 className={`user-item ${isSelected ? "active" : ""}`}
@@ -90,7 +91,7 @@ const Sidebar = () => {
                     {userUnreadCount > 99 ? "99+" : userUnreadCount}
                   </div>
                 )}
-              </div>
+              </button>
             );
           })
         )}

@@ -1,264 +1,112 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-/* prevents clipping */
-.post-page,
-.sellpage-wrapper,
-.main-content,
-.app,
-.layout {
-  min-height: 100vh;
-  height: auto;
-  overflow-y: auto;
-}
-
-/* Container */
 .post-container {
-  max-width: 600px;
-  margin: 40px auto;              
-  padding: 32px;
-  padding-bottom: 60px;           
-  background: linear-gradient(180deg, #ffffff, #f9fbff);
-  border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(27, 74, 145, 0.12);
+  width: min(calc(100% - 32px), 680px);
+  margin: clamp(24px, 5vw, 56px) auto max(36px, calc(24px + env(safe-area-inset-bottom)));
+  padding: clamp(24px, 5vw, 40px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #fff, #fbfcff);
+  box-shadow: var(--shadow-md);
+  animation: post-form-in 360ms ease-out both;
 }
 
-
-.title {
+.post-title {
+  margin: 0 0 clamp(26px, 5vw, 38px);
+  color: var(--color-primary);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
   text-align: center;
-  margin-bottom: 35px;
-  color: #1b4a91;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -0.6px;
 }
 
+.post-form { display: flex; flex-direction: column; gap: 21px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.form-group > label { margin: 0; color: #344054; font-size: 0.86rem; font-weight: 750; }
+.field-note { margin-left: 5px; color: var(--color-text-muted); font-size: 0.75rem; font-weight: 550; }
 
-.logo_sellpage {
-  font-size: 36px;
-  font-weight: 700;
-  color: #1b4a91;
-  font-family: "Playfair Display", serif;
-  letter-spacing: -0.5px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-
-.post-form {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-
-label {
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #1f2d3d;
-  font-size: 14px;
-}
-
-
-input[type="text"],
-input[type="number"],
-textarea,
-select {
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #d6e0f0;
-  background: #fdfefe;
-  outline: none;
-  font-size: 15px;
-  transition: all 0.25s ease;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #9aa6b2;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: #1b4a91;
-  box-shadow: 0 0 0 3px rgba(27, 74, 145, 0.15);
-}
-
-
-.image-upload-container {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.upload-box {
-  width: 90px;
-  height: 90px;
-  border: 2px dashed #1b4a91;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  color: #1b4a91;
-  cursor: pointer;
-  background: linear-gradient(145deg, #f4f7ff, #ffffff);
-  transition: all 0.25s ease;
-}
-
-.upload-box:hover {
-  background: #eaf0ff;
-  transform: translateY(-2px);
-}
-
-
-.image-preview {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-.image-preview img {
+.post-form input[type="text"],
+.post-form input[type="number"],
+.post-form textarea,
+.post-form select {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid #cfd6e2;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--color-text);
+  font-size: 0.92rem;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
 }
+.post-form textarea { min-height: 120px; resize: vertical; line-height: 1.55; }
+.post-form input::placeholder, .post-form textarea::placeholder { color: #8b95a5; }
+.post-form input:focus, .post-form textarea:focus, .post-form select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(27, 74, 145, 0.12); }
 
-
-.remove-btn {
-  position: absolute;             
-  top: 6px;
-  right: 6px;
-  background: rgba(0, 0, 0, 0.65);
-  border: none;
-  color: white;
-  font-size: 14px;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  cursor: pointer;
-  transition: 0.2s;
+.image-upload-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 12px; }
+.upload-box, .sell-image-preview { width: 100%; aspect-ratio: 1; border-radius: var(--radius-md); }
+.upload-box {
   display: grid;
   place-items: center;
-  z-index: 2;
-}
-
-.remove-btn:hover {
-  background: #ff4d4f;
-}
-
-
-.submit-btn {
-  margin-top: 10px;
-  margin-bottom: 24px;           
-  background: linear-gradient(135deg, #1b4a91, #1a62c6);
-  color: white;
-  padding: 14px;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
+  margin: 0;
+  border: 2px dashed rgba(27, 74, 145, 0.65);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 2rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(26, 98, 198, 0.35);
+.upload-box:hover { border-color: var(--color-primary); background: rgba(27, 74, 145, 0.13); transform: translateY(-2px); }
+.sell-image-preview { position: relative; overflow: hidden; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); }
+.sell-image-preview img { width: 100%; height: 100%; object-fit: cover; }
+.remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  background: rgba(17,24,39,.78);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
 }
+.remove-btn:hover { background: #b42318; transform: scale(1.06); }
 
-.submit-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-  transform: none;
-  box-shadow: none;
+.post-form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.submit-btn {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+  padding: 0 18px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(27, 74, 145, 0.18);
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
+.submit-btn:hover { background: var(--color-primary-hover); transform: translateY(-1px); box-shadow: 0 12px 24px rgba(27, 74, 145, 0.23); }
+.submit-btn.secondary { background: #fff; color: var(--color-primary); box-shadow: none; }
+.submit-btn.secondary:hover { background: var(--color-primary-soft); }
 
+@keyframes post-form-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 480px) {
   .post-container {
-    margin: 40px 12px;
-    padding: 20px;
-    padding-bottom: 70px;
-    border-radius: 16px;
+    width: min(calc(100% - 24px), 680px);
+    margin-top: 18px;
+    margin-bottom: max(32px, calc(22px + env(safe-area-inset-bottom)));
+    padding: 22px 17px 30px;
   }
-
-  .logo_sellpage {
-    font-size: 28px;
-  }
-
-  .title {
-    font-size: 22px;
-    margin-bottom: 24px;
-  }
-
-  input,
-  textarea,
-  select {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .image-upload-container {
-    gap: 10px;
-    justify-content: center;
-  }
-
-  .upload-box,
-  .image-preview {
-    width: 70px;
-    height: 70px;
-    border-radius: 14px;
-  }
-
-  .submit-btn {
-    font-size: 15px;
-    padding: 12px;
-    margin-bottom: 30%;
-  }
-}
-
-
-@media (max-width: 768px) {
-  .post-container {
-    margin: 60px 20px;
-    padding: 26px;
-    padding-bottom: 70px;
-  }
-
-  .logo_sellpage {
-    font-size: 32px;
-  }
-
-  .title {
-    font-size: 26px;
-  }
-
-  .upload-box,
-  .image-preview {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-
-@media (min-width: 1200px) {
-  .post-container {
-    max-width: 550px;
-    margin: 40px auto;            
-  }
+  .image-upload-container { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+  .post-form-actions { grid-template-columns: 1fr; }
 }

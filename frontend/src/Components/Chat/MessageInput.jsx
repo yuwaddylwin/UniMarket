@@ -44,7 +44,7 @@ const MessageInput = () => {
     <form className="message-input-container" onSubmit={handleSendMessage}>
       {/* IMAGE PREVIEW */}
       {imagePreview && (
-        <div className="image-preview">
+        <div className="message-image-preview">
           <img src={imagePreview} alt="preview" />
           <button type="button" onClick={removeImage}>
             <X size={14} />
@@ -66,13 +66,14 @@ const MessageInput = () => {
           type="button"
           className="icon-btn"
           onClick={() => galleryInputRef.current.click()}
+          aria-label="Attach an image"
         >
           <Image size={20} />
         </button>
 
         {/* SEND BUTTON */}
         {(text.trim() || imagePreview) && (
-          <button type="submit" className="send-btn">
+          <button type="submit" className="send-btn" aria-label="Send message">
                 <Send size={18} />
         </button>
         )}

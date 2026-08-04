@@ -82,6 +82,8 @@ export default function ItemCard({ item, onDeleteItem }) {
         <button
           type="button"
           className="profile-kebab-btn"
+          aria-label={`Open actions for ${title}`}
+          aria-expanded={menuOpen}
           onClick={() => setMenuOpen((v) => !v)}
           disabled={isDeleting}
         >
@@ -89,7 +91,7 @@ export default function ItemCard({ item, onDeleteItem }) {
         </button>
 
         {menuOpen && (
-          <div className="profile-kebab-menu" role="menu">
+          <div className="profile-kebab-menu" role="menu" aria-label={`Actions for ${title}`}>
             <button
               type="button"
               className="profile-kebab-item"

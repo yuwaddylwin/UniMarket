@@ -7,18 +7,18 @@
 }
 
 /* IMAGE PREVIEW */
-.image-preview {
+.message-image-preview {
   position: relative;
   width: 140px;
   margin-bottom: 8px;
 }
 
-.image-preview img {
+.message-image-preview img {
   width: 100%;
   border-radius: 12px;
 }
 
-.image-preview button {
+.message-image-preview button {
   position: absolute;
   top: -6px;
   right: -6px;

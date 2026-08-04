@@ -1,18 +1,41 @@
 /* BOTTOM NAV BAR */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
-  width: 100%;
+  inset: auto 0 0;
+  width: auto;
   height: 68px;
-  background: white;
-  display: flex;
-  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.96);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
-  border-top: 1px solid #eee;
+  padding-right: max(8px, env(safe-area-inset-right));
+  padding-left: max(8px, env(safe-area-inset-left));
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -8px 24px rgba(17, 24, 39, 0.06);
+  backdrop-filter: blur(14px);
   z-index: 999;
 }
 
+.bottom-nav > button {
+  justify-self: center;
+}
+
 /* ICONS */
+.bottom-nav-item {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+.bottom-nav-item:hover { background: var(--color-primary-soft); transform: translateY(-1px); }
+
 .bottom-nav svg {
   width: 26px;
   height: 26px;
@@ -37,7 +60,11 @@
   justify-content: center;
   margin-top: -11px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  border: 0;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
 }
+.plus-btn:hover { background: var(--color-primary-hover); transform: translateY(-2px); box-shadow: 0 9px 20px rgba(27, 74, 145, 0.25); }
 
 .plus-btn svg {
   color: white !important;
@@ -51,27 +78,24 @@
 
 /* PROFILE IMAGE */
 .avatar {
-  width: 26px;
-  height: 26px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible;
+  padding: 0;
 }
 
 .avatar img {
-  width: 100%;
-  height: 100%;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
   object-fit: cover;
-}
-
-/* MOBILE SAFE SPACE BELOW */
-body {
-  padding-bottom: 70px;
 }
 
 /* Make Cart fit bottom navbar */
 .bottom-nav .cart-icon {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   background: none;
   box-shadow: none;
   position: relative;
@@ -137,4 +161,3 @@ body {
     transform: scale(1.1);
   }
 }
-

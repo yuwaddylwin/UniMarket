@@ -78,9 +78,9 @@ export default function ItemsList({ AddtoCart }) {
     <div className="items-container">
       <div className="items-header">
         <h2>For You!</h2>
-        <span className="link" onClick={() => navigate("/products")}>
+        <button className="items-view-link" type="button" onClick={() => navigate("/products")}>
           View More
-        </span>
+        </button>
       </div>
 
       <div className="il-wrap">
@@ -121,7 +121,14 @@ export default function ItemsList({ AddtoCart }) {
                 className="item-card"
                 key={item._id}
                 onClick={() => navigate(`/products/${item._id}`)}
-                style={{ cursor: "pointer" }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigate(`/products/${item._id}`);
+                  }
+                }}
+                role="link"
+                tabIndex={0}
               >
                 <div className="item-img">
                   <img
@@ -156,7 +163,7 @@ export default function ItemsList({ AddtoCart }) {
 
                   <div className="item-actions">
                     <button
-                        className="btn primary"
+                        className="item-action-btn primary"
                         onClick={(e) => {
                           e.stopPropagation();
 
@@ -173,7 +180,7 @@ export default function ItemsList({ AddtoCart }) {
                       </button>
 
                       <button
-                        className="btn secondary"
+                        className="item-action-btn secondary"
                         onClick={(e) => {
                           e.stopPropagation();
 

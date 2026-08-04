@@ -16,6 +16,7 @@ import ResendVerificationPage from "./pages/ResendVerificationPage";
 import { useHomeLogic } from "./Components/Logics/useHome";
 import { useAuthStore } from "./Components/store/useAuthStore";
 import LoadingSpinner from "./Components/common/LoadingSpinner";
+import RequireAuth from "./Components/common/RequireAuth";
 
 import MainLayout from "./Components/layouts/MainLayout";
 import { Toaster } from "react-hot-toast";
@@ -23,10 +24,8 @@ import "./App.css";
 
 export default function App() {
   const [cartItems, setCartItems] = useState([]);
-  const { checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
+  const { checkAuth, isCheckingAuth } = useAuthStore();
   const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
-
-  console.log({onlineUsers})
 
   useEffect(() => {
     checkAuth();
@@ -51,11 +50,17 @@ export default function App() {
           <Route path="/" element={<Home cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/login" element={<LoginForm/>} /> 
           <Route path="/signup" element={<SignUpForm/>} />
-          <Route path="/sell" element={<Sell />} />
+          <Route
+            path="/sell"
+            element={
+              <RequireAuth>
+                <Sell />
+              </RequireAuth>
+            }
+          />
           <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/products" element={<ItemsPage AddtoCart={AddtoCart} />} />
-          <Route path="/sell" element={<Sell />} />
           <Route path="/products/:id"
             element={
               <ProductsDetails

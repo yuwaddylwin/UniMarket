@@ -3,7 +3,7 @@ const API_ORIGIN =
     ? "https://unimarket-08di.onrender.com"
     : "http://localhost:8000";
 
-export const DEFAULT_AVATAR = "/Images/default-avatar.svg";
+export const DEFAULT_AVATAR = "/Images/no-pfp.jpg"; // Default avatar image path
 
 export function getProfileImageSrc(profilePic) {
   if (!profilePic || typeof profilePic !== "string") return DEFAULT_AVATAR;

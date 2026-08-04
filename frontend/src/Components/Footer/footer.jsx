@@ -7,9 +7,9 @@ export default function Footer() {
       <div className="footer-container">
         <div className="footer-section contact">
           <h4>Contact Us</h4>
-          <p><span>Email:</span> yuwaddylwin.2004@gmail.com</p>
+          <p><span>Email:</span> unimarket.app.official@gmail.com</p>
           <p><span>Phone:</span> +66 817-374-337</p>
-          <p>Bangkok, Thailand</p>
+          <p><span>Address:</span> Bangkok, Thailand</p>
         </div>
       </div>
 

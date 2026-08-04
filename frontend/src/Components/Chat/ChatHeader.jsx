@@ -30,11 +30,9 @@ const ChatHeader = () => {
     <div className="chat-header">
       <div className="chat-header-left">
         {isMobile && (
-          <ArrowLeft
-            className="chat-header-back"
-            size={22}
-            onClick={handleBack}
-          />
+          <button className="chat-header-back" type="button" aria-label="Back to conversations" onClick={handleBack}>
+            <ArrowLeft size={22} />
+          </button>
         )}
 
         <div className="chat-header-avatar-wrapper">

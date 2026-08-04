@@ -4,6 +4,7 @@ import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import LoadingSpinner from "../common/LoadingSpinner";
+import ProfileAvatar from "../common/ProfileAvatar";
 
 const API_BASE = "http://localhost:8000";
 
@@ -101,6 +102,14 @@ export default function ItemsPage() {
                 className="ip-card"
                 key={item._id}
                 onClick={() => navigate(`/products/${item._id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigate(`/products/${item._id}`);
+                  }
+                }}
+                role="link"
+                tabIndex={0}
               >
                 <div className="ip-img">
                   <img
@@ -112,7 +121,21 @@ export default function ItemsPage() {
                     }}
                   />
                 </div>
-
+                <div className="ip-card-body">
+                  <div className="ip-card-price">{item.price} Baht</div>
+                  <h3>{item.title}</h3>
+                  {item?.seller?.fullName && (
+                    <div className="ip-seller">
+                      <ProfileAvatar
+                        profilePic={item.seller.profilePic}
+                        alt=""
+                        className="ip-seller-avatar"
+                        loading="lazy"
+                      />
+                      <span>{item.seller.fullName}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             ))
           )}

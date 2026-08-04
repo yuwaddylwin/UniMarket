@@ -19,27 +19,29 @@ export default function BottomNav({ cartCount = 0 }) {
 
 
   return (
-    <div className="bottom-nav">
+    <nav className="bottom-nav" aria-label="Quick navigation">
       
-      <Home onClick={() => navigate("/")} />
-      <div className="chat-icon-wrapper" onClick={handleChatClick}>
+      <button className="bottom-nav-item" type="button" aria-label="Home" onClick={() => navigate("/")}><Home /></button>
+      <button className="bottom-nav-item chat-icon-wrapper" type="button" aria-label="Messages" onClick={handleChatClick}>
         <MessageCircle className="bn-chat-icon"/>
         {totalUnread > 0 && (
           <div className="message-badge">
             {totalUnread > 99 ? "99+" : totalUnread}
           </div>
         )}
-      </div>
-      <div
+      </button>
+      <button
           className="plus-btn"
+          type="button"
+          aria-label="Sell an item"
           onClick={() => navigate(authUser ? "/sell" : "/login")}
         >
           <Plus />
-        </div>
+        </button>
 
 
 
-      <div className="cart-icon" onClick={() => navigate("/cart")}>
+      <button className="bottom-nav-item cart-icon" type="button" aria-label={`Cart with ${cartCount} items`} onClick={() => navigate("/cart")}>
         <ShoppingCart />
 
         {cartCount > 0 && (
@@ -47,11 +49,13 @@ export default function BottomNav({ cartCount = 0 }) {
             {cartCount}
           </div>
         )}
-      </div>
+      </button>
 
       {/* Profile Avatar */}
-      <div 
-        className="avatar" 
+      <button
+        type="button"
+        className="bottom-nav-item avatar"
+        aria-label="Profile"
         onClick={() => {
           if (!authUser) {
             navigate("/login");
@@ -64,7 +68,7 @@ export default function BottomNav({ cartCount = 0 }) {
           profilePic={authUser?.profilePic}
           alt="profile" 
         />
-      </div>
-    </div>
+      </button>
+    </nav>
   );
 }

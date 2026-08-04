@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useItemsList } from "../Logics/useItemsList";
-import { useNavigate } from "react-router-dom";
 import "./ProductsDetails.css";
 import { axiosInstance } from "../lib/axios";
 import ProfileAvatar from "../common/ProfileAvatar";
 import LoadingSpinner from "../common/LoadingSpinner";
+import { useAuthStore } from "../store/useAuthStore";
+import toast from "react-hot-toast";
+import { ArrowLeft, MessageCircle, ShoppingCart, ZoomIn } from "lucide-react";
 
 function extractId(value) {
   if (!value) return null;
@@ -17,6 +19,8 @@ export default function ItemPage({ AddtoCart }) {
   const { id } = useParams();
   const { items, isLoading, error } = useItemsList();
   const navigate = useNavigate();
+  const location = useLocation();
+  const authUser = useAuthStore((state) => state.authUser);
 
   
   
@@ -149,107 +153,155 @@ export default function ItemPage({ AddtoCart }) {
 
   const hasMultipleImages = images.length > 1;
 
+  const requireAuthentication = () => {
+    if (authUser) return true;
+
+    toast("Please log in to continue.");
+    navigate("/login", {
+      state: { from: `${location.pathname}${location.search}` },
+    });
+    return false;
+  };
+
   return (
     <main className="item-details-page">
-      <div className="item-post">
-      <button
-        className="item-back-button"
-        type="button"
-        aria-label="Go back"
-        onClick={() => navigate(-1)}
-      >
-        <span aria-hidden="true">←</span>
-        <span>Back</span>
-      </button>
-      <div className="seller-info">
-        <ProfileAvatar
-          profilePic={seller?.profilePic}
-          alt="Seller"
-          className="seller-avatar"
-        />
-        <div>
-          <p className="seller-name">{sellerName}</p>
-          {isMine && <p className="seller-badge">My Listing</p>}
+      <article className="item-post">
+        <header className="item-details-topbar">
+          <button
+            className="item-back-button"
+            type="button"
+            aria-label="Go back"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft size={19} aria-hidden="true" />
+            <span>Back to listings</span>
+          </button>
+        </header>
+
+        <div className="item-detail-layout">
+          <section className="item-gallery" aria-label="Item photos">
+            <div
+              className="carousel"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              {hasMultipleImages && (
+                <button
+                  className="nav-btn left"
+                  onClick={prevImage}
+                  disabled={currentImg === 0}
+                  type="button"
+                  aria-label="Previous image"
+                >
+                  ‹
+                </button>
+              )}
+
+              {images.length > 0 ? (
+                <img
+                  key={currentImg}
+                  src={images[currentImg]}
+                  alt={item.title}
+                  className="carousel-image"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Open full-size item image"
+                  onClick={() => {
+                    if (!didSwipe.current) setIsFullscreen(true);
+                    didSwipe.current = false;
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setIsFullscreen(true);
+                    }
+                  }}
+                  onError={(e) => (e.currentTarget.src = "/no-image.png")}
+                />
+              ) : (
+                <div className="no-image">No Image</div>
+              )}
+
+              {hasMultipleImages && (
+                <button
+                  className="nav-btn right"
+                  onClick={nextImage}
+                  disabled={currentImg === images.length - 1}
+                  type="button"
+                  aria-label="Next image"
+                >
+                  ›
+                </button>
+              )}
+
+              {images.length > 0 && (
+                <div className="image-meta" aria-hidden="true">
+                  <ZoomIn size={15} />
+                  <span>{currentImg + 1} / {images.length}</span>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="item-summary">
+            <div className="item-details">
+              <p className="item-details-eyebrow">Item details</p>
+              <h1 className="item-title">{item.title}</h1>
+              <p className="item-price">{item.price} Baht</p>
+              <div className="seller-info">
+                <ProfileAvatar
+                  profilePic={seller?.profilePic}
+                  alt="Seller"
+                  className="seller-avatar"
+                />
+                <div className="seller-copy">
+                  {!isMine && <span className="seller-label">Seller</span>}
+                  <p className="seller-name">{sellerName}</p>
+                  {isMine && <p className="seller-badge">My Listing</p>}
+                </div>
+              </div>
+              <div className="item-description-block">
+                <h2>Description</h2>
+                <p className="item-description">{item.description}</p>
+              </div>
+            </div>
+
+            <div className="bottom-buttons">
+              {!isMine && (
+                <button
+                  className="add-to-cart"
+                  onClick={() => {
+                    if (!requireAuthentication()) return;
+                    AddtoCart(item);
+                  }}
+                  type="button"
+                >
+                  <ShoppingCart size={19} aria-hidden="true" />
+                  <span>Add to cart</span>
+                </button>
+              )}
+
+              {!isMine && (
+                <button
+                  className="talk-to-seller"
+                  type="button"
+                  onClick={() => {
+                    if (!requireAuthentication()) return;
+
+                    if (!sellerId) {
+                      alert("Seller info not available for this item.");
+                      return;
+                    }
+                    navigate(`/chat/${sellerId}`);
+                  }}
+                >
+                  <MessageCircle size={19} aria-hidden="true" />
+                  <span>Chat with seller</span>
+                </button>
+              )}
+            </div>
+          </section>
         </div>
-      </div>
-
-      <div
-        className="carousel"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        {hasMultipleImages && (
-          <button
-            className="nav-btn left"
-            onClick={prevImage}
-            disabled={currentImg === 0}
-            type="button"
-            aria-label="Previous image"
-          >
-            ‹
-          </button>
-        )}
-
-        {images.length > 0 ? (
-          <img
-            key={currentImg}
-            src={images[currentImg]}
-            alt={item.title}
-            className="carousel-image"
-            onClick={() => {
-              if (!didSwipe.current) setIsFullscreen(true);
-              didSwipe.current = false;
-            }}
-            style={{ cursor: "zoom-in" }}
-            onError={(e) => (e.currentTarget.src = "/no-image.png")}
-          />
-        ) : (
-          <div className="no-image">No Image</div>
-        )}
-
-        {hasMultipleImages && (
-          <button
-            className="nav-btn right"
-            onClick={nextImage}
-            disabled={currentImg === images.length - 1}
-            type="button"
-            aria-label="Next image"
-          >
-            ›
-          </button>
-        )}
-      </div>
-
-      <div className="item-details">
-        <h3 className="item-title">{item.title}</h3>
-        <p className="item-price">{item.price} Baht</p>
-        <p className="item-description">{item.description}</p>
-      </div>
-
-      <div className="bottom-buttons">
-        {!isMine && (
-          <button className="add-to-cart" onClick={() => AddtoCart(item)} type="button">
-            Add to Cart 🛒
-          </button>
-        )}
-
-        {!isMine && (
-          <button
-            className="talk-to-seller"
-            type="button"
-            onClick={() => {
-              if (!sellerId) {
-                alert("Seller info not available for this item.");
-                return;
-              }
-              navigate(`/chat/${sellerId}`);
-            }}
-          >
-            Talk to Seller 💬
-          </button>
-        )}
-
-      </div>
 
       {/* Fullscreen*/}
 {isFullscreen && images.length > 0 && (
@@ -310,6 +362,6 @@ export default function ItemPage({ AddtoCart }) {
     )}
   </div>
 )}
-</div>
+      </article>
     </main>
 )}

@@ -1,186 +1,38 @@
-.profile-item-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 14px; /* optional */
-}
-
-/* IMAGE SAME SIZE */
-.profile-item-img {
-  width: 100%;
-  aspect-ratio: 4 / 3;       
-  overflow: hidden;
-  background: #f3f3f3;
-}
-
-.profile-item-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;            
-}
-
-/* MENU DOES NOT MOVE THE DOTS */
-.profile-item-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  width: 34px;
-  height: 34px;
-}
-
-/* button */
-.profile-kebab-btn {
-  width: 34px;
-  height: 34px;
-  border: none;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 10px;
-  cursor: pointer;
-
-  /* stable alignment */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-
-  font-size: 20px;
-  line-height: 1;
-
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-}
-
-.profile-kebab-btn:active {
-  transform: none; 
-}
-
-.profile-kebab-btn:focus {
-  outline: none;
-}
-
-
-.profile-kebab-menu {
-  position: absolute;
-  top: 40px;     
-  right: 0;
-
-  margin-top: 0; 
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  min-width: 140px;
-}
-
-.profile-kebab-item {
-  width: 100%;
-  padding: 10px 12px;
-  text-align: left;
-  border: none;
-  background: #fff;
-  cursor: pointer;
-}
-
-.profile-kebab-item:hover {
-  background: #f6f6f6;
-}
-
-.profile-kebab-item.danger {
-  color: #c0392b;
-}
-
-/* body */
-.profile-item-body {
-  padding: 10px 12px;
-}
-
-.profile-item-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
+.profile-item-card { position: relative; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; box-shadow: var(--shadow-sm); transition: box-shadow var(--transition), transform var(--transition); }
+.profile-item-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.profile-item-img { width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: #eef1f5; }
+.profile-item-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 300ms ease; }
+.profile-item-card:hover .profile-item-img img { transform: scale(1.03); }
+.profile-item-actions { position: absolute; top: 9px; right: 9px; z-index: 10; }
+.profile-kebab-btn { width: 36px; height: 36px; display: grid; place-items: center; padding: 0; border: 1px solid rgba(17,24,39,.1); border-radius: 11px; background: rgba(255,255,255,.95); color: var(--color-text); font-size: 1.25rem; line-height: 1; cursor: pointer; box-shadow: var(--shadow-xs); }
+.profile-kebab-btn:hover { background: #fff; box-shadow: var(--shadow-sm); }
+.profile-kebab-menu { position: absolute; top: 42px; right: 0; min-width: 140px; overflow: hidden; padding: 5px; border: 1px solid var(--color-border); border-radius: 12px; background: #fff; box-shadow: var(--shadow-md); }
+.profile-kebab-item { width: 100%; min-height: 38px; padding: 0 10px; border: 0; border-radius: 8px; background: #fff; color: var(--color-text); text-align: left; cursor: pointer; }
+.profile-kebab-item:hover { background: #f6f7f9; }
+.profile-kebab-item.danger { color: #b42318; }
+.profile-item-body { padding: 13px 14px; }
+.profile-item-title-row { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .profile-item-title {
+  min-width: 0;
+  min-height: 2.7em;
   margin: 0;
-  font-size: 16px;
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--color-text);
+  font-size: .95rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
-
-.profile-item-price {
-  margin: 0;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-/* Confirm modal overlay */
-.confirm-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 16px;
-}
-
-/* Modal box */
-.confirm-modal {
-  width: min(420px, 100%);
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  padding: 16px;
-}
-
-.confirm-title {
-  margin: 0 0 6px 0;
-  font-size: 18px;
-}
-
-.confirm-text {
-  margin: 0 0 14px 0;
-  font-size: 14px;
-  color: #444;
-}
-
-.confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.confirm-btn {
-  border: 1px solid #ddd;
-  background: #fff;
-  padding: 9px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.confirm-btn:hover {
-  background: #f6f6f6;
-}
-
-.confirm-btn.danger {
-  border-color: #f2c0bc;
-  background: #ffe9e7;
-  color: #c0392b;
-}
-
-.confirm-btn.danger:hover {
-  background: #ffdeda;
-}
-
-.confirm-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.profile-item-price { margin: 0; color: #087443; font-size: .82rem; font-weight: 800; white-space: nowrap; }
+.confirm-overlay { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; padding: 16px; background: rgba(17,24,39,.58); backdrop-filter: blur(3px); }
+.confirm-modal { width: min(100%, 420px); padding: 24px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: #fff; box-shadow: var(--shadow-lg); }
+.confirm-title { margin: 0 0 6px; color: var(--color-text); font-size: 1.2rem; }
+.confirm-text { margin: 0 0 20px; color: var(--color-text-muted); font-size: .88rem; line-height: 1.55; }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 9px; }
+.confirm-btn { min-height: 42px; padding: 0 14px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: #fff; color: var(--color-text); font-weight: 750; cursor: pointer; transition: background var(--transition), transform var(--transition); }
+.confirm-btn:hover { background: #f6f7f9; transform: translateY(-1px); }
+.confirm-btn.danger { border-color: #efbbb6; background: #fff3f2; color: #b42318; }
+.confirm-btn.danger:hover { background: #fee4e2; }

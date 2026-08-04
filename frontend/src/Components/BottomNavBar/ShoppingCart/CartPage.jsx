@@ -35,11 +35,21 @@ export default function CartPage({ cartItems, setCartItems }) {
   };
 
   return (
-    <div className="cart-page">
-      <h2>Your Cart</h2>
+    <main className="cart-page">
+      <header className="cart-page-header">
+        <div>
+          <p className="cart-eyebrow">Saved items</p>
+          <h1>Your Cart</h1>
+        </div>
+        <span className="cart-count">{cartItems.length} {cartItems.length === 1 ? "item" : "items"}</span>
+      </header>
 
       {cartItems.length === 0 ? (
-        <p>Nothing is in your cart.</p>
+        <div className="cart-empty">
+          <h2>Your cart is empty</h2>
+          <p>Browse UniMarket and save something you like.</p>
+          <button type="button" onClick={() => navigate("/products")}>Browse items</button>
+        </div>
       ) : (
         <ul>
           {cartItems.map((item) => {
@@ -75,6 +85,7 @@ export default function CartPage({ cartItems, setCartItems }) {
 
                   <button
                     className="delete-btn"
+                    type="button"
                     onClick={() => handleDelete(item._id)}
                   >
                     Delete
@@ -85,6 +96,6 @@ export default function CartPage({ cartItems, setCartItems }) {
           })}
         </ul>
       )}
-    </div>
+    </main>
   );
 }

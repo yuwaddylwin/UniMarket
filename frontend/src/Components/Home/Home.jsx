@@ -1,6 +1,5 @@
 import React from "react";
 import "./Home.css";
-import Navbar from "../Navbar/Navbar";
 import ItemsList from "../ItemsList/ItemsList";
 import Footer from "../Footer/footer";
 import { useNavigate } from "react-router-dom";
@@ -11,15 +10,13 @@ import { useAuthStore } from "../store/useAuthStore";
 export default function Home({ cartItems, setCartItems }) {
   const navigate = useNavigate();
   const {authUser} = useAuthStore();
-  const { count, AddtoCart } = useHomeLogic(cartItems, setCartItems);
+  const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
 
   const items = useItemStore((s) => s.items); //  get all posted items
 
   return (
     <>
       <div className="home-container">
-        <Navbar count={count} />
-
         <div className="hero-section">
           <main className="hero-text">
             <h1>WHAT's UniMarket??</h1>
@@ -37,7 +34,7 @@ export default function Home({ cartItems, setCartItems }) {
         </div>
 
         <button
-            className="btn"
+            className="hero-cta"
             onClick={() => navigate(authUser ? "/sell" : "/login")}
           >
             Sell Now

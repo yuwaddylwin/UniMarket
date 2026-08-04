@@ -16,22 +16,23 @@ function Sell() {
 
   return (
     <div className="post-container">
-      <h1 className="title">
+      <h1 className="post-title">
         {isEditMode ? "Edit Your Item" : "Post Your Items & Sell it!"}
       </h1>
 
       <form className="post-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Item Images (required, max 6)</label>
+          <label>Item Images <span className="field-note">Required, up to 6</span></label>
           <div className="image-upload-container">
             {/* Image Previews */}
             {item.images.map((img, index) => (
-              <div className="image-preview" key={index}>
+              <div className="sell-image-preview" key={index}>
                 <img src={img.url} alt="preview" />
                 <button
                   type="button"
                   className="remove-btn"
                   onClick={() => removeImage(index)}
+                  aria-label={`Remove image ${index + 1}`}
                 >
                   ×
                 </button>
@@ -40,8 +41,8 @@ function Sell() {
 
             {/* Upload Button */}
             {item.images.length < 6 && (
-              <label className="upload-box">
-                +
+              <label className="upload-box" aria-label="Add item images">
+                <span aria-hidden="true">+</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -55,8 +56,9 @@ function Sell() {
         </div>
 
         <div className="form-group">
-          <label>Item Name</label>
+          <label htmlFor="item-name">Item Name</label>
           <input
+            id="item-name"
             type="text"
             name="name"
             value={item.name}
@@ -67,8 +69,9 @@ function Sell() {
         </div>
 
         <div className="form-group">
-          <label>Category</label>
+          <label htmlFor="item-category">Category</label>
           <select
+            id="item-category"
             name="category"
             value={item.category}
             onChange={handleChange}
@@ -85,8 +88,9 @@ function Sell() {
         </div>
 
         <div className="form-group">
-          <label>Price (THB)</label>
+          <label htmlFor="item-price">Price (THB)</label>
           <input
+            id="item-price"
             type="number"
             name="price"
             value={item.price}
@@ -105,8 +109,9 @@ function Sell() {
         </div>
 
         <div className="form-group">
-          <label>Description</label>
+          <label htmlFor="item-description">Description</label>
           <textarea
+            id="item-description"
             name="description"
             value={item.description}
             onChange={handleChange}
@@ -118,7 +123,7 @@ function Sell() {
 
         {/* Buttons */}
         {isEditMode ? (
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className="post-form-actions">
             <button
               type="submit"
               className="submit-btn"
@@ -129,7 +134,7 @@ function Sell() {
             </button>
             <button
               type="button"
-              className="submit-btn"
+              className="submit-btn secondary"
               onClick={handleCancel}
               disabled={isSubmitting}
             >
