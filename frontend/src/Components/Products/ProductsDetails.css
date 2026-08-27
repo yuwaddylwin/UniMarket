@@ -196,7 +196,7 @@
 }
 .item-details { min-width: 0; }
 .item-details-eyebrow { margin: 0 0 10px; color: var(--pd-blue); font-size: 0.72rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
-.item-title { margin: 0 0 16px; color: var(--pd-text); font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.8rem, 3vw, 2.55rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.12; overflow-wrap: anywhere; }
+.item-title { margin: 0 0 16px; color: var(--pd-text); font-family: inherit; font-size: clamp(1.8rem, 3vw, 2.55rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.12; overflow-wrap: anywhere; }
 .item-price { width: fit-content; display: inline-flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px; border: 1px solid rgba(16, 129, 81, 0.2); border-radius: 10px; background: rgba(16, 185, 129, 0.1); color: #087443; font-size: 0.92rem; font-weight: 850; }
 .item-price::before { content: "฿"; }
 .item-description-block { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--pd-line); }

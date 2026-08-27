@@ -1,9 +1,15 @@
 .verification-page {
-  min-height: 100vh;
+  min-height: calc(100dvh - var(--header-height));
   display: grid;
   place-items: center;
   padding: 24px 16px;
-  background: #f3f6fb;
+  background: #f6f8fb;
+}
+
+@media (max-width: 640px) {
+  .verification-page {
+    min-height: calc(100dvh - var(--header-compact-mobile-height));
+  }
 }
 
 .verification-card {

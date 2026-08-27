@@ -1,74 +1,80 @@
-import React from "react";
-import { Home, Plus, ShoppingCart } from "lucide-react";
-import "./BottomNav.css";
-import { useNavigate } from "react-router-dom";
+import { Home, MessageCircle, Plus, Search, User } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { MessageCircle } from "lucide-react";
-import ProfileAvatar from "../common/ProfileAvatar";
+import "./BottomNav.css";
 
-
-export default function BottomNav({ cartCount = 0 }) {
-  
+export default function BottomNav() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { authUser, totalUnread } = useAuthStore();
-  
-  const handleChatClick = () => {
-    if (!authUser) navigate("/login");
-    else navigate("/chat");
-  };
 
+  const handleChatClick = () => navigate(authUser ? "/chat" : "/login");
+  const handleProfileClick = () => navigate(authUser ? "/profile" : "/login");
+  const isPostActive = location.pathname === "/post" || location.pathname === "/sell";
+  const isActive = (path) =>
+    path === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(path);
 
   return (
     <nav className="bottom-nav" aria-label="Quick navigation">
-      
-      <button className="bottom-nav-item" type="button" aria-label="Home" onClick={() => navigate("/")}><Home /></button>
-      <button className="bottom-nav-item chat-icon-wrapper" type="button" aria-label="Messages" onClick={handleChatClick}>
-        <MessageCircle className="bn-chat-icon"/>
-        {totalUnread > 0 && (
-          <div className="message-badge">
-            {totalUnread > 99 ? "99+" : totalUnread}
-          </div>
-        )}
-      </button>
+      <NavButton
+        label="Home"
+        icon={<Home aria-hidden="true" />}
+        active={isActive("/")}
+        onClick={() => navigate("/")}
+      />
+
+      <NavButton
+        label="Chat"
+        icon={<MessageCircle aria-hidden="true" />}
+        active={isActive("/chat")}
+        onClick={handleChatClick}
+        badge={totalUnread > 0 ? (totalUnread > 99 ? "99+" : totalUnread) : null}
+      />
+
       <button
-          className="plus-btn"
-          type="button"
-          aria-label="Sell an item"
-          onClick={() => navigate(authUser ? "/sell" : "/login")}
-        >
-          <Plus />
-        </button>
-
-
-
-      <button className="bottom-nav-item cart-icon" type="button" aria-label={`Cart with ${cartCount} items`} onClick={() => navigate("/cart")}>
-        <ShoppingCart />
-
-        {cartCount > 0 && (
-          <div className="cart-badge">
-            {cartCount}
-          </div>
-        )}
-      </button>
-
-      {/* Profile Avatar */}
-      <button
+        className={`bottom-nav-sell${isPostActive ? " is-active" : ""}`}
         type="button"
-        className="bottom-nav-item avatar"
-        aria-label="Profile"
-        onClick={() => {
-          if (!authUser) {
-            navigate("/login");
-          } else {
-            navigate("/profile");
-          }
-        }}
+        aria-label="Post a listing"
+        aria-current={isPostActive ? "page" : undefined}
+        onClick={() => navigate(authUser ? "/post" : "/login")}
       >
-        <ProfileAvatar
-          profilePic={authUser?.profilePic}
-          alt="profile" 
-        />
+        <span className="bottom-nav-sell-icon"><Plus aria-hidden="true" /></span>
+        <span>Post</span>
       </button>
+
+      <NavButton
+        label="Search"
+        icon={<Search aria-hidden="true" />}
+        active={isActive("/products")}
+        onClick={() => navigate("/products")}
+      />
+
+      <NavButton
+        label="Profile"
+        icon={<User aria-hidden="true" />}
+        active={isActive("/profile")}
+        onClick={handleProfileClick}
+      />
     </nav>
+  );
+}
+
+function NavButton({ label, icon, active, onClick, badge = null }) {
+  return (
+    <button
+      className={`bottom-nav-item${active ? " is-active" : ""}`}
+      type="button"
+      aria-label={label}
+      aria-current={active ? "page" : undefined}
+      onClick={onClick}
+    >
+      <span className="bottom-nav-icon">
+        {icon}
+        {badge !== null && <span className="bottom-nav-badge">{badge}</span>}
+      </span>
+      <span className="bottom-nav-label">{label}</span>
+    </button>
   );
 }

@@ -1,6 +1,6 @@
 .ip-page { width: min(calc(100% - 40px), var(--content-wide)); margin: 0 auto; padding: clamp(32px, 5vw, 60px) 0 56px; }
 .ip-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.ip-title { margin: 0; color: var(--color-text); font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 3vw, 2.35rem); letter-spacing: -0.025em; }
+.ip-title { margin: 0; color: var(--color-text); font-family: inherit; font-size: clamp(1.7rem, 3vw, 2.35rem); letter-spacing: -0.025em; }
 .ip-chip { max-width: min(100%, 420px); overflow: hidden; padding: 7px 12px; border: 1px solid rgba(27,74,145,.18); border-radius: var(--radius-pill); background: var(--color-primary-soft); color: #344054; font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
 .ip-result { margin: -8px 0 24px; padding: 16px 18px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; }
 .ip-notfound { margin: 0; color: var(--color-text); font-size: 1rem; font-weight: 800; }

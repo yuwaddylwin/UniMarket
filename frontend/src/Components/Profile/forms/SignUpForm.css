@@ -22,7 +22,7 @@
 .login-form h1 {
   margin: 0 0 14px;
   color: var(--color-primary);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: inherit;
   font-size: clamp(1.85rem, 5vw, 2.35rem);
   line-height: 1.1;
   text-align: center;
@@ -107,4 +107,4 @@
 .verification-result p { margin: 0; color: var(--color-text-muted); }
 
 @keyframes auth-page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 640px) { .profile { min-height: calc(100dvh - var(--header-mobile-height) - 68px); padding: 24px 12px; } }
+@media (max-width: 640px) { .profile { min-height: calc(100dvh - var(--header-compact-mobile-height) - var(--bottom-nav-height)); padding: 24px 12px; } }

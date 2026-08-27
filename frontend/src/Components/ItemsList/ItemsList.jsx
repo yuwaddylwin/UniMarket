@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import "./ItemsList.css";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
 import ProfileAvatar from "../common/ProfileAvatar";
 import LoadingSpinner from "../common/LoadingSpinner";
 
@@ -24,9 +24,8 @@ function getFirstImageSrc(item) {
   return url;
 }
 
-export default function ItemsList({ AddtoCart }) {
+export default function ItemsList() {
   const { items, isLoading, error } = useItemsList();
-  const { authUser } = useAuthStore();
   const navigate = useNavigate();
 
   const scrollerRef = useRef(null);
@@ -48,11 +47,7 @@ export default function ItemsList({ AddtoCart }) {
     };
   }, []);
 
-  const filteredItems = items.filter((item) => {
-    const sellerId = item?.seller?._id || item?.seller?.id;
-    if (!authUser?._id || !sellerId) return true;
-    return sellerId !== authUser._id;
-  });
+  const filteredItems = items;
 
   const scrollByCards = (dir) => {
     const el = scrollerRef.current;
@@ -77,9 +72,12 @@ export default function ItemsList({ AddtoCart }) {
   return (
     <div className="items-container">
       <div className="items-header">
-        <h2>For You!</h2>
+        <div>
+          <span className="items-eyebrow">Fresh from your community</span>
+          <h2>Popular Items</h2>
+        </div>
         <button className="items-view-link" type="button" onClick={() => navigate("/products")}>
-          View More
+          View All <span aria-hidden="true">&gt;</span>
         </button>
       </div>
 
@@ -139,10 +137,10 @@ export default function ItemsList({ AddtoCart }) {
                       e.currentTarget.src = "/Images/placeholder.png";
                     }}
                   />
+                  <div className="item-price">{item.price} Baht</div>
                 </div>
 
                 <div className="item-body">
-                  <div className="item-price">{item.price} Baht</div>
                   <h3 className="item-title">{item.title}</h3>
 
                   {item?.seller?.fullName && (
@@ -154,54 +152,15 @@ export default function ItemsList({ AddtoCart }) {
                         loading="lazy"
                       />
                       <span className="seller-name">
-                        Seller: {item.seller.fullName}
+                        Listed by {item.seller.fullName}
                       </span>
                     </div>
                   )}
 
                   <p className="item-desc">{item.description}</p>
-
-                  <div className="item-actions">
-                    <button
-                        className="item-action-btn primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-
-                          if (!authUser) {
-                            navigate("/login");
-                            return; 
-                          }
-
-                          AddtoCart(item);
-                        }}
-                        type="button"
-                      >
-                        ADD TO CART 🛒
-                      </button>
-
-                      <button
-                        className="item-action-btn secondary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-
-                          if (!authUser) {
-                            navigate("/login");
-                            return; 
-                          }
-
-                          const sellerId = item?.seller?._id || item?.seller?.id;
-                          if (!sellerId) {
-                            alert("Seller info not available for this item.");
-                            return;
-                          }
-
-                          navigate(`/chat/${sellerId}`);
-                        }}
-                        type="button"
-                      >
-                        TALK TO SELLER 💬
-                      </button>
-
+                  <div className="item-card-footer" aria-hidden="true">
+                    <span>View details</span>
+                    <ArrowUpRight />
                   </div>
                 </div>
               </div>

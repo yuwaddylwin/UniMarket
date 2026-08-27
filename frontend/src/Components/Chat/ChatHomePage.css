@@ -5,8 +5,7 @@ html, body, #root {
 
 .chat-layout {
   display: flex;
-  height: 100dvh;
-  padding-bottom: 68px;
+  height: calc(100dvh - var(--header-height));
   box-sizing: border-box;
   overflow: hidden;
   background: #fff;
@@ -25,8 +24,15 @@ html, body, #root {
 }
 
 .mobile-layout {
-  height: calc(100dvh - 68px);
+  height: calc(100dvh - var(--header-height));
   overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .chat-layout,
+  .mobile-layout {
+    height: calc(100dvh - var(--header-compact-mobile-height));
+  }
 }
 
 @media (max-width: 900px) and (min-width: 769px) {

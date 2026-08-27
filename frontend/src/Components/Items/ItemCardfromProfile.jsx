@@ -46,7 +46,7 @@ export default function ItemCard({ item, onDeleteItem }) {
 
   const handleEdit = () => {
     setMenuOpen(false);
-    navigate("/sell", { state: { mode: "edit", item } });
+    navigate("/post", { state: { mode: "edit", item } });
   };
 
   const handleDeleteClick = () => {

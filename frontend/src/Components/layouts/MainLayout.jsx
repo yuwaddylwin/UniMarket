@@ -1,15 +1,22 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import BottomNav from "../BottomNavBar/BottomNav";
 import Navbar from "../Navbar/Navbar";
 
-const MainLayout = ({ cartItems }) => {
+const MainLayout = ({ cartItems, showBottomNav = true }) => {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <>
-      <Navbar />
-      <div className="app-content">
+      <Navbar cartCount={cartItems.length} />
+      <div
+        className={`app-content${isHome ? " app-content--home" : ""}${
+          showBottomNav ? " app-content--with-bottom" : " app-content--without-bottom"
+        }`}
+      >
         <Outlet />
       </div>
-      <BottomNav cartCount={cartItems.length} />
+      {showBottomNav && <BottomNav />}
     </>
   );
 };

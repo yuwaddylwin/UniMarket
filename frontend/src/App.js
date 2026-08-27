@@ -51,6 +51,14 @@ export default function App() {
           <Route path="/login" element={<LoginForm/>} /> 
           <Route path="/signup" element={<SignUpForm/>} />
           <Route
+            path="/post"
+            element={
+              <RequireAuth>
+                <Sell />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/sell"
             element={
               <RequireAuth>
@@ -73,10 +81,16 @@ export default function App() {
         </Route>
 
         {/* ROUTES WITHOUT BottomNav */}
+        <Route
+          element={
+            <MainLayout cartItems={cartItems} showBottomNav={false} />
+          }
+        >
             <Route path="/chat" element={<ChatHomePage />} />
             <Route path="/chat/:sellerId" element={<ChatHomePage />} />
             <Route path="/verify/:token" element={<VerifyEmailPage />} />
             <Route path="/resend-verification" element={<ResendVerificationPage />} />
+        </Route>
 
       </Routes>
     </Router>

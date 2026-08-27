@@ -1,71 +1,186 @@
-import React from "react";
-import "./Home.css";
-import ItemsList from "../ItemsList/ItemsList";
-import Footer from "../Footer/footer";
+import { useEffect, useRef, useState } from "react";
+import {
+  BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  MessageCircle,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useHomeLogic } from "../Logics/useHome";
-import { useItemStore } from "../store/useItemStore";
-import { useAuthStore } from "../store/useAuthStore";
+import AccommodationSection from "../Accommodation/AccommodationSection";
+import Footer from "../Footer/footer";
+import ItemsList from "../ItemsList/ItemsList";
+import "./Home.css";
 
-export default function Home({ cartItems, setCartItems }) {
+const SLIDES = [
+  {
+    image: "/Images/unimarket/buy-sell.jpg",
+    eyebrow: "A marketplace made for students",
+    title: "Buy and sell within your campus community.",
+    description: "Pass useful items on, discover affordable finds, and keep good things in student hands.",
+    alt: "Two university students exchanging books and a desk lamp on campus",
+    position: "center",
+  },
+  {
+    image: "/Images/unimarket/accommodation.jpg",
+    eyebrow: "Student-friendly accommodation",
+    title: "Find a place that feels like home.",
+    description: "Explore practical places near university that fit student life and student budgets.",
+    alt: "University students viewing a welcoming room near campus",
+    position: "center",
+  },
+  {
+    image: "/Images/unimarket/connect.jpg",
+    eyebrow: "Direct student connections",
+    title: "Chat, connect, and make it happen.",
+    description: "Speak directly with other students to ask questions, arrange details, and build trust.",
+    alt: "Students connecting through marketplace chat in a university courtyard",
+    position: "center",
+  },
+];
+
+export default function Home() {
   const navigate = useNavigate();
-  const {authUser} = useAuthStore();
-  const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef(null);
 
-  const items = useItemStore((s) => s.items); //  get all posted items
+  useEffect(() => {
+    if (isPaused) return undefined;
+    const timer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % SLIDES.length);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [isPaused]);
+
+  const showSlide = (index) => {
+    setActiveSlide((index + SLIDES.length) % SLIDES.length);
+  };
+
+  const handleTouchEnd = (event) => {
+    if (touchStartX.current === null) return;
+    const distance = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(distance) < 45) return;
+    showSlide(activeSlide + (distance < 0 ? 1 : -1));
+  };
 
   return (
     <>
-      <div className="home-container">
-        <div className="hero-section">
-          <main className="hero-text">
-            <h1>WHAT's UniMarket??</h1>
-            <h2>A Second-Hand Market Platform for Uni Students</h2>
-            <h2>Buy & Sell Things and Services</h2>
-          </main>
+      <main className="home-page">
+        <section
+          className="home-carousel"
+          aria-roledescription="carousel"
+          aria-label="Discover UniMarket"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onFocusCapture={() => setIsPaused(true)}
+          onBlurCapture={() => setIsPaused(false)}
+          onTouchStart={(event) => {
+            touchStartX.current = event.touches[0].clientX;
+          }}
+          onTouchEnd={handleTouchEnd}
+        >
+          {SLIDES.map((slide, index) => (
+            <article
+              className={`home-slide${index === activeSlide ? " is-active" : ""}`}
+              aria-hidden={index !== activeSlide}
+              key={slide.title}
+            >
+              <img
+                src={slide.image}
+                alt={index === activeSlide ? slide.alt : ""}
+                style={{ objectPosition: slide.position }}
+              />
+              <div className="home-slide-overlay" aria-hidden="true" />
+              <div className="home-slide-copy">
+                <span>{slide.eyebrow}</span>
+                <h1>{slide.title}</h1>
+                <p>{slide.description}</p>
+              </div>
+            </article>
+          ))}
 
-          <div className="hero-image">
-            <img
-              className="img"
-              src="/Images/Logo.jpg"
-              alt="UniMarket Platform"
-            />
-          </div>
-        </div>
-
-        <button
-            className="hero-cta"
-            onClick={() => navigate(authUser ? "/sell" : "/login")}
+          <button
+            className="home-carousel-arrow home-carousel-arrow--left"
+            type="button"
+            aria-label="Show previous image"
+            onClick={() => showSlide(activeSlide - 1)}
           >
-            Sell Now
+            <ChevronLeft aria-hidden="true" />
+          </button>
+          <button
+            className="home-carousel-arrow home-carousel-arrow--right"
+            type="button"
+            aria-label="Show next image"
+            onClick={() => showSlide(activeSlide + 1)}
+          >
+            <ChevronRight aria-hidden="true" />
           </button>
 
-      </div>
+          <div className="home-carousel-dots" aria-label="Choose carousel image">
+            {SLIDES.map((slide, index) => (
+              <button
+                className={index === activeSlide ? "is-active" : ""}
+                type="button"
+                aria-label={`Show image ${index + 1}: ${slide.title}`}
+                aria-current={index === activeSlide ? "true" : undefined}
+                onClick={() => showSlide(index)}
+                key={slide.title}
+              />
+            ))}
+          </div>
 
-      {/* pass items here */}
-      <ItemsList items={items} AddtoCart={AddtoCart} cartItems={cartItems} />
+          <div className="home-carousel-status" aria-hidden="true">
+            <span>{String(activeSlide + 1).padStart(2, "0")}</span>
+            <i />
+            <span>{String(SLIDES.length).padStart(2, "0")}</span>
+          </div>
+        </section>
 
-      <div className="hero-section">
-        <main className="hero-text2">
-          <h1>How it Works?</h1>
-          <h2>
-            1. <strong>Sign Up:</strong> Verify with your Student Email to join
-            the community.
+        <section className="home-value-strip" aria-label="Why students use UniMarket">
+          <article>
+            <span className="home-value-icon"><BadgeCheck aria-hidden="true" /></span>
+            <div>
+              <h2>Student-focused</h2>
+              <p>Built around university life.</p>
+            </div>
+          </article>
+          <article>
+            <span className="home-value-icon"><MapPin aria-hidden="true" /></span>
+            <div>
+              <h2>Close to campus</h2>
+              <p>Find useful things nearby.</p>
+            </div>
+          </article>
+          <article>
+            <span className="home-value-icon"><MessageCircle aria-hidden="true" /></span>
+            <div>
+              <h2>Connect directly</h2>
+              <p>Chat student to student.</p>
+            </div>
+          </article>
+        </section>
+
+        <div className="home-discovery">
+          <header className="home-discovery-intro">
+            <span>Explore UniMarket</span>
+            <h2>Everything students need,<br />right around campus.</h2>
+            <p>From your next room to your next everyday essential, discover listings shaped around student life.</p>
+          </header>
+          <AccommodationSection />
+          <ItemsList />
+        </div>
+
+        <section className="home-signup" aria-labelledby="home-signup-title">
+          <span className="home-signup-eyebrow">Join your campus community</span>
+          <h2 id="home-signup-title">
+            Ready to buy or sell your<br /><em>next campus find?</em>
           </h2>
-          <h2>
-            2. <strong>List or Browse:</strong> Post Items to Sell or Explore to
-            Buy Things.
-          </h2>
-          <h2>
-            3. <strong>Connect & Chat:</strong> Chat with the Sellers or Buyers
-            to ask questions.
-          </h2>
-          <h2>
-            4. <strong>Meet up & Complete:</strong> Meet up and finalize the
-            deal.
-          </h2>
-        </main>
-      </div>
+          <p>Discover useful finds, pass things forward, and connect with students around you.</p>
+          <button type="button" onClick={() => navigate("/signup")}>Sign Up</button>
+        </section>
+      </main>
 
       <Footer />
     </>

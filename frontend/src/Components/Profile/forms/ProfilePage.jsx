@@ -126,7 +126,7 @@ export default function ProfilePage() {
         </div>
 
         <section className="sell-items-section">
-          <h2>Your Sell Items</h2>
+          <h2>Your Posted Items</h2>
           <p style={{ opacity: 0.7 }}>Please log in to see your items.</p>
         </section>
       </div>
@@ -172,7 +172,7 @@ export default function ProfilePage() {
       </div>
 
       <section className="sell-items-section">
-        <h2>Your Sell Items</h2>
+        <h2>Your Posted Items</h2>
 
         {loadingItems ? (
           <LoadingSpinner
