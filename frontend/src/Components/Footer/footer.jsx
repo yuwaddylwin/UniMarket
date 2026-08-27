@@ -1,5 +1,5 @@
 import "./footer.css";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -8,15 +8,15 @@ export default function Footer() {
         <section className="footer-brand" aria-label="UniMarket">
           <h3>Uni<span>Market</span></h3>
           <p className="footer-tagline">A student marketplace for useful finds, nearby living, and real campus connections.</p>
-          <p className="footer-copyright">© {new Date().getFullYear()} UniMarket. All rights reserved.</p>
+          <span className="footer-trust"><ShieldCheck aria-hidden="true" /> Built for safer student exchanges</span>
         </section>
 
         <section className="footer-section">
           <h4>Help</h4>
           <ul>
-            <li>How it Works</li>
-            <li>Privacy</li>
-            <li>Terms</li>
+            <li><a href="/#home-discovery">How it works <ArrowUpRight aria-hidden="true" /></a></li>
+            <li><a href="mailto:unimarket.app.official@gmail.com?subject=UniMarket%20Safety">Safety help <ArrowUpRight aria-hidden="true" /></a></li>
+            <li><a href="mailto:unimarket.app.official@gmail.com?subject=UniMarket%20Support">Get support <ArrowUpRight aria-hidden="true" /></a></li>
           </ul>
         </section>
 
@@ -35,6 +35,10 @@ export default function Footer() {
             <span>Bangkok, Thailand</span>
           </p>
         </section>
+      </div>
+      <div className="footer-bottom">
+        <p>© {new Date().getFullYear()} UniMarket. All rights reserved.</p>
+        <p>Made for student life in Bangkok.</p>
       </div>
     </footer>
   );

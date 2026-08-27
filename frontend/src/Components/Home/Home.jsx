@@ -162,7 +162,7 @@ export default function Home() {
           </article>
         </section>
 
-        <div className="home-discovery">
+        <div id="home-discovery" className="home-discovery">
           <header className="home-discovery-intro">
             <span>Explore UniMarket</span>
             <h2>Everything students need,<br />right around campus.</h2>
@@ -173,12 +173,14 @@ export default function Home() {
         </div>
 
         <section className="home-signup" aria-labelledby="home-signup-title">
-          <span className="home-signup-eyebrow">Join your campus community</span>
-          <h2 id="home-signup-title">
-            Ready to buy or sell your<br /><em>next campus find?</em>
-          </h2>
-          <p>Discover useful finds, pass things forward, and connect with students around you.</p>
-          <button type="button" onClick={() => navigate("/signup")}>Sign Up</button>
+          <div className="home-signup-card">
+            <span className="home-signup-eyebrow">Join your campus community</span>
+            <h2 id="home-signup-title">
+              Ready to find your need &<br /><em>Sell what you don't?</em>
+            </h2>
+            <p>Discover second-hand items, find accommodation, and connect with students around your campus.</p>
+            <button type="button" onClick={() => navigate("/signup")}>Sign Up</button>
+          </div>
         </section>
       </main>
 

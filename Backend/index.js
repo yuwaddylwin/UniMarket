@@ -10,6 +10,7 @@ import ItemsList from "./src/routes/Items.route.js";
 import authRoutes from "./src/routes/auth.route.js";
 import messageRoutes from "./src/routes/message.route.js";
 import uploadRoutes from "./src/routes/upload.route.js"
+import accommodationRoutes from "./src/routes/accommodations.route.js";
 import { app, server } from "./src/lib/socket.js";
 
 
@@ -35,6 +36,7 @@ const MONGOURL = process.env.MONGO_URL;
 
 // Routes
 app.use("/api/items", ItemsList);
+app.use("/api/accommodations", accommodationRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes); 
 app.use("/api/upload", uploadRoutes);

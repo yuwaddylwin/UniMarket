@@ -129,16 +129,39 @@
 .home-signup {
   width: 100%;
   margin: 0;
-  padding: clamp(72px, 10vw, 126px) 20px clamp(68px, 9vw, 112px);
-  background:
-    radial-gradient(circle at 50% -20%, rgba(72, 129, 209, 0.32), transparent 44%),
-    #101b2c;
+  padding: clamp(52px, 7vw, 84px) 20px 28px;
+  background: #f5f7fb;
   color: #fff;
   text-align: center;
 }
+.home-signup-card {
+  position: relative;
+  width: min(100%, 1200px);
+  margin: 0 auto;
+  overflow: hidden;
+  padding: clamp(72px, 9vw, 112px) 24px clamp(68px, 8vw, 98px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: clamp(24px, 3vw, 36px);
+  background:
+    radial-gradient(circle at 50% -20%, rgba(72, 129, 209, 0.32), transparent 44%),
+    #101b2c;
+  box-shadow: 0 28px 70px rgba(16, 27, 44, 0.18);
+}
+.home-signup-card::before,
+.home-signup-card::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border: 1px solid rgba(120, 173, 247, 0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.home-signup-card::before { top: -145px; left: -72px; }
+.home-signup-card::after { right: -100px; bottom: -165px; width: 280px; height: 280px; }
 .home-signup-eyebrow { display: block; margin-bottom: 14px; color: #78adf7; font-size: 0.72rem; font-weight: 850; letter-spacing: 0.15em; text-transform: uppercase; }
-.home-signup h2 { margin: 0; color: #f9fbff; font-family: Arial, Helvetica, sans-serif; font-size: clamp(1.85rem, 4.1vw, 3.35rem); font-weight: 600; letter-spacing: -0.035em; line-height: 1.06; }
-.home-signup h2 em { color: #78adf7; font-style: normal; font-weight: 600; }
+.home-signup h2 { margin: 0; color: #f9fbff; font-family: Georgia, Cambria, "Times New Roman", serif; font-size: clamp(2rem, 4.35vw, 3.65rem); font-weight: 500; letter-spacing: -0.045em; line-height: 1.04; text-wrap: balance; }
+.home-signup h2 em { color: #8fbcfa; font-style: italic; font-weight: 500; }
 .home-signup p { max-width: 580px; margin: 22px auto 0; color: #aebdd1; font-size: clamp(0.9rem, 1.4vw, 1.02rem); line-height: 1.6; }
 .home-signup button {
   min-width: min(100%, 180px);
@@ -190,7 +213,8 @@
   .home-slide-copy h1 { font-size: 1.95rem; }
   .home-slide-copy p { display: none; }
   .home-carousel-arrow { width: 38px; height: 38px; }
-  .home-signup { width: 100%; }
+  .home-signup { width: 100%; padding: 36px 14px 18px; }
+  .home-signup-card { padding-right: 18px; padding-left: 18px; border-radius: 24px; }
   .home-value-strip { width: calc(100% - 24px); }
   .home-discovery-intro { width: calc(100% - 24px); }
 }

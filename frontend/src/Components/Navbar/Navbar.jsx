@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, Search as SearchIcon, ShoppingCart, X } from "lucide-react";
 
 const MENU_ITEMS = [
-  "Profile Setting",
-  "Accommodation",
-  "Items",
-  "Help",
-  "Contact",
+  { label: "Profile", to: "/profile" },
+  { label: "Accommodation", href: "/#accommodation-title" },
+  { label: "Browse items", to: "/products" },
+  { label: "Help & support", href: "mailto:unimarket.app.official@gmail.com?subject=UniMarket%20Support" },
+  { label: "Contact", href: "mailto:unimarket.app.official@gmail.com" },
 ];
 
 export default function Navbar({ cartCount = 0 }) {
@@ -24,6 +24,12 @@ export default function Navbar({ cartCount = 0 }) {
   useEffect(() => {
     if (!isMenuOpen) return undefined;
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => {
+      menuRef.current?.querySelector(".navbar-menu a")?.focus();
+    }, 220);
+
     const handlePointerDown = (event) => {
       if (!menuRef.current?.contains(event.target)) setIsMenuOpen(false);
     };
@@ -34,6 +40,8 @@ export default function Navbar({ cartCount = 0 }) {
     document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
+      window.clearTimeout(focusTimer);
+      document.body.style.overflow = previousOverflow;
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
@@ -47,7 +55,7 @@ export default function Navbar({ cartCount = 0 }) {
   };
 
   return (
-    <header className={`navbar-container${isHome ? " navbar-container--home" : ""}`}>
+    <header className={`navbar-container${isHome ? " navbar-container--home" : ""}${isMenuOpen ? " navbar-container--menu-open" : ""}`}>
       <nav className="navbar-inner" aria-label="Main navigation">
         <Logo />
 
@@ -62,18 +70,20 @@ export default function Navbar({ cartCount = 0 }) {
         )}
 
         <div className="navbar-actions" ref={menuRef}>
-          <Link
-            className="navbar-icon-button navbar-cart-button"
-            to="/cart"
-            aria-label={`Cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}
-          >
-            <ShoppingCart aria-hidden="true" />
-            {cartCount > 0 && (
-              <span className="navbar-cart-badge">
-                {cartCount > 99 ? "99+" : cartCount}
-              </span>
-            )}
-          </Link>
+          {!isMenuOpen && (
+            <Link
+              className="navbar-icon-button navbar-cart-button"
+              to="/cart"
+              aria-label={`Cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}
+            >
+              <ShoppingCart aria-hidden="true" />
+              {cartCount > 0 && (
+                <span className="navbar-cart-badge">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           <button
             className="navbar-icon-button"
@@ -91,11 +101,31 @@ export default function Navbar({ cartCount = 0 }) {
             className={`navbar-menu${isMenuOpen ? " navbar-menu--open" : ""}`}
             aria-hidden={!isMenuOpen}
           >
-            <ul>
-              {MENU_ITEMS.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+            <div className="navbar-menu-shell">
+              <div className="navbar-menu-brand" aria-hidden="true">Uni<span>Market</span></div>
+              <div className="navbar-menu-content">
+                <span className="navbar-menu-eyebrow">Explore UniMarket</span>
+                <ul>
+                  {MENU_ITEMS.map((item, index) => (
+                    <li key={item.label}>
+                      {item.to ? (
+                        <Link to={item.to} onClick={() => setIsMenuOpen(false)}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
+                        </Link>
+                      ) : (
+                        <a href={item.href} onClick={() => setIsMenuOpen(false)}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="navbar-menu-footer">
+                <p>A marketplace made for student life.</p>
+                <p>Bangkok, Thailand</p>
+              </div>
+            </div>
           </div>
         </div>
       </nav>
