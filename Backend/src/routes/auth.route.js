@@ -4,6 +4,7 @@ import {
   login,
   logout,
   updateProfile,
+  removeProfilePhoto,
   checkAuth,
   verifyEmail,
   resendVerificationEmail,
@@ -22,6 +23,7 @@ router.post("/resend-verification", resendVerificationEmail);
 router.post("/logout", logout);
 
 router.post("/update-profile", ProtectRoute, updateProfile);
+router.delete("/profile-photo", ProtectRoute, removeProfilePhoto);
 
 router.get("/check", ProtectRoute, checkAuth);
 

@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
         type: String,
         default: "",
     },
+    profilePicPublicId: {
+        type: String,
+        default: "",
+        select: false,
+    },
     verified: {
         type: Boolean,
         default: false,

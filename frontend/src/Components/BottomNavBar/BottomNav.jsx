@@ -1,6 +1,7 @@
 import { Home, MessageCircle, Plus, Search, User } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import ProfileAvatar from "../common/ProfileAvatar";
 import "./BottomNav.css";
 
 export default function BottomNav() {
@@ -47,13 +48,15 @@ export default function BottomNav() {
       <NavButton
         label="Search"
         icon={<Search aria-hidden="true" />}
-        active={isActive("/products")}
-        onClick={() => navigate("/products")}
+        active={isActive("/search")}
+        onClick={() => navigate("/search")}
       />
 
       <NavButton
         label="Profile"
-        icon={<User aria-hidden="true" />}
+        icon={authUser?.profilePic
+          ? <ProfileAvatar className="bottom-nav-profile-photo" profilePic={authUser.profilePic} alt="" />
+          : <User aria-hidden="true" />}
         active={isActive("/profile")}
         onClick={handleProfileClick}
       />

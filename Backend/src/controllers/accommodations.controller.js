@@ -28,14 +28,13 @@ function normalizeAccommodation(accommodation) {
     accommodation.user && typeof accommodation.user === "object"
       ? accommodation.user
       : null;
-  const seller =
-    accommodation.seller?.fullName ||
-    accommodation.seller?.profilePic ||
-    accommodation.seller?.id
-      ? accommodation.seller
-      : user
-      ? buildSellerSnapshot(user)
-      : null;
+  const seller = user
+    ? buildSellerSnapshot(user)
+    : accommodation.seller?.fullName ||
+      accommodation.seller?.profilePic ||
+      accommodation.seller?.id
+    ? accommodation.seller
+    : null;
 
   return { ...accommodation, seller };
 }
@@ -162,6 +161,24 @@ export const getMyAccommodations = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: error.message || "Error fetching accommodations",
+    });
+  }
+};
+
+export const getAccommodationById = async (req, res) => {
+  try {
+    const accommodation = await Accommodation.findById(req.params.id)
+      .populate("user", "fullName username name email profilePic avatar photo")
+      .lean();
+
+    if (!accommodation) {
+      return res.status(404).json({ message: "Accommodation not found" });
+    }
+
+    return res.status(200).json(normalizeAccommodation(accommodation));
+  } catch (error) {
+    return res.status(400).json({
+      message: error.message || "Error fetching accommodation",
     });
   }
 };

@@ -1,28 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
 import "./ItemsList.css";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate } from "react-router-dom";
-import ProfileAvatar from "../common/ProfileAvatar";
 import LoadingSpinner from "../common/LoadingSpinner";
-
-const API_BASE = "http://localhost:8000";
-
-
-function getFirstImageSrc(item) {
-  const first = item?.images?.[0];
-
-  let url =
-    typeof first === "string"
-      ? first
-      : typeof first === "object"
-      ? first?.url
-      : "";
-
-  if (!url) return "/Images/placeholder.png";
-  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
-  return url;
-}
+import ItemListingCard from "./ItemListingCard";
 
 export default function ItemsList() {
   const { items, isLoading, error } = useItemsList();
@@ -114,57 +95,7 @@ export default function ItemsList() {
           ) : filteredItems.length === 0 ? (
             <p className="items-state">No items found.</p>
           ) : (
-            filteredItems.map((item) => (
-              <div
-                className="item-card"
-                key={item._id}
-                onClick={() => navigate(`/products/${item._id}`)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    navigate(`/products/${item._id}`);
-                  }
-                }}
-                role="link"
-                tabIndex={0}
-              >
-                <div className="item-img">
-                  <img
-                    src={getFirstImageSrc(item)}
-                    alt={item.title}
-                    loading="lazy"
-                    onError={(e) => {
-                      e.currentTarget.src = "/Images/placeholder.png";
-                    }}
-                  />
-                  <div className="item-price">{item.price} Baht</div>
-                </div>
-
-                <div className="item-body">
-                  <h3 className="item-title">{item.title}</h3>
-
-                  {item?.seller?.fullName && (
-                    <div className="seller-row">
-                      <ProfileAvatar
-                        className="seller-pic"
-                        profilePic={item.seller.profilePic}
-                        alt={item.seller.fullName}
-                        loading="lazy"
-                      />
-                      <span className="seller-name">
-                        Listed by {item.seller.fullName}
-                      </span>
-                    </div>
-                  )}
-
-                  <p className="item-desc">{item.description}</p>
-                  <div className="item-card-footer" aria-hidden="true">
-                    <span>View details</span>
-                    <ArrowUpRight />
-                  </div>
-                </div>
-              </div>
-            ))
+            filteredItems.map((item) => <ItemListingCard item={item} key={item._id} />)
           )}
         </div>
 

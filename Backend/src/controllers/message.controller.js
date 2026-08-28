@@ -3,6 +3,15 @@ import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
+function isSelfChat(req) {
+    return String(req.user?._id) === String(req.params.id);
+}
+
+function rejectSelfChat(req, res) {
+    if (!isSelfChat(req)) return false;
+    res.status(400).json({ message: "You cannot chat with yourself" });
+    return true;
+}
 
 export const getUsersForSidebar = async (req,res) => {
     try{
@@ -25,6 +34,7 @@ export const getUsersForSidebar = async (req,res) => {
                     },
                 },
             },
+            { $match: { partnerId: { $ne: loggedInUserId } } },
             { $group: { _id: "$partnerId", latestMessageAt: { $first: "$createdAt" } } },
             { $sort: { latestMessageAt: -1 } },
         ]);
@@ -47,6 +57,7 @@ export const getUsersForSidebar = async (req,res) => {
 
 export const getUserForChat = async (req, res) => {
     try {
+        if (rejectSelfChat(req, res)) return;
         const user = await User.findById(req.params.id).select("-password");
         if (!user) return res.status(404).json({ message: "User not found" });
         res.status(200).json(user);
@@ -58,6 +69,7 @@ export const getUserForChat = async (req, res) => {
 
 export const getMessage = async (req, res) => {
     try{
+        if (rejectSelfChat(req, res)) return;
         const { id: userToChatId} = req.params
         const myId = req.user._id;
 
@@ -77,6 +89,7 @@ export const getMessage = async (req, res) => {
 
 export const sendMessage = async (req, res) =>{
     try{
+        if (rejectSelfChat(req, res)) return;
         const {text, image} = req.body;
         const {id: receivedId} = req.params;
         const senderId = req.user._id;
@@ -122,6 +135,7 @@ export const sendMessage = async (req, res) =>{
 
 export const markMessagesAsSeen = async (req, res) => {
     try{
+        if (rejectSelfChat(req, res)) return;
         const { id: userId } = req.params;
         const myId = req.user._id;
 
@@ -149,7 +163,7 @@ export const getUnreadCount = async (req, res) => {
 
         // Get total unread count from all users
         const unreadMessages = await Message.aggregate([
-            { $match: { receivedId: myId, seen: false } },
+            { $match: { receivedId: myId, senderId: { $ne: myId }, seen: false } },
             {
                 $group: {
                     _id: "$senderId",

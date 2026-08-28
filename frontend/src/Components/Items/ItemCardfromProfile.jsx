@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
+import ProfileAvatar from "../common/ProfileAvatar";
+import { normalizeSeller } from "../Logics/useItemsList";
+import { normalizeAccommodationSeller } from "../Logics/useAccommodations";
 import "./ItemCardfromProfile.css";
 
 const API_BASE = "http://localhost:8000";
@@ -24,6 +27,17 @@ export default function ItemCard({ item, onDeleteItem }) {
   const coverSrc = getCoverSrc(item);
   const title = item?.title || item?.name || "Untitled";
   const itemId = item?._id || item?.id;
+  const isAccommodation = item?.listingType === "accommodation";
+  const seller = isAccommodation
+    ? normalizeAccommodationSeller(item)
+    : normalizeSeller(item);
+  const detailsPath = isAccommodation
+    ? `/accommodations/${itemId}`
+    : `/products/${itemId}`;
+
+  const openListing = () => {
+    if (itemId) navigate(detailsPath);
+  };
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -77,14 +91,28 @@ export default function ItemCard({ item, onDeleteItem }) {
   };
 
   return (
-    <div className="profile-item-card">
-      <div className="profile-item-actions" ref={menuRef}>
+    <div
+      className="profile-item-card"
+      onClick={openListing}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openListing();
+        }
+      }}
+      role="link"
+      tabIndex={0}
+    >
+      {!isAccommodation && <div className="profile-item-actions" ref={menuRef}>
         <button
           type="button"
           className="profile-kebab-btn"
           aria-label={`Open actions for ${title}`}
           aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((v) => !v)}
+          onClick={(event) => {
+            event.stopPropagation();
+            setMenuOpen((v) => !v);
+          }}
           disabled={isDeleting}
         >
           ⋮
@@ -95,7 +123,10 @@ export default function ItemCard({ item, onDeleteItem }) {
             <button
               type="button"
               className="profile-kebab-item"
-              onClick={handleEdit}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleEdit();
+              }}
               disabled={isDeleting}
             >
               Edit
@@ -103,14 +134,17 @@ export default function ItemCard({ item, onDeleteItem }) {
             <button
               type="button"
               className="profile-kebab-item danger"
-              onClick={handleDeleteClick}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleDeleteClick();
+              }}
               disabled={isDeleting}
             >
               Delete
             </button>
           </div>
         )}
-      </div>
+      </div>}
 
       <div className="profile-item-img">
         <img
@@ -127,13 +161,29 @@ export default function ItemCard({ item, onDeleteItem }) {
             ฿{Number(item?.price || 0).toLocaleString()}
           </p>
         </div>
+        <p className="profile-item-kind">
+          {isAccommodation ? "Accommodation" : "Item"}
+          {isAccommodation && item?.pricePeriod ? ` · per ${item.pricePeriod}` : ""}
+        </p>
+        {seller?.fullName && <div className="profile-item-seller">
+          <ProfileAvatar
+            className="profile-item-seller-photo"
+            profilePic={seller.profilePic}
+            alt={seller.fullName}
+          />
+          <span>Listed by {seller.fullName}</span>
+        </div>}
       </div>
 
       {/* Confirm Modal */}
       {confirmOpen && (
         <div
           className="confirm-overlay"
-          onMouseDown={() => !isDeleting && setConfirmOpen(false)}
+          onClick={(event) => event.stopPropagation()}
+          onMouseDown={(event) => {
+            event.stopPropagation();
+            if (!isDeleting) setConfirmOpen(false);
+          }}
           role="dialog"
           aria-modal="true"
         >

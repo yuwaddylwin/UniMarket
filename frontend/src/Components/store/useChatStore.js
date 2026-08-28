@@ -24,11 +24,20 @@ export const useChatStore = create((set,get) =>({
     },
 
     getUserById: async (userId) => {
+        const currentUserId = useAuthStore.getState().authUser?._id;
+        if (currentUserId && String(currentUserId) === String(userId)) {
+            throw new Error("You cannot chat with yourself");
+        }
         const res = await axiosInstance.get(`/messages/users/${userId}`);
         return res.data;
     },
 
     getMessages: async(userId) => {
+        const currentUserId = useAuthStore.getState().authUser?._id;
+        if (currentUserId && String(currentUserId) === String(userId)) {
+            set({ messages: [], selectedUser: null });
+            return;
+        }
         set({ isMessagesLoading: true});
         try{
             const res = await axiosInstance.get(`/messages/${userId}`);
@@ -44,6 +53,11 @@ export const useChatStore = create((set,get) =>({
 
     sendMessage: async(messageData) => {
         const {selectedUser, messages} = get()
+        const currentUserId = useAuthStore.getState().authUser?._id;
+        if (!selectedUser?._id || String(currentUserId) === String(selectedUser._id)) {
+            toast.error("You cannot chat with yourself");
+            return;
+        }
         try{
             const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
             set((state) => ({

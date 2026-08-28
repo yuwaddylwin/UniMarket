@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import "./ItemsPage.css";
 import { useItemsList } from "../Logics/useItemsList";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ProfileAvatar from "../common/ProfileAvatar";
 
@@ -26,30 +25,21 @@ function getFirstImageSrc(item) {
 
 export default function ItemsPage() {
   const { items, isLoading, error } = useItemsList();
-  const { authUser } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const rawSearch = searchParams.get("search") || "";
   const searchQuery = rawSearch.trim().toLowerCase();
 
-  const baseItems = useMemo(() => {
-    return items.filter((item) => {
-      const sellerId = item?.seller?._id || item?.seller?.id;
-      if (!authUser?._id || !sellerId) return true;
-      return sellerId !== authUser._id;
-    });
-  }, [items, authUser?._id]);
-
   const { orderedItems, matchedCount } = useMemo(() => {
     if (!searchQuery) {
-      return { orderedItems: baseItems, matchedCount: null };
+      return { orderedItems: items, matchedCount: null };
     }
 
     const matches = [];
     const others = [];
 
-    for (const item of baseItems) {
+    for (const item of items) {
       const title = (item?.title || "").toLowerCase();
       const seller = (item?.seller?.fullName || "").toLowerCase();
       const isMatch = title.includes(searchQuery) || seller.includes(searchQuery);
@@ -62,7 +52,7 @@ export default function ItemsPage() {
       orderedItems: [...matches, ...others],
       matchedCount: matches.length,
     };
-  }, [baseItems, searchQuery]);
+  }, [items, searchQuery]);
 
   return (
     <div className="ip-page">

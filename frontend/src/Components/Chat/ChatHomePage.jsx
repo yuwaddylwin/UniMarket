@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore";
 import Sidebar from "./Sidebar";
 import NoChatSelected from "./NoChatSelected";
 import ChatContainer from "./ChatContainer";
@@ -9,6 +10,8 @@ import { useIsMobile } from "./IsMobile";
 
 const ChatHomePage = () => {
   const { sellerId } = useParams(); 
+  const navigate = useNavigate();
+  const authUser = useAuthStore((state) => state.authUser);
   const isMobile = useIsMobile();
 
   // get from store
@@ -24,6 +27,13 @@ const ChatHomePage = () => {
   let cancelled = false; 
 
   const pickUser = async () => {
+    if (sellerId && String(sellerId) === String(authUser?._id)) {
+      setSelectedUser(null);
+      navigate("/chat", { replace: true });
+      return;
+    }
+
+    if (!sellerId) return;
     // already selected
     if (useChatStore.getState().selectedUser?._id === sellerId) return;
 
@@ -59,7 +69,7 @@ const ChatHomePage = () => {
   return () => {
     cancelled = true; // prevents late setSelectedUser after back navigation
   };
-}, [sellerId, getUsers, getUserById, setSelectedUser]);
+}, [sellerId, authUser?._id, getUsers, getUserById, navigate, setSelectedUser]);
 
 
   // MOBILE: show ONE page at a time

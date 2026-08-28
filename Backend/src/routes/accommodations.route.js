@@ -2,6 +2,7 @@ import express from "express";
 import {
   createAccommodation,
   getAccommodations,
+  getAccommodationById,
   getMyAccommodations,
 } from "../controllers/accommodations.controller.js";
 import { ProtectRoute } from "../middleware/auth.middleware.js";
@@ -21,6 +22,7 @@ const uploadAccommodationImages = (req, res, next) => {
 
 router.get("/", getAccommodations);
 router.get("/mine", ProtectRoute, getMyAccommodations);
+router.get("/:id", getAccommodationById);
 router.post("/", ProtectRoute, uploadAccommodationImages, createAccommodation);
 
 export default router;

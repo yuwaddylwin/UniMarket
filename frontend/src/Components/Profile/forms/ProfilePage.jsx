@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
-import { Camera, LogOut, LogIn } from "lucide-react";
+import { Camera, LogOut, LogIn, Trash2, X } from "lucide-react";
+import toast from "react-hot-toast";
 import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
@@ -10,14 +11,22 @@ import LoadingSpinner from "../../common/LoadingSpinner";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { authUser, updateProfile, logout, isUpdatingProfile } = useAuthStore();
+  const {
+    authUser,
+    updateProfile,
+    removeProfilePhoto,
+    logout,
+    isUpdatingProfile,
+    isRemovingProfilePhoto,
+  } = useAuthStore();
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showRemovePhotoConfirm, setShowRemovePhotoConfirm] = useState(false);
 
-  // DB items
-  const [myItems, setMyItems] = useState([]);
+  // Listings are kept in their own database collections and combined only for display.
+  const [myListings, setMyListings] = useState([]);
   const [loadingItems, setLoadingItems] = useState(true);
   const [itemsError, setItemsError] = useState("");
 
@@ -27,7 +36,8 @@ export default function ProfilePage() {
       setSelectedFile(null);
       setPreview(null);
       setShowLogoutConfirm(false);
-      setMyItems([]);
+      setShowRemovePhotoConfirm(false);
+      setMyListings([]);
       setLoadingItems(false);
       setItemsError("");
     }
@@ -42,37 +52,68 @@ export default function ProfilePage() {
     reader.readAsDataURL(selectedFile);
   }, [selectedFile]);
 
+  const handleFileSelect = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Profile picture must be 5 MB or smaller.");
+      return;
+    }
+    setSelectedFile(file);
+  };
+
   useEffect(() => {
     const userId = authUser?._id || authUser?.id;
     if (!userId) return undefined;
 
     const controller = new AbortController();
 
-    const fetchMyItems = async () => {
+    const fetchMyListings = async () => {
       try {
         setLoadingItems(true);
         setItemsError("");
 
-        const res = await axiosInstance.get("/items/mine", {
-          signal: controller.signal,
-        });
+        const [itemsResponse, accommodationsResponse] = await Promise.all([
+          axiosInstance.get("/items/mine", { signal: controller.signal }),
+          axiosInstance.get("/accommodations/mine", { signal: controller.signal }),
+        ]);
 
-        const list = Array.isArray(res.data) ? res.data : res.data?.items || [];
-        if (!controller.signal.aborted) setMyItems(list);
+        const items = Array.isArray(itemsResponse.data)
+          ? itemsResponse.data
+          : itemsResponse.data?.items || [];
+        const accommodations = Array.isArray(accommodationsResponse.data)
+          ? accommodationsResponse.data
+          : accommodationsResponse.data?.accommodations || [];
+        const listings = [
+          ...items.map((item) => ({ ...item, listingType: "item" })),
+          ...accommodations.map((listing) => ({
+            ...listing,
+            listingType: "accommodation",
+          })),
+        ].sort(
+          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+
+        if (!controller.signal.aborted) setMyListings(listings);
       } catch (err) {
         if (controller.signal.aborted) return;
 
         console.error("Fetch my items error:", err);
         setItemsError(
           err?.response?.data?.message ||
-            "Unable to load your items. Please try again."
+            "Unable to load your listings. Please try again."
         );
       } finally {
         if (!controller.signal.aborted) setLoadingItems(false);
       }
     };
 
-    fetchMyItems();
+    fetchMyListings();
     return () => controller.abort();
   }, [authUser?._id, authUser?.id]);
 
@@ -83,8 +124,20 @@ export default function ProfilePage() {
     try {
       await updateProfile({ profilePic: preview });
       setSelectedFile(null);
+      setPreview(null);
     } catch (err) {
       console.error("Upload error:", err);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      await removeProfilePhoto();
+      setSelectedFile(null);
+      setPreview(null);
+      setShowRemovePhotoConfirm(false);
+    } catch (err) {
+      console.error("Remove photo error:", err);
     }
   };
 
@@ -126,8 +179,8 @@ export default function ProfilePage() {
         </div>
 
         <section className="sell-items-section">
-          <h2>Your Posted Items</h2>
-          <p style={{ opacity: 0.7 }}>Please log in to see your items.</p>
+          <h2>Your Listed Items</h2>
+          <p style={{ opacity: 0.7 }}>Please log in to see your listings.</p>
         </section>
       </div>
     );
@@ -148,31 +201,46 @@ export default function ProfilePage() {
             className="profile-photo"
           />
 
-          <label className="upload-btn">
-            <Camera size={20} />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setSelectedFile(e.target.files[0])}
-            />
-          </label>
         </div>
 
         <p className="username">{authUser?.fullName}</p>
 
-        {selectedFile && (
-          <button
-            onClick={handleUploadPhoto}
-            disabled={isUpdatingProfile}
-            className="save-photo-btn"
-          >
-            {isUpdatingProfile ? "Uploading..." : "Save Photo"}
+        <div className="profile-photo-actions">
+          <label className="change-photo-btn">
+            <Camera size={17} aria-hidden="true" />
+            {authUser?.profilePic ? "Change Photo" : "Upload Photo"}
+            <input type="file" accept="image/*" onChange={handleFileSelect} />
+          </label>
+
+          {authUser?.profilePic && !selectedFile && (
+            <button
+              type="button"
+              className="remove-photo-btn"
+              onClick={() => setShowRemovePhotoConfirm(true)}
+            >
+              <Trash2 size={17} aria-hidden="true" />
+              Remove Photo
+            </button>
+          )}
+        </div>
+
+        {selectedFile && <div className="profile-photo-save-actions">
+          <button onClick={handleUploadPhoto} disabled={isUpdatingProfile || !preview} className="save-photo-btn">
+            {isUpdatingProfile ? "Uploading..." : preview ? "Save Photo" : "Preparing..."}
           </button>
-        )}
+          <button
+            type="button"
+            className="cancel-photo-btn"
+            disabled={isUpdatingProfile}
+            onClick={() => { setSelectedFile(null); setPreview(null); }}
+          >
+            <X size={16} aria-hidden="true" /> Cancel
+          </button>
+        </div>}
       </div>
 
       <section className="sell-items-section">
-        <h2>Your Posted Items</h2>
+        <h2>Your Listed Items</h2>
 
         {loadingItems ? (
           <LoadingSpinner
@@ -183,10 +251,10 @@ export default function ProfilePage() {
           <p className="profile-items-error" role="alert">
             {itemsError}
           </p>
-        ) : myItems.length === 0 ? (
-          <p style={{ opacity: 0.7 }}>No items posted yet.</p>
+        ) : myListings.length === 0 ? (
+          <p style={{ opacity: 0.7 }}>No listings posted yet.</p>
         ) : (
-          <ItemCarousel items={myItems} />
+          <ItemCarousel items={myListings} />
         )}
       </section>
 
@@ -212,6 +280,23 @@ export default function ProfilePage() {
               </button>
               <button className="yes-btn" onClick={handleConfirmLogout}>
                 Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRemovePhotoConfirm && (
+        <div className="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="remove-photo-title">
+          <div className="confirm-box">
+            <p id="remove-photo-title">Remove your profile photo?</p>
+            <span className="confirm-description">Your default profile icon will be shown across UniMarket.</span>
+            <div className="confirm-buttons">
+              <button className="cancel-btn" type="button" onClick={() => setShowRemovePhotoConfirm(false)} disabled={isRemovingProfilePhoto}>
+                Cancel
+              </button>
+              <button className="yes-btn" type="button" onClick={handleRemovePhoto} disabled={isRemovingProfilePhoto}>
+                {isRemovingProfilePhoto ? "Removing..." : "Remove"}
               </button>
             </div>
           </div>

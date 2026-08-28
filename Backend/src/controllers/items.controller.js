@@ -166,15 +166,14 @@ export const getItems = async (req, res) => {
     const normalized = items.map((it) => {
       const u = it.user && typeof it.user === "object" ? it.user : null;
 
-      const seller =
-        it.seller?.fullName || it.seller?.profilePic || it.seller?.id
-          ? it.seller
-          : u
+      const seller = u
           ? {
               id: u._id,
               fullName: u.fullName || u.name || u.username || u.email || "Seller",
               profilePic: u.profilePic || u.avatar || u.photo || "",
             }
+          : it.seller?.fullName || it.seller?.profilePic || it.seller?.id
+          ? it.seller
           : null;
 
       return { ...it, seller };
@@ -200,15 +199,14 @@ export const getMyItems = async (req, res) => {
     const normalized = items.map((it) => {
       const u = it.user && typeof it.user === "object" ? it.user : null;
 
-      const seller =
-        it.seller?.fullName || it.seller?.profilePic || it.seller?.id
-          ? it.seller
-          : u
+      const seller = u
           ? {
               id: u._id,
               fullName: u.fullName || u.name || u.username || u.email || "Seller",
               profilePic: u.profilePic || u.avatar || u.photo || "",
             }
+          : it.seller?.fullName || it.seller?.profilePic || it.seller?.id
+          ? it.seller
           : null;
 
       return { ...it, seller };
@@ -230,15 +228,14 @@ export const getItemById = async (req, res) => {
 
     const u = item.user && typeof item.user === "object" ? item.user : null;
 
-    const seller =
-      item.seller?.fullName || item.seller?.profilePic || item.seller?.id
-        ? item.seller
-        : u
+    const seller = u
         ? {
             id: u._id,
             fullName: u.fullName || u.name || u.username || u.email || "Seller",
             profilePic: u.profilePic || u.avatar || u.photo || "",
           }
+        : item.seller?.fullName || item.seller?.profilePic || item.seller?.id
+        ? item.seller
         : null;
 
     return res.status(200).json({ ...item, seller });

@@ -109,6 +109,20 @@
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 
+.profile-photo-actions,
+.profile-photo-save-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+.change-photo-btn,
+.remove-photo-btn,
+.cancel-photo-btn { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 14px; border: 1px solid var(--profile-border); border-radius: 12px; background: #fff; color: var(--profile-text); font-size: .82rem; font-weight: 750; cursor: pointer; transition: background var(--transition), border-color var(--transition), transform var(--transition); }
+.change-photo-btn { border-color: rgba(27, 74, 145, .24); color: var(--profile-brand); }
+.change-photo-btn:hover { background: rgba(27, 74, 145, .06); transform: translateY(-1px); }
+.change-photo-btn input { display: none; }
+.remove-photo-btn { color: #b42318; }
+.remove-photo-btn:hover { border-color: #efbbb6; background: #fff3f2; transform: translateY(-1px); }
+.cancel-photo-btn:hover { background: #f6f7f9; }
+.profile-photo-save-actions .save-photo-btn { width: auto; margin-top: 0; }
+.confirm-description { display: block; margin-top: 7px; color: var(--color-text-muted); font-size: .82rem; line-height: 1.5; }
+
 .save-photo-btn:hover {
   filter: brightness(1.05);
   transform: translateY(-1px);

@@ -15,6 +15,7 @@ export const useAuthStore = create((set, get) => ({
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
+  isRemovingProfilePhoto: false,
   isCheckingAuth: true,
   socket: null,
   unreadCount: {}, // { userId: count }
@@ -93,13 +94,30 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/update-profile", data);
       set({ authUser: res.data });
       toast.success("Profile updated successfully!");
+      return res.data;
     } catch (error) {
       console.log("ERROR RESPONSE:", error.response);
       console.log("ERROR MESSAGE:", error.message);
       console.log("ERROR DATA:", error.response?.data);
       toast.error(error.response?.data?.message || "Something went wrong!");
+      throw error;
     } finally {
       set({ isUpdatingProfile: false });
+    }
+  },
+
+  removeProfilePhoto: async () => {
+    set({ isRemovingProfilePhoto: true });
+    try {
+      const res = await axiosInstance.delete("/auth/profile-photo");
+      set({ authUser: res.data });
+      toast.success("Profile photo removed");
+      return res.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to remove profile photo");
+      throw error;
+    } finally {
+      set({ isRemovingProfilePhoto: false });
     }
   },
 

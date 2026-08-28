@@ -9,6 +9,41 @@ const VERIFICATION_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const REGISTRATION_SUCCESS_MESSAGE =
   "Registration successful. Please verify your email before logging in.";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PROFILE_IMAGE_PATTERN = /^data:image\/(?:avif|gif|jpe?g|png|webp);base64,/i;
+const MAX_PROFILE_IMAGE_DATA_LENGTH = 7 * 1024 * 1024;
+
+const getCloudinaryPublicIdFromUrl = (imageUrl) => {
+  if (!imageUrl || typeof imageUrl !== "string" || !imageUrl.includes("res.cloudinary.com")) {
+    return "";
+  }
+
+  try {
+    const pathAfterUpload = new URL(imageUrl).pathname.split("/upload/")[1];
+    if (!pathAfterUpload) return "";
+    const segments = pathAfterUpload.split("/").filter(Boolean);
+    if (/^v\d+$/.test(segments[0] || "")) segments.shift();
+    if (!segments.length) return "";
+    const publicId = decodeURIComponent(segments.join("/")).replace(/\.[^.\/]+$/, "");
+    return publicId.startsWith("profile_pictures/") ? publicId : "";
+  } catch {
+    return "";
+  }
+};
+
+const destroyProfileImage = async (publicId) => {
+  if (!publicId) return;
+  await cloudinary.uploader.destroy(publicId, { invalidate: true });
+};
+
+const serializePublicUser = (user) => ({
+  _id: user._id,
+  fullName: user.fullName,
+  email: user.email,
+  profilePic: user.profilePic || "",
+  verified: user.verified,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+});
 
 const logVerificationStep = (step, details = {}) => {
   console.log("[email-verification]", step, details);
@@ -299,29 +334,73 @@ const logout = (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
+  let uploadedPublicId = "";
   try {
     const { profilePic } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
+    if (!profilePic || typeof profilePic !== "string") {
       return res.status(400).json({ message: "Profile picture missing" });
     }
+    if (!PROFILE_IMAGE_PATTERN.test(profilePic)) {
+      return res.status(400).json({ message: "Please upload a valid image file" });
+    }
+    if (profilePic.length > MAX_PROFILE_IMAGE_DATA_LENGTH) {
+      return res.status(413).json({ message: "Profile picture must be 5 MB or smaller" });
+    }
 
-    // Upload to Cloudinary
+    const user = await User.findById(userId).select("+profilePicPublicId");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const previousPublicId =
+      user.profilePicPublicId || getCloudinaryPublicIdFromUrl(user.profilePic);
+
     const uploaded = await cloudinary.uploader.upload(profilePic, {
       folder: "profile_pictures",
+      resource_type: "image",
+    });
+    uploadedPublicId = uploaded.public_id;
+
+    user.profilePic = uploaded.secure_url;
+    user.profilePicPublicId = uploaded.public_id;
+    await user.save();
+
+    if (previousPublicId && previousPublicId !== uploaded.public_id) {
+      await destroyProfileImage(previousPublicId).catch((error) => {
+        console.error("Unable to remove previous profile picture:", error.message);
+      });
+    }
+
+    return res.status(200).json(serializePublicUser(user));
+  } catch (err) {
+    if (uploadedPublicId) {
+      await destroyProfileImage(uploadedPublicId).catch(() => {});
+    }
+    console.error("Error updating profile picture:", err.message);
+    return res.status(500).json({ message: "Unable to update profile picture" });
+  }
+};
+
+const removeProfilePhoto = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("+profilePicPublicId");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const previousPublicId =
+      user.profilePicPublicId || getCloudinaryPublicIdFromUrl(user.profilePic);
+
+    user.profilePic = "";
+    user.profilePicPublicId = "";
+    await user.save();
+
+    await destroyProfileImage(previousPublicId).catch((error) => {
+      console.error("Unable to remove profile picture from storage:", error.message);
     });
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploaded.secure_url },
-      { new: true }
-    ).select("-password");
-
-    res.json(updatedUser);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(200).json(serializePublicUser(user));
+  } catch (error) {
+    console.error("Error removing profile picture:", error.message);
+    return res.status(500).json({ message: "Unable to remove profile picture" });
   }
 };
 
@@ -339,6 +418,7 @@ export {
   login,
   logout,
   updateProfile,
+  removeProfilePhoto,
   checkAuth,
   verifyEmail,
   resendVerificationEmail,

@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import AccommodationSection from "../Accommodation/AccommodationSection";
 import Footer from "../Footer/footer";
 import ItemsList from "../ItemsList/ItemsList";
+import { useAuthStore } from "../store/useAuthStore";
 import "./Home.css";
 
 const SLIDES = [
@@ -41,6 +42,7 @@ const SLIDES = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const authUser = useAuthStore((state) => state.authUser);
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef(null);
@@ -174,12 +176,25 @@ export default function Home() {
 
         <section className="home-signup" aria-labelledby="home-signup-title">
           <div className="home-signup-card">
-            <span className="home-signup-eyebrow">Join your campus community</span>
-            <h2 id="home-signup-title">
-              Ready to find your need &<br /><em>Sell what you don't?</em>
-            </h2>
-            <p>Discover second-hand items, find accommodation, and connect with students around your campus.</p>
-            <button type="button" onClick={() => navigate("/signup")}>Sign Up</button>
+            {authUser ? (
+              <>
+                <span className="home-signup-eyebrow">Welcome back to UniMarket</span>
+                <h2 id="home-signup-title">
+                  Have something to share?<br /><em>Create your next listing.</em>
+                </h2>
+                <p>Post an item or accommodation for students in your campus community.</p>
+                <button type="button" onClick={() => navigate("/post")}>Post a Listing</button>
+              </>
+            ) : (
+              <>
+                <span className="home-signup-eyebrow">Join your campus community</span>
+                <h2 id="home-signup-title">
+                  Ready to find your need &<br /><em>Sell what you don't?</em>
+                </h2>
+                <p>Discover items, find accommodation, and connect with students around your campus.</p>
+                <button type="button" onClick={() => navigate("/signup")}>Sign Up</button>
+              </>
+            )}
           </div>
         </section>
       </main>

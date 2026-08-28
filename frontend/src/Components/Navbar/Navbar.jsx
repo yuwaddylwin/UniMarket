@@ -5,7 +5,7 @@ import { Menu, Search as SearchIcon, ShoppingCart, X } from "lucide-react";
 
 const MENU_ITEMS = [
   { label: "Profile", to: "/profile" },
-  { label: "Accommodation", href: "/#accommodation-title" },
+  { label: "Accommodation", to: "/accommodations" },
   { label: "Browse items", to: "/products" },
   { label: "Help & support", href: "mailto:unimarket.app.official@gmail.com?subject=UniMarket%20Support" },
   { label: "Contact", href: "mailto:unimarket.app.official@gmail.com" },

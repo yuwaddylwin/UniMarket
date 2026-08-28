@@ -1,17 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { axiosInstance } from "../lib/axios";
 
-function normalizeSeller(it) {
-  // If backend sends seller snapshot
-  if (it?.seller && typeof it.seller === "object") {
-    return {
-      id: it.seller.id || it.seller._id || it.seller.userId || null,
-      fullName: it.seller.fullName || it.seller.name || it.seller.username || "",
-      profilePic: it.seller.profilePic || it.seller.avatar || "",
-    };
-  }
-
-  // If backend populates user
+export function normalizeSeller(it) {
+  // The populated owner is authoritative so profile changes affect old listings.
   if (it?.user && typeof it.user === "object") {
     return {
       id: it.user._id || it.user.id || null,
@@ -22,6 +13,15 @@ function normalizeSeller(it) {
         it.user.email ||
         "",
       profilePic: it.user.profilePic || it.user.avatar || it.user.photo || "",
+    };
+  }
+
+  // Legacy fallback for records whose owner can no longer be populated.
+  if (it?.seller && typeof it.seller === "object") {
+    return {
+      id: it.seller.id || it.seller._id || it.seller.userId || null,
+      fullName: it.seller.fullName || it.seller.name || it.seller.username || "",
+      profilePic: it.seller.profilePic || it.seller.avatar || "",
     };
   }
 

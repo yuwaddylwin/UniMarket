@@ -10,6 +10,9 @@ import LoginForm from "./Components/Profile/forms/LoginForm";
 import SignUpForm from "./Components/Profile/forms/SignUpForm";
 import ChatHomePage from "./Components/Chat/ChatHomePage";
 import ItemsPage from "./Components/ItemsPage/ItemsPage";
+import AccommodationsPage from "./Components/Accommodation/AccommodationsPage";
+import AccommodationDetails from "./Components/Accommodation/AccommodationDetails";
+import SearchPage from "./Components/Search/SearchPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ResendVerificationPage from "./pages/ResendVerificationPage";
 
@@ -69,6 +72,9 @@ export default function App() {
           <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/products" element={<ItemsPage AddtoCart={AddtoCart} />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/accommodations" element={<AccommodationsPage />} />
+          <Route path="/accommodations/:id" element={<AccommodationDetails />} />
           <Route path="/products/:id"
             element={
               <ProductsDetails

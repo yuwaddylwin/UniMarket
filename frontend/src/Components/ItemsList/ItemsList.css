@@ -87,6 +87,7 @@
   box-shadow: 0 5px 14px rgba(9, 20, 36, 0.16);
   backdrop-filter: blur(8px);
 }
+.item-type-badge { position: absolute; z-index: 1; top: 13px; left: 13px; padding: 7px 10px; border: 1px solid rgba(255, 255, 255, .62); border-radius: var(--radius-pill); background: rgba(255, 255, 255, .92); color: var(--color-primary); font-size: .66rem; font-weight: 850; box-shadow: 0 5px 14px rgba(9, 20, 36, .14); backdrop-filter: blur(8px); }
 
 .item-card .item-body { min-height: 185px; display: flex; flex-direction: column; gap: 10px; padding: 16px 17px 15px; }
 .item-card .item-title { margin: 0; color: #152238; font-family: inherit; font-size: 1.15rem; font-weight: 700; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }

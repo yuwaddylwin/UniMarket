@@ -2,6 +2,7 @@ import React from "react";
 import "./CartPage.css";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const API_BASE = "http://localhost:8000";
 
@@ -27,6 +28,7 @@ function getFirstImageSrc(item) {
 
 export default function CartPage({ cartItems, setCartItems }) {
   const navigate = useNavigate();
+  const authUser = useAuthStore((state) => state.authUser);
 
   const handleDelete = (id) => {
     const updated = cartItems.filter((item) => item._id !== id);
@@ -48,13 +50,16 @@ export default function CartPage({ cartItems, setCartItems }) {
         <div className="cart-empty">
           <h2>Your cart is empty</h2>
           <p>Browse UniMarket and save something you like.</p>
-          <button type="button" onClick={() => navigate("/products")}>Browse items</button>
+          <button type="button" onClick={() => navigate("/")}>Browse items</button>
         </div>
       ) : (
         <ul>
           {cartItems.map((item) => {
             const imageSrc = getFirstImageSrc(item);
             const sellerId = item?.seller?._id || item?.seller?.id;
+            const isMine = Boolean(
+              authUser?._id && sellerId && String(authUser._id) === String(sellerId)
+            );
 
             return (
               <li key={item._id}>
@@ -69,7 +74,7 @@ export default function CartPage({ cartItems, setCartItems }) {
                 <span className="cart-price">{item.price} Baht</span>
 
                 <div className="cart-page-btns">
-                  <button
+                  {!isMine && <button
                     className="talk-btn"
                     type="button"
                     onClick={() => {
@@ -81,7 +86,7 @@ export default function CartPage({ cartItems, setCartItems }) {
                     }}
                   >
                     Talk to Seller 💬
-                  </button>
+                  </button>}
 
                   <button
                     className="delete-btn"

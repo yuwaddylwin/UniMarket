@@ -1,0 +1,64 @@
+import { ArrowUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import ProfileAvatar from "../common/ProfileAvatar";
+import "./ItemsList.css";
+
+const API_BASE = "http://localhost:8000";
+
+function getFirstImageSrc(item) {
+  const first = item?.images?.[0];
+  const url = typeof first === "string" ? first : first?.url || "";
+  if (!url) return "/Images/placeholder.png";
+  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
+  return url;
+}
+
+export default function ItemListingCard({ item, showTypeLabel = false }) {
+  const navigate = useNavigate();
+  const openListing = () => navigate(`/products/${item._id}`);
+
+  return (
+    <article
+      className="item-card"
+      onClick={openListing}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openListing();
+        }
+      }}
+      role="link"
+      tabIndex={0}
+    >
+      <div className="item-img">
+        <img
+          src={getFirstImageSrc(item)}
+          alt={item.title}
+          loading="lazy"
+          onError={(event) => { event.currentTarget.src = "/Images/placeholder.png"; }}
+        />
+        {showTypeLabel && <span className="item-type-badge">Item</span>}
+        <div className="item-price">{item.price} Baht</div>
+      </div>
+      <div className="item-body">
+        <h3 className="item-title">{item.title}</h3>
+        {item?.seller?.fullName && (
+          <div className="seller-row">
+            <ProfileAvatar
+              className="seller-pic"
+              profilePic={item.seller.profilePic}
+              alt={item.seller.fullName}
+              loading="lazy"
+            />
+            <span className="seller-name">Listed by {item.seller.fullName}</span>
+          </div>
+        )}
+        <p className="item-desc">{item.description}</p>
+        <div className="item-card-footer" aria-hidden="true">
+          <span>View details</span>
+          <ArrowUpRight />
+        </div>
+      </div>
+    </article>
+  );
+}
