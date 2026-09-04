@@ -360,12 +360,41 @@ test("an owner can mark an active profile listing as done without deleting it", 
   fireEvent.click(screen.getByRole("button", { name: "Open actions for User A Desk" }));
   fireEvent.click(screen.getByRole("button", { name: "Mark as done" }));
 
+  expect(screen.getByRole("dialog", { name: "Mark as sold?" })).toBeInTheDocument();
+  expect(axiosInstance.patch).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Yes, mark as sold" }));
+
   await waitFor(() => expect(axiosInstance.patch).toHaveBeenCalledWith(
     "/items/item-a/status",
     { status: "sold" }
   ));
   await waitFor(() => expect(screen.queryByText("User A Desk")).not.toBeInTheDocument());
   expect(axiosInstance.delete).not.toHaveBeenCalled();
+});
+
+test("deleting a profile listing requires confirmation and removes it after success", async () => {
+  axiosInstance.get.mockImplementation((path) => {
+    if (path === "/items/mine") return Promise.resolve({ data: [ownItem] });
+    if (path === "/accommodations/mine") return Promise.resolve({ data: [] });
+    return Promise.reject(new Error(`Unexpected request: ${path}`));
+  });
+  render(<MemoryRouter><ProfilePage /></MemoryRouter>);
+
+  expect(await screen.findByText("User A Desk")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Open actions for User A Desk" }));
+  fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+  expect(screen.getByText(/Are you sure you want to delete this listing\?/)).toBeInTheDocument();
+  expect(axiosInstance.delete).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+  expect(screen.getByText("User A Desk")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "Open actions for User A Desk" }));
+  fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+  fireEvent.click(screen.getByRole("button", { name: "Yes, Delete" }));
+
+  await waitFor(() => expect(axiosInstance.delete).toHaveBeenCalledWith("/items/item-a"));
+  await waitFor(() => expect(screen.queryByText("User A Desk")).not.toBeInTheDocument());
 });
 
 test("an accommodation listing offers edit, delete, and mark as done actions", async () => {

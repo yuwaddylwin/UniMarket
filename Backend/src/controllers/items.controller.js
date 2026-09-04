@@ -1,5 +1,18 @@
 import Item from "../models/ItemsList.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import mongoose from "mongoose";
+
+function hasValidId(id) {
+  return mongoose.isObjectIdOrHexString(id);
+}
+
+function sendControllerError(res, error, fallback) {
+  if (error?.name === "ValidationError" || error?.name === "CastError") {
+    return res.status(400).json({ message: error.message || fallback });
+  }
+  console.error(fallback, error);
+  return res.status(500).json({ message: fallback });
+}
 
 // build seller snapshot from req.user
 function buildSellerSnapshot(user) {
@@ -64,6 +77,7 @@ function uploadBufferToCloudinary(buffer, folder = "items") {
 }
 
 export const createItem = async (req, res) => {
+  const uploadedImages = [];
   try {
     const title = (req.body.title ?? req.body.name ?? "").trim();
     const category = (req.body.category ?? "").trim();
@@ -127,7 +141,6 @@ export const createItem = async (req, res) => {
     }
 
     // upload new images to cloudinary
-    const uploadedImages = [];
     for (const file of req.files || []) {
       const result = await uploadBufferToCloudinary(file.buffer, "items");
       uploadedImages.push({
@@ -148,11 +161,14 @@ export const createItem = async (req, res) => {
 
     return res.status(201).json(newItem);
   } catch (err) {
+    for (const image of uploadedImages) {
+      if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+    }
+    if (err?.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: err.message });
+    }
     console.error("Error creating item:", err);
-    return res.status(400).json({
-      success: false,
-      message: err.message || "Error creating item",
-    });
+    return res.status(500).json({ success: false, message: "Error creating item" });
   }
 };
 
@@ -181,7 +197,8 @@ export const getItems = async (req, res) => {
 
     return res.status(200).json(normalized);
   } catch (err) {
-    return res.status(500).json({ message: err.message || "Error fetching items" });
+    console.error("Error fetching items", err);
+    return res.status(500).json({ message: "Error fetching items" });
   }
 };
 
@@ -214,12 +231,16 @@ export const getMyItems = async (req, res) => {
 
     return res.status(200).json(normalized);
   } catch (err) {
-    return res.status(500).json({ message: err.message || "Error fetching my items" });
+    console.error("Error fetching my items", err);
+    return res.status(500).json({ message: "Error fetching my items" });
   }
 };
 
 export const getItemById = async (req, res) => {
   try {
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid item id" });
+    }
     const item = await Item.findOne({ _id: req.params.id, status: { $ne: "sold" } })
       .populate("user", "fullName username name email profilePic avatar photo")
       .lean();
@@ -240,7 +261,7 @@ export const getItemById = async (req, res) => {
 
     return res.status(200).json({ ...item, seller });
   } catch (err) {
-    return res.status(400).json({ message: err.message || "Error fetching item" });
+    return sendControllerError(res, err, "Error fetching item");
   }
 };
 
@@ -259,12 +280,16 @@ export const getMyArchivedItems = async (req, res) => {
       };
     }));
   } catch (error) {
-    return res.status(500).json({ message: error.message || "Error fetching archived items" });
+    console.error("Error fetching archived items", error);
+    return res.status(500).json({ message: "Error fetching archived items" });
   }
 };
 
 export const updateItemStatus = async (req, res) => {
   try {
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid item id" });
+    }
     const status = req.body?.status;
     if (!["active", "sold"].includes(status)) {
       return res.status(400).json({ message: "Status must be active or sold" });
@@ -279,15 +304,20 @@ export const updateItemStatus = async (req, res) => {
     await item.save();
     return res.status(200).json({ message: status === "sold" ? "Item archived" : "Item restored", item });
   } catch (error) {
-    return res.status(400).json({ message: error.message || "Unable to update item status" });
+    return sendControllerError(res, error, "Unable to update item status");
   }
 };
 
 // UPDATE (Cloudinary)
 export const updateItem = async (req, res) => {
+  const uploadedImages = [];
   try {
     if (!req.user?._id) {
       return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid item id" });
     }
 
     const item = await Item.findById(req.params.id);
@@ -298,7 +328,7 @@ export const updateItem = async (req, res) => {
     }
 
     const title = (req.body.title ?? req.body.name ?? "").trim();
-    const category = req.body.category;
+    const category = String(req.body.category || "").trim();
     const description = (req.body.description ?? "").trim();
     const price = req.body.price;
 
@@ -327,19 +357,26 @@ export const updateItem = async (req, res) => {
     }
 
     // kept existing cloudinary images from frontend
-    const existingRaw = parseMaybeJson(req.body.existingImages, []);
-    const existingImages = normalizeImages(existingRaw);
+    const existingRaw = normalizeImages(parseMaybeJson(req.body.existingImages, []));
+    const requestedPublicIds = new Set(existingRaw.map((image) => image.publicId).filter(Boolean));
+    // Never trust URLs/public IDs supplied by the browser. Only retain images
+    // that already belong to this listing.
+    const existingImages = (item.images || [])
+      .filter((image) => image.publicId && requestedPublicIds.has(image.publicId))
+      .map((image) => ({ url: image.url, publicId: image.publicId }));
 
     // upload new files to cloudinary
-    const newImages = [];
     for (const file of req.files || []) {
       const result = await uploadBufferToCloudinary(file.buffer, "items");
-      newImages.push({ url: result.secure_url, publicId: result.public_id });
+      uploadedImages.push({ url: result.secure_url, publicId: result.public_id });
     }
 
-    const nextImages = [...existingImages, ...newImages].slice(0, 6);
+    const nextImages = [...existingImages, ...uploadedImages].slice(0, 6);
 
     if (nextImages.length === 0) {
+      for (const image of uploadedImages) {
+        await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+      }
       return res.status(400).json({ message: "At least 1 image is required" });
     }
 
@@ -351,9 +388,6 @@ export const updateItem = async (req, res) => {
     const nextPublicIds = nextImages.map((img) => img.publicId).filter(Boolean);
 
     const removed = prevPublicIds.filter((pid) => !nextPublicIds.includes(pid));
-    for (const publicId of removed) {
-      await cloudinary.uploader.destroy(publicId).catch(() => {});
-    }
 
     item.title = title;
     item.price = numericPrice;
@@ -363,9 +397,23 @@ export const updateItem = async (req, res) => {
     item.seller = buildSellerSnapshot(req.user);
 
     const saved = await item.save();
+    // Cloudinary cleanup happens only after MongoDB has committed the new image
+    // list, so a database failure cannot leave the saved listing with dead URLs.
+    for (const publicId of removed) {
+      await cloudinary.uploader.destroy(publicId).catch(() => {});
+    }
+    const retainedPublicIds = new Set(nextPublicIds);
+    for (const image of uploadedImages) {
+      if (!retainedPublicIds.has(image.publicId)) {
+        await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+      }
+    }
     return res.status(200).json({ message: "Item updated", item: saved });
   } catch (err) {
-    return res.status(400).json({ message: err.message || "Error updating item" });
+    for (const image of uploadedImages) {
+      if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+    }
+    return sendControllerError(res, err, "Error updating item");
   }
 };
 
@@ -375,6 +423,10 @@ export const deleteItem = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid item id" });
+    }
+
     const item = await Item.findById(req.params.id);
     if (!item) return res.status(404).json({ message: "Item not found" });
 
@@ -382,17 +434,18 @@ export const deleteItem = async (req, res) => {
       return res.status(403).json({ message: "Forbidden" });
     }
 
-    // delete images from cloudinary too
+    // Commit the database deletion first. Cloudinary cleanup is best-effort and
+    // must not leave a live listing pointing at deleted images if MongoDB fails.
+    await Item.deleteOne({ _id: req.params.id });
+
     for (const img of item.images || []) {
       if (img.publicId) {
         await cloudinary.uploader.destroy(img.publicId).catch(() => {});
       }
     }
 
-    await Item.deleteOne({ _id: req.params.id });
-
     return res.status(200).json({ message: "Item deleted", id: req.params.id });
   } catch (err) {
-    return res.status(400).json({ message: err.message || "Error deleting item" });
+    return sendControllerError(res, err, "Error deleting item");
   }
 };

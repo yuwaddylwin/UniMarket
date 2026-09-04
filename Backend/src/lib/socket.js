@@ -7,7 +7,11 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: [
+      "http://localhost:3000",
+      "https://unimarket-web.onrender.com",
+      process.env.CLIENT_URL,
+    ].filter(Boolean),
     credentials: true,
   },
 });

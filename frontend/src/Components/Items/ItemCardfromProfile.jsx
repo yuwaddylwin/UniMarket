@@ -7,16 +7,14 @@ import { normalizeSeller } from "../Logics/useItemsList";
 import { formatListingPrice } from "../common/listingPrice";
 import "../common/ListingPrice.css";
 import { normalizeAccommodationSeller } from "../Logics/useAccommodations";
+import { resolveApiAssetUrl } from "../../config/api";
 import "./ItemCardfromProfile.css";
-
-const API_BASE = "http://localhost:8000";
 
 function getCoverSrc(item) {
   const first = item?.images?.[0];
   const url = typeof first === "string" ? first : first?.url || "";
   if (!url) return "/Images/placeholder.png";
-  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
-  return url;
+  return resolveApiAssetUrl(url, "/Images/placeholder.png");
 }
 
 export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveMode = false }) {
@@ -25,6 +23,9 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const deleteLockRef = useRef(false);
+  const statusLockRef = useRef(false);
+  const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
   const menuRef = useRef(null);
 
   const coverSrc = getCoverSrc(item);
@@ -53,13 +54,16 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
 
   // Close modal on ESC
   useEffect(() => {
-    if (!confirmOpen) return;
+    if (!confirmOpen && !statusConfirmOpen) return;
     const onKeyDown = (e) => {
-      if (e.key === "Escape") setConfirmOpen(false);
+      if (e.key === "Escape" && !isDeleting && !isUpdatingStatus) {
+        setConfirmOpen(false);
+        setStatusConfirmOpen(false);
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [confirmOpen]);
+  }, [confirmOpen, statusConfirmOpen, isDeleting, isUpdatingStatus]);
 
   const handleEdit = () => {
     setMenuOpen(false);
@@ -73,9 +77,10 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
   };
 
   const confirmDelete = async () => {
-    if (!itemId) return;
+    if (!itemId || deleteLockRef.current) return;
 
     try {
+      deleteLockRef.current = true;
       setIsDeleting(true);
 
       const resource = isAccommodation ? "accommodations" : "items";
@@ -90,23 +95,27 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
         err?.response?.data?.message || err?.message || "Delete failed"
       );
     } finally {
+      deleteLockRef.current = false;
       setIsDeleting(false);
     }
   };
 
   const handleStatusChange = async () => {
-    if (!itemId) return;
+    if (!itemId || statusLockRef.current) return;
     const nextStatus = archiveMode ? "active" : "sold";
     const resource = isAccommodation ? "accommodations" : "items";
     try {
+      statusLockRef.current = true;
       setIsUpdatingStatus(true);
       await axiosInstance.patch(`/${resource}/${itemId}/status`, { status: nextStatus });
       toast.success(archiveMode ? "Listing restored" : "Listing moved to Archive");
       setMenuOpen(false);
+      setStatusConfirmOpen(false);
       onArchiveChange?.(itemId);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Unable to update listing status");
     } finally {
+      statusLockRef.current = false;
       setIsUpdatingStatus(false);
     }
   };
@@ -168,7 +177,11 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
               className="profile-kebab-item"
               onClick={(event) => {
                 event.stopPropagation();
-                handleStatusChange();
+                if (archiveMode) handleStatusChange();
+                else {
+                  setMenuOpen(false);
+                  setStatusConfirmOpen(true);
+                }
               }}
               disabled={isDeleting || isUpdatingStatus}
             >
@@ -224,9 +237,9 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
             className="confirm-modal"
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <h3 className="confirm-title">Are you sure?</h3>
+            <h3 className="confirm-title">Delete listing?</h3>
             <p className="confirm-text">
-              This will permanently delete <b>{title}</b>.
+              Are you sure you want to delete this listing? <b>{title}</b> will be permanently removed.
             </p>
 
             <div className="confirm-actions">
@@ -245,6 +258,32 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
                 disabled={isDeleting}
               >
                 {isDeleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {statusConfirmOpen && (
+        <div
+          className="confirm-overlay"
+          onClick={(event) => event.stopPropagation()}
+          onMouseDown={(event) => {
+            event.stopPropagation();
+            if (!isUpdatingStatus) setStatusConfirmOpen(false);
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={`sold-confirm-${itemId}`}
+        >
+          <div className="confirm-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <h3 className="confirm-title" id={`sold-confirm-${itemId}`}>Mark as sold?</h3>
+            <p className="confirm-text">
+              This will remove <b>{title}</b> from the marketplace and move it to your Archive.
+            </p>
+            <div className="confirm-actions">
+              <button type="button" className="confirm-btn" onClick={() => setStatusConfirmOpen(false)} disabled={isUpdatingStatus}>Cancel</button>
+              <button type="button" className="confirm-btn" onClick={handleStatusChange} disabled={isUpdatingStatus}>
+                {isUpdatingStatus ? "Saving…" : "Yes, mark as sold"}
               </button>
             </div>
           </div>

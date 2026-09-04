@@ -56,7 +56,8 @@ const MessageInput = () => {
       <div className="message-input-row">
         <input
           type="text"
-          placeholder="Message..."
+          placeholder="Type a message..."
+          aria-label="Type a message"
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
@@ -72,11 +73,14 @@ const MessageInput = () => {
         </button>
 
         {/* SEND BUTTON */}
-        {(text.trim() || imagePreview) && (
-          <button type="submit" className="send-btn" aria-label="Send message">
-                <Send size={18} />
+        <button
+          type="submit"
+          className="send-btn"
+          aria-label="Send message"
+          disabled={!text.trim() && !imagePreview}
+        >
+          <Send size={18} />
         </button>
-        )}
       </div>
 
       {/* CAMERA INPUT */}

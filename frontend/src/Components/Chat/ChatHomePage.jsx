@@ -7,8 +7,9 @@ import NoChatSelected from "./NoChatSelected";
 import ChatContainer from "./ChatContainer";
 import "./ChatHomePage.css";
 import { useIsMobile } from "./IsMobile";
+import DesktopChatNav from "./DesktopChatNav";
 
-const ChatHomePage = () => {
+const ChatHomePage = ({ cartCount = 0 }) => {
   const { sellerId } = useParams(); 
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.authUser);
@@ -33,7 +34,10 @@ const ChatHomePage = () => {
       return;
     }
 
-    if (!sellerId) return;
+    if (!sellerId) {
+      if (useChatStore.getState().selectedUser) setSelectedUser(null);
+      return;
+    }
     // already selected
     if (useChatStore.getState().selectedUser?._id === sellerId) return;
 
@@ -60,7 +64,10 @@ const ChatHomePage = () => {
       const user = await getUserById(sellerId);
       if (!cancelled) setSelectedUser(user);
     } catch {
-      if (!cancelled) setSelectedUser(null);
+      if (!cancelled) {
+        setSelectedUser(null);
+        navigate("/chat", { replace: true });
+      }
     }
   };
 
@@ -83,13 +90,16 @@ const ChatHomePage = () => {
 
   // DESKTOP: show BOTH sidebar + chat
   return (
-    <div className="chat-layout">
-      <div className="chat-sidebar">
-        <Sidebar />
-      </div>
+    <div className="chat-desktop-shell">
+      <DesktopChatNav cartCount={cartCount} />
+      <div className="chat-layout">
+        <div className="chat-sidebar">
+          <Sidebar />
+        </div>
 
-      <div className="chat-main">
-        {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
+        <div className="chat-main">
+          {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
+        </div>
       </div>
     </div>
   );

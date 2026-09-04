@@ -1,5 +1,18 @@
 import Accommodation from "../models/Accommodation.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import mongoose from "mongoose";
+
+function hasValidId(id) {
+  return mongoose.isObjectIdOrHexString(id);
+}
+
+function sendControllerError(res, error, fallback) {
+  if (error?.name === "ValidationError" || error?.name === "CastError") {
+    return res.status(400).json({ message: error.message || fallback });
+  }
+  console.error(fallback, error);
+  return res.status(500).json({ message: fallback });
+}
 
 function buildSellerSnapshot(user) {
   if (!user) return undefined;
@@ -150,11 +163,11 @@ export const createAccommodation = async (req, res) => {
     for (const image of uploadedImages) {
       if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
     console.error("Error creating accommodation:", error);
-    return res.status(400).json({
-      success: false,
-      message: error.message || "Error creating accommodation",
-    });
+    return res.status(500).json({ success: false, message: "Error creating accommodation" });
   }
 };
 
@@ -167,9 +180,8 @@ export const getAccommodations = async (_req, res) => {
 
     return res.status(200).json(accommodations.map(normalizeAccommodation));
   } catch (error) {
-    return res.status(500).json({
-      message: error.message || "Error fetching accommodations",
-    });
+    console.error("Error fetching accommodations", error);
+    return res.status(500).json({ message: "Error fetching accommodations" });
   }
 };
 
@@ -182,14 +194,16 @@ export const getMyAccommodations = async (req, res) => {
       .lean();
     return res.status(200).json(accommodations.map(normalizeAccommodation));
   } catch (error) {
-    return res.status(500).json({
-      message: error.message || "Error fetching accommodations",
-    });
+    console.error("Error fetching my accommodations", error);
+    return res.status(500).json({ message: "Error fetching accommodations" });
   }
 };
 
 export const getAccommodationById = async (req, res) => {
   try {
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid accommodation id" });
+    }
     const accommodation = await Accommodation.findOne({ _id: req.params.id, status: { $ne: "sold" } })
       .populate("user", "fullName username name email profilePic avatar photo")
       .lean();
@@ -200,9 +214,7 @@ export const getAccommodationById = async (req, res) => {
 
     return res.status(200).json(normalizeAccommodation(accommodation));
   } catch (error) {
-    return res.status(400).json({
-      message: error.message || "Error fetching accommodation",
-    });
+    return sendControllerError(res, error, "Error fetching accommodation");
   }
 };
 
@@ -211,6 +223,10 @@ export const updateAccommodation = async (req, res) => {
 
   try {
     if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
+
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid accommodation id" });
+    }
 
     const accommodation = await Accommodation.findById(req.params.id);
     if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
@@ -294,7 +310,7 @@ export const updateAccommodation = async (req, res) => {
     for (const image of uploadedImages) {
       if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
-    return res.status(400).json({ message: error.message || "Error updating accommodation" });
+    return sendControllerError(res, error, "Error updating accommodation");
   }
 };
 
@@ -302,19 +318,23 @@ export const deleteAccommodation = async (req, res) => {
   try {
     if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
 
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid accommodation id" });
+    }
+
     const accommodation = await Accommodation.findById(req.params.id);
     if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
     if (String(accommodation.user) !== String(req.user._id)) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
+    await Accommodation.deleteOne({ _id: req.params.id });
     for (const image of accommodation.images || []) {
       if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
-    await Accommodation.deleteOne({ _id: req.params.id });
     return res.status(200).json({ message: "Accommodation deleted", id: req.params.id });
   } catch (error) {
-    return res.status(400).json({ message: error.message || "Error deleting accommodation" });
+    return sendControllerError(res, error, "Error deleting accommodation");
   }
 };
 
@@ -327,12 +347,16 @@ export const getMyArchivedAccommodations = async (req, res) => {
       .lean();
     return res.status(200).json(accommodations.map(normalizeAccommodation));
   } catch (error) {
-    return res.status(500).json({ message: error.message || "Error fetching archived accommodations" });
+    console.error("Error fetching archived accommodations", error);
+    return res.status(500).json({ message: "Error fetching archived accommodations" });
   }
 };
 
 export const updateAccommodationStatus = async (req, res) => {
   try {
+    if (!hasValidId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid accommodation id" });
+    }
     const status = req.body?.status;
     if (!["active", "sold"].includes(status)) {
       return res.status(400).json({ message: "Status must be active or sold" });
@@ -350,6 +374,6 @@ export const updateAccommodationStatus = async (req, res) => {
       accommodation,
     });
   } catch (error) {
-    return res.status(400).json({ message: error.message || "Unable to update accommodation status" });
+    return sendControllerError(res, error, "Unable to update accommodation status");
   }
 };

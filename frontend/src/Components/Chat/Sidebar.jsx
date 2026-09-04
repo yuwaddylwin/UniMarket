@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./SidebarSkeleton/SidebarSkeleton";
 import "./Sidebar.css";
-import BottomNav from "../BottomNavBar/BottomNav";
 import ProfileAvatar from "../common/ProfileAvatar";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const {
     getUsers,
     users,
@@ -35,11 +36,17 @@ const Sidebar = () => {
   const filteredUsers = users
     .filter((user) => user._id !== authUser?._id)
     .filter((user) =>
-      user.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+      String(user.fullName || user.username || "")
+        .toLowerCase()
+        .includes(searchTerm.trim().toLowerCase())
     );
 
   return (
     <aside className="sidebar">
+      <div className="sidebar-heading">
+        <span>Inbox</span>
+        <h1>Messages</h1>
+      </div>
       <div className="sidebar-search">
         <Search size={18} aria-hidden="true" />
         <input
@@ -66,7 +73,10 @@ const Sidebar = () => {
               <button
                 type="button"
                 key={user._id}
-                onClick={() => setSelectedUser(user)}
+                onClick={() => {
+                  setSelectedUser(user);
+                  navigate(`/chat/${user._id}`);
+                }}
                 className={`user-item ${isSelected ? "active" : ""}`}
               >
                 <div className="avatar-wrapper">
@@ -96,7 +106,6 @@ const Sidebar = () => {
           })
         )}
       </div>
-      <BottomNav/>
     </aside>
   );
 };

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Camera, Check, LogIn, Pencil, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import { axiosInstance } from "../../lib/axios";
@@ -15,9 +15,11 @@ const ACCEPTED_PROFILE_PHOTO_TYPES = new Set([
 
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const fileInputRef = useRef(null);
   const { authUser, updateProfile, isUpdatingProfile } = useAuthStore();
-  const [myListings, setMyListings] = useState([]);
+  const updatedListing = location.state?.updatedListing;
+  const [myListings, setMyListings] = useState(() => updatedListing ? [updatedListing] : []);
   const [loadingItems, setLoadingItems] = useState(true);
   const [itemsError, setItemsError] = useState("");
   const [photoError, setPhotoError] = useState("");
@@ -56,7 +58,11 @@ export default function ProfilePage() {
           ...items.map((item) => ({ ...item, listingType: "item" })),
           ...accommodations.map((listing) => ({ ...listing, listingType: "accommodation" })),
         ].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-        if (!controller.signal.aborted) setMyListings(listings);
+        if (!controller.signal.aborted) {
+          // The update response is rendered immediately while this authoritative
+          // refresh retrieves the rest of the owner's listings.
+          setMyListings(listings);
+        }
       } catch (error) {
         if (controller.signal.aborted) return;
         console.error("Fetch my listings error:", error);
@@ -205,7 +211,7 @@ export default function ProfilePage() {
         <div className="profile-section-heading">
           <div><h2>Your listings</h2></div>
         </div>
-        {loadingItems ? (
+        {loadingItems && myListings.length === 0 ? (
           <LoadingSpinner className="profile-items-loading" label="Loading your listings…" />
         ) : itemsError ? (
           <p className="profile-items-error" role="alert">{itemsError}</p>

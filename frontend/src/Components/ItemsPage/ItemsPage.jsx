@@ -6,8 +6,7 @@ import { formatListingPrice } from "../common/listingPrice";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ProfileAvatar from "../common/ProfileAvatar";
-
-const API_BASE = "http://localhost:8000";
+import { resolveApiAssetUrl } from "../../config/api";
 
 
 function getFirstImageSrc(item) {
@@ -21,8 +20,7 @@ function getFirstImageSrc(item) {
       : "";
 
   if (!url) return "/Images/placeholder.png";
-  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
-  return url;
+  return resolveApiAssetUrl(url, "/Images/placeholder.png");
 }
 
 export default function ItemsPage() {

@@ -108,8 +108,8 @@ export default function App() {
             <MainLayout cartItems={cartItems} showBottomNav={false} />
           }
         >
-            <Route path="/chat" element={<ChatHomePage />} />
-            <Route path="/chat/:sellerId" element={<ChatHomePage />} />
+            <Route path="/chat" element={<ChatHomePage cartCount={cartItems.length} />} />
+            <Route path="/chat/:sellerId" element={<ChatHomePage cartCount={cartItems.length} />} />
             <Route path="/verify/:token" element={<VerifyEmailPage />} />
             <Route path="/resend-verification" element={<ResendVerificationPage />} />
         </Route>

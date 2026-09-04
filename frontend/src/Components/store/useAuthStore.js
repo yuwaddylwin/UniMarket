@@ -2,11 +2,9 @@ import { create } from "zustand";
 import { axiosInstance, setAuthToken, removeAuthToken, getAuthToken } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import { API_ORIGIN } from "../../config/api";
 
-const SOCKET_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://unimarket-08di.onrender.com"
-    : "http://localhost:8000";
+const SOCKET_URL = API_ORIGIN;
 
 
 export const useAuthStore = create((set, get) => ({

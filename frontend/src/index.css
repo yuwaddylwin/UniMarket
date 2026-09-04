@@ -63,6 +63,18 @@ code { font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", mon
   .app-content--home { padding-top: var(--header-mobile-height); }
 }
 
+@media (min-width: 769px) and (min-height: 501px), (min-width: 933px) {
+  .app-shell--chat > .navbar-container,
+  .app-shell--chat > .bottom-nav { display: none; }
+  .app-shell--chat > .app-content { min-height: 100dvh; padding: 0; }
+}
+
+@media (max-width: 768px), (max-width: 932px) and (max-height: 500px) and (pointer: coarse) {
+  .app-shell--active-chat > .navbar-container,
+  .app-shell--active-chat > .bottom-nav { display: none; }
+  .app-shell--active-chat > .app-content { min-height: 100dvh; padding: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

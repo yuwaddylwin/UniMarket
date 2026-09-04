@@ -198,9 +198,12 @@ export function useSellLogic() {
       formData.append("existingImages", JSON.stringify(existing));
       if (!editingId) throw new Error("Missing item id for edit.");
       appendNewImages(formData, item.images);
-      await axiosInstance.put(`/items/${editingId}`, formData);
+      const response = await axiosInstance.put(`/items/${editingId}`, formData);
       toast.success("Item updated successfully");
-      navigate(-1);
+      navigate("/profile", {
+        replace: true,
+        state: { updatedListing: { ...(response.data?.item || editPayload), listingType: "item" } },
+      });
       return;
     }
 
@@ -252,9 +255,17 @@ export function useSellLogic() {
       formData.append("existingImages", JSON.stringify(existing));
       if (!editingId) throw new Error("Missing accommodation id for edit.");
       appendNewImages(formData, accommodation.images);
-      await axiosInstance.put(`/accommodations/${editingId}`, formData);
+      const response = await axiosInstance.put(`/accommodations/${editingId}`, formData);
       toast.success("Accommodation updated successfully");
-      navigate(-1);
+      navigate("/profile", {
+        replace: true,
+        state: {
+          updatedListing: {
+            ...(response.data?.accommodation || editPayload),
+            listingType: "accommodation",
+          },
+        },
+      });
       return;
     }
 

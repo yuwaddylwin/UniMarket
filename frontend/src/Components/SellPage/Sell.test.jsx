@@ -50,5 +50,13 @@ test("edits an existing accommodation through the shared listing form", async ()
   const submitted = axiosInstance.put.mock.calls[0][1];
   expect(submitted.get("price")).toBe("6800");
   expect(submitted.get("existingImages")).toContain("accommodations/studio");
-  expect(mockNavigate).toHaveBeenCalledWith(-1);
+  expect(mockNavigate).toHaveBeenCalledWith("/profile", {
+    replace: true,
+    state: {
+      updatedListing: expect.objectContaining({
+        _id: "stay-a",
+        listingType: "accommodation",
+      }),
+    },
+  });
 });

@@ -3,15 +3,13 @@ import ProfileAvatar from "../common/ProfileAvatar";
 import { formatListingPrice } from "../common/listingPrice";
 import "../common/ListingPrice.css";
 import "./ItemsList.css";
-
-const API_BASE = "http://localhost:8000";
+import { resolveApiAssetUrl } from "../../config/api";
 
 function getFirstImageSrc(item) {
   const first = item?.images?.[0];
   const url = typeof first === "string" ? first : first?.url || "";
   if (!url) return "/Images/placeholder.png";
-  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
-  return url;
+  return resolveApiAssetUrl(url, "/Images/placeholder.png");
 }
 
 export default function ItemListingCard({ item, showTypeLabel = false }) {

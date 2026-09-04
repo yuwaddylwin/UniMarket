@@ -1,15 +1,10 @@
-const API_ORIGIN =
-  process.env.NODE_ENV === "production"
-    ? "https://unimarket-08di.onrender.com"
-    : "http://localhost:8000";
+import { resolveApiAssetUrl } from "../../config/api";
 
 export const DEFAULT_AVATAR = "/Images/no-pfp.jpg"; // Default avatar image path
 
 export function getProfileImageSrc(profilePic) {
   if (!profilePic || typeof profilePic !== "string") return DEFAULT_AVATAR;
-  return profilePic.startsWith("/uploads/")
-    ? `${API_ORIGIN}${profilePic}`
-    : profilePic;
+  return resolveApiAssetUrl(profilePic, DEFAULT_AVATAR);
 }
 
 export default function ProfileAvatar({ profilePic, alt = "Profile", ...props }) {

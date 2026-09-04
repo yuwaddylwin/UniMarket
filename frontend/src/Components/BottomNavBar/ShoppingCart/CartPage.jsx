@@ -3,8 +3,7 @@ import "./CartPage.css";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
-
-const API_BASE = "http://localhost:8000";
+import { resolveApiAssetUrl } from "../../../config/api";
 
 
 function getFirstImageSrc(item) {
@@ -21,9 +20,7 @@ function getFirstImageSrc(item) {
 
   if (!url) return "/no-image.png";
 
-  if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
-
-  return url;
+  return resolveApiAssetUrl(url, "/no-image.png");
 }
 
 export default function CartPage({ cartItems, setCartItems }) {

@@ -21,6 +21,7 @@
 }
 
 .message-content {
+  min-width: 0;
   max-width: min(72%, 560px);
   display: flex;
   flex-direction: column;
@@ -29,6 +30,7 @@
 
 /* TEXT BUBBLE */
 .message-bubble {
+  max-width: 100%;
   background: #fff;
   padding: 10px 13px;
   border-radius: 18px 18px 18px 4px;
