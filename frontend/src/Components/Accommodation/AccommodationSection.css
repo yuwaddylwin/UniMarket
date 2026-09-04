@@ -23,17 +23,14 @@
 .accommodation-card:hover .accommodation-image img { transform: scale(1.045); }
 .accommodation-image > span { position: absolute; z-index: 1; top: 13px; left: 13px; padding: 7px 10px; border: 1px solid rgba(255, 255, 255, 0.62); border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.92); color: var(--color-primary); font-size: 0.66rem; font-weight: 850; box-shadow: 0 5px 14px rgba(9, 20, 36, 0.14); backdrop-filter: blur(8px); }
 .accommodation-body { min-height: 185px; display: flex; flex-direction: column; gap: 9px; padding: 16px 17px 15px; }
-.accommodation-price { color: #087657; font-size: 0.76rem; font-weight: 850; }
-.accommodation-body h3 { margin: 0; color: #152238; font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+.accommodation-price { flex: 0 0 auto; }
+.accommodation-body h3 { margin: 0; color: #152238; font-size: 1.15rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
 .accommodation-location { display: flex; align-items: center; gap: 5px; margin: 0; color: #536176; font-size: 0.76rem; font-weight: 650; }
 .accommodation-location svg { flex: 0 0 auto; color: var(--color-primary); }
 .accommodation-seller { display: flex; align-items: center; gap: 7px; min-width: 0; }
 .accommodation-seller .seller-pic { width: 28px; height: 28px; flex: 0 0 auto; border: 1px solid rgba(20, 35, 60, .12); border-radius: 50%; object-fit: cover; }
 .accommodation-seller .seller-name { min-width: 0; overflow: hidden; color: #536176; font-size: .74rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .accommodation-details { margin: 0; color: #778397; font-size: 0.78rem; line-height: 1.45; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.accommodation-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 11px; border-top: 1px solid rgba(20, 35, 60, 0.08); color: var(--color-primary); font-size: 0.75rem; font-weight: 800; }
-.accommodation-card-footer svg { width: 18px; height: 18px; transition: transform var(--transition); }
-.accommodation-card:hover .accommodation-card-footer svg { transform: translate(2px, -2px); }
 
 @media (min-width: 600px) {
   .accommodation-row { padding-inline: 48px; }

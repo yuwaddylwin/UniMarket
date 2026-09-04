@@ -1,25 +1,45 @@
 import "./Navbar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { Menu, Search as SearchIcon, ShoppingCart, X } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  Menu,
+  Search as SearchIcon,
+  ShoppingCart,
+  X,
+} from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
+import { CONTACT } from "../../config/contact";
 
-const MENU_ITEMS = [
-  { label: "Profile", to: "/profile" },
-  { label: "Accommodation", to: "/accommodations" },
-  { label: "Browse items", to: "/products" },
-  { label: "Help & support", href: "mailto:unimarket.app.official@gmail.com?subject=UniMarket%20Support" },
-  { label: "Contact", href: "mailto:unimarket.app.official@gmail.com" },
+const MAIN_MENU_ITEMS = [
+  {
+    number: "01",
+    label: "Profile Settings",
+    to: "/profile/settings",
+  },
+  { number: "02", label: "Accommodation", to: "/accommodations" },
+  { number: "03", label: "Browse items", to: "/products" },
 ];
 
 export default function Navbar({ cartCount = 0 }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { authUser, logout } = useAuthStore();
   const isHome = location.pathname === "/";
   const [q, setQ] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const menuRef = useRef(null);
+  const helpMenuRef = useRef(null);
+  const contactMenuRef = useRef(null);
 
-  useEffect(() => setIsMenuOpen(false), [location.pathname]);
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setHelpOpen(false);
+    setContactOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!isMenuOpen) return undefined;
@@ -27,14 +47,31 @@ export default function Navbar({ cartCount = 0 }) {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => {
-      menuRef.current?.querySelector(".navbar-menu a")?.focus();
+      menuRef.current?.querySelector(".navbar-menu a, .navbar-menu button")?.focus();
     }, 220);
 
     const handlePointerDown = (event) => {
-      if (!menuRef.current?.contains(event.target)) setIsMenuOpen(false);
+      if (!menuRef.current?.contains(event.target)) {
+        setIsMenuOpen(false);
+        setHelpOpen(false);
+        setContactOpen(false);
+        return;
+      }
+
+      const clickedDropdown =
+        helpMenuRef.current?.contains(event.target) ||
+        contactMenuRef.current?.contains(event.target);
+      if (!clickedDropdown) {
+        setHelpOpen(false);
+        setContactOpen(false);
+      }
     };
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") setIsMenuOpen(false);
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        setHelpOpen(false);
+        setContactOpen(false);
+      }
     };
 
     document.addEventListener("pointerdown", handlePointerDown);
@@ -52,6 +89,18 @@ export default function Navbar({ cartCount = 0 }) {
     const query = q.trim();
     if (!query) return;
     navigate(`/products?search=${encodeURIComponent(query)}`);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    setHelpOpen(false);
+    setContactOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    closeMenu();
+    navigate("/login");
   };
 
   return (
@@ -102,28 +151,95 @@ export default function Navbar({ cartCount = 0 }) {
             aria-hidden={!isMenuOpen}
           >
             <div className="navbar-menu-shell">
-              <div className="navbar-menu-brand" aria-hidden="true">Uni<span>Market</span></div>
               <div className="navbar-menu-content">
                 <span className="navbar-menu-eyebrow">Explore UniMarket</span>
-                <ul>
-                  {MENU_ITEMS.map((item, index) => (
+                <ul className="navbar-menu-list">
+                  {MAIN_MENU_ITEMS.map((item) => {
+                    return (
                     <li key={item.label}>
-                      {item.to ? (
-                        <Link to={item.to} onClick={() => setIsMenuOpen(false)}>
-                          <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
-                        </Link>
-                      ) : (
-                        <a href={item.href} onClick={() => setIsMenuOpen(false)}>
-                          <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
-                        </a>
-                      )}
+                      <Link className="navbar-menu-item" to={item.to} onClick={closeMenu}>
+                        <span className="navbar-menu-number">{item.number}</span>
+                        <span className="navbar-menu-label">
+                          {item.label}
+                        </span>
+                      </Link>
                     </li>
-                  ))}
+                    );
+                  })}
+
+                  <li className="navbar-menu-group" ref={helpMenuRef}>
+                    <button
+                      className="navbar-menu-item navbar-menu-toggle"
+                      type="button"
+                      aria-expanded={helpOpen}
+                      aria-controls="help-support-menu"
+                      onClick={() => {
+                        setHelpOpen((open) => !open);
+                        setContactOpen(false);
+                      }}
+                    >
+                      <span className="navbar-menu-number">04</span>
+                      <span className="navbar-menu-label">Help &amp; Support</span>
+                      <ChevronDown className={helpOpen ? "is-open" : ""} aria-hidden="true" />
+                    </button>
+                    <ul
+                      id="help-support-menu"
+                      className="navbar-submenu"
+                      hidden={!helpOpen}
+                    >
+                      <li><a href="/#home-discovery" onClick={closeMenu}>How it works</a></li>
+                      <li><Link to="/privacy" onClick={closeMenu}>Privacy</Link></li>
+                      <li><Link to="/terms" onClick={closeMenu}>Terms</Link></li>
+                    </ul>
+                  </li>
+
+                  <li className="navbar-menu-group" ref={contactMenuRef}>
+                    <button
+                      className="navbar-menu-item navbar-menu-toggle"
+                      type="button"
+                      aria-expanded={contactOpen}
+                      aria-controls="contact-menu"
+                      onClick={() => {
+                        setContactOpen((open) => !open);
+                        setHelpOpen(false);
+                      }}
+                    >
+                      <span className="navbar-menu-number">05</span>
+                      <span className="navbar-menu-label">Contact</span>
+                      <ChevronDown className={contactOpen ? "is-open" : ""} aria-hidden="true" />
+                    </button>
+                    <ul id="contact-menu" className="navbar-submenu navbar-contact-submenu" hidden={!contactOpen}>
+                      <li>
+                        <a href={CONTACT.emailHref} onClick={closeMenu}>
+                          <strong>Email</strong><small>{CONTACT.email}</small>
+                        </a>
+                      </li>
+                      <li>
+                        <a href={CONTACT.phoneHref} onClick={closeMenu}>
+                          <strong>Phone</strong><small>{CONTACT.phone}</small>
+                        </a>
+                      </li>
+                      <li>
+                        <a href={CONTACT.addressHref} target="_blank" rel="noreferrer" onClick={closeMenu}>
+                          <strong>Address</strong><small>{CONTACT.address}</small>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+
+                  {authUser && (
+                    <li>
+                      <button className="navbar-menu-item navbar-logout" type="button" onClick={handleLogout}>
+                        <span className="navbar-menu-number">06</span>
+                        <span className="navbar-menu-label"><LogOut aria-hidden="true" />Logout</span>
+                      </button>
+                    </li>
+                  )}
                 </ul>
               </div>
               <div className="navbar-menu-footer">
                 <p>A marketplace made for student life.</p>
-                <p>Bangkok, Thailand</p>
+                <p>{CONTACT.address}</p>
               </div>
             </div>
           </div>

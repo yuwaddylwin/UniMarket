@@ -20,6 +20,7 @@ let mockRouteId = null;
 let mockAccommodations = [];
 let mockPathname = "";
 const mockNavigate = jest.fn();
+const mockUpdateProfile = jest.fn();
 
 jest.mock("react-router-dom", () => ({
   MemoryRouter: ({ children }) => children,
@@ -45,7 +46,7 @@ jest.mock("./Components/store/useAuthStore", () => ({
   useAuthStore: (selector) => {
     const state = {
       authUser: mockAuthUser,
-      updateProfile: jest.fn(),
+      updateProfile: mockUpdateProfile,
       logout: jest.fn(),
       isUpdatingProfile: false,
       isRemovingProfilePhoto: false,
@@ -59,6 +60,7 @@ jest.mock("./Components/store/useAuthStore", () => ({
 jest.mock("./Components/lib/axios", () => ({
   axiosInstance: {
     get: jest.fn(),
+    patch: jest.fn(),
     delete: jest.fn(),
   },
 }));
@@ -78,6 +80,7 @@ const otherItem = {
   _id: "item-b",
   title: "User B Lamp",
   price: 200,
+  category: "Items",
   description: "Lamp",
   images: [],
   user: userB,
@@ -103,7 +106,10 @@ beforeEach(() => {
   mockAccommodations = [];
   mockPathname = "";
   mockNavigate.mockReset();
+  mockUpdateProfile.mockReset().mockResolvedValue(undefined);
   axiosInstance.get.mockReset();
+  axiosInstance.patch.mockReset().mockResolvedValue({ data: {} });
+  axiosInstance.delete.mockReset().mockResolvedValue({ data: {} });
 });
 
 test("the items page includes both the signed-in user's listing and other users' listings", () => {
@@ -145,6 +151,8 @@ test("another user still sees the chat action on a listing", () => {
   const posts = container.querySelectorAll("[data-listing-id]");
   expect(posts[0]).toHaveAttribute("data-listing-id", "item-b");
   expect(posts[1]).toHaveAttribute("data-listing-id", "item-a");
+  expect(within(posts[0]).queryByText("Items")).not.toBeInTheDocument();
+  expect(within(posts[0]).getByText("฿200")).toHaveClass("listing-price");
   expect(within(posts[0]).getByRole("button", { name: /chat with seller/i })).toBeInTheDocument();
   fireEvent.click(within(posts[0]).getByRole("button", { name: /add to cart/i }));
   expect(addToCart).toHaveBeenCalledWith(otherItem);
@@ -312,9 +320,71 @@ test("profile retrieves and displays items and accommodations from their own API
   expect(await screen.findByText("User A Desk")).toBeInTheDocument();
   expect(screen.getByText("User A Studio")).toBeInTheDocument();
   expect(screen.getByText(/Accommodation · per month/)).toBeInTheDocument();
-  expect(screen.getAllByText("Listed by User A")).toHaveLength(2);
+  expect(screen.getByRole("button", { name: "Edit profile photo" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Edit profile" })).toBeInTheDocument();
+  expect(screen.getAllByText("User A")).toHaveLength(3);
+  expect(screen.queryByText(/Listed by/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/change photo/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/remove photo/i)).not.toBeInTheDocument();
   screen.getAllByAltText("User A").forEach((avatar) => {
     expect(avatar).toHaveAttribute("src", "/Images/no-pfp.jpg");
+  });
+});
+
+test("profile photo edit uploads a validated image through the persisted profile action", async () => {
+  axiosInstance.get.mockImplementation(() => Promise.resolve({ data: [] }));
+  const { container } = render(<MemoryRouter><ProfilePage /></MemoryRouter>);
+  const input = container.querySelector('input[type="file"]');
+  const photo = new File(["photo"], "avatar.png", { type: "image/png" });
+
+  fireEvent.change(input, { target: { files: [photo] } });
+
+  const saveButton = await screen.findByRole("button", { name: /save photo/i });
+  expect(screen.getAllByAltText("User A")[0]).toHaveAttribute("src", expect.stringMatching(/^data:image\/png;base64,/));
+  expect(mockUpdateProfile).not.toHaveBeenCalled();
+  fireEvent.click(saveButton);
+
+  await waitFor(() => expect(mockUpdateProfile).toHaveBeenCalledTimes(1));
+  expect(mockUpdateProfile.mock.calls[0][0].profilePic).toMatch(/^data:image\/png;base64,/);
+});
+
+test("an owner can mark an active profile listing as done without deleting it", async () => {
+  axiosInstance.get.mockImplementation((path) => {
+    if (path === "/items/mine") return Promise.resolve({ data: [ownItem] });
+    if (path === "/accommodations/mine") return Promise.resolve({ data: [] });
+    return Promise.reject(new Error(`Unexpected request: ${path}`));
+  });
+  render(<MemoryRouter><ProfilePage /></MemoryRouter>);
+
+  expect(await screen.findByText("User A Desk")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Open actions for User A Desk" }));
+  fireEvent.click(screen.getByRole("button", { name: "Mark as done" }));
+
+  await waitFor(() => expect(axiosInstance.patch).toHaveBeenCalledWith(
+    "/items/item-a/status",
+    { status: "sold" }
+  ));
+  await waitFor(() => expect(screen.queryByText("User A Desk")).not.toBeInTheDocument());
+  expect(axiosInstance.delete).not.toHaveBeenCalled();
+});
+
+test("an accommodation listing offers edit, delete, and mark as done actions", async () => {
+  axiosInstance.get.mockImplementation((path) => {
+    if (path === "/items/mine") return Promise.resolve({ data: [] });
+    if (path === "/accommodations/mine") return Promise.resolve({ data: [ownAccommodation] });
+    return Promise.reject(new Error(`Unexpected request: ${path}`));
+  });
+  render(<MemoryRouter><ProfilePage /></MemoryRouter>);
+
+  expect(await screen.findByText("User A Studio")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Open actions for User A Studio" }));
+  expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Mark as done" })).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+  expect(mockNavigate).toHaveBeenCalledWith("/post", {
+    state: { mode: "edit", item: expect.objectContaining({ _id: "stay-a", listingType: "accommodation" }) },
   });
 });
 
@@ -343,7 +413,8 @@ test("accommodation cards show the database-backed owner name and profile pictur
 
   render(<MemoryRouter><AccommodationSection /></MemoryRouter>);
 
-  expect(screen.getByText("Listed by User A")).toBeInTheDocument();
+  expect(screen.getByText("User A")).toBeInTheDocument();
+  expect(screen.queryByText(/Listed by/i)).not.toBeInTheDocument();
   expect(screen.getByAltText("User A")).toHaveAttribute("src", "https://example.com/user-a.jpg");
 });
 

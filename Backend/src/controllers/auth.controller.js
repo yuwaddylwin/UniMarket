@@ -38,8 +38,14 @@ const destroyProfileImage = async (publicId) => {
 const serializePublicUser = (user) => ({
   _id: user._id,
   fullName: user.fullName,
+  username: user.username || "",
   email: user.email,
   profilePic: user.profilePic || "",
+  preferences: {
+    language: user.preferences?.language || "en",
+    messages: user.preferences?.messages !== false,
+    notifications: user.preferences?.notifications !== false,
+  },
   verified: user.verified,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
@@ -164,13 +170,7 @@ const login = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    res.status(200).json({
-      token,
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      profilePic: user.profilePic,
-    });
+    res.status(200).json({ token, ...serializePublicUser(user) });
   } catch (error) {
     console.log("Error in login controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -381,6 +381,103 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const updateProfileDetails = async (req, res) => {
+  try {
+    const fullName =
+      typeof req.body?.fullName === "string" ? req.body.fullName.trim() : "";
+
+    if (!fullName) {
+      return res.status(400).json({ message: "Name cannot be empty" });
+    }
+    if (fullName.length < 2 || fullName.length > 80) {
+      return res.status(400).json({
+        message: "Name must be between 2 and 80 characters",
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.fullName = fullName;
+    await user.save();
+
+    return res.status(200).json(serializePublicUser(user));
+  } catch (error) {
+    console.error("Error updating profile details:", error.message);
+    return res.status(500).json({ message: "Unable to update profile settings" });
+  }
+};
+
+const updatePreferences = async (req, res) => {
+  try {
+    const language = req.body?.language;
+    const messages = req.body?.messages;
+    const notifications = req.body?.notifications;
+
+    if (!['en', 'th'].includes(language)) {
+      return res.status(400).json({ message: "Language must be English or Thai" });
+    }
+    if (typeof messages !== "boolean" || typeof notifications !== "boolean") {
+      return res.status(400).json({ message: "Notification preferences must be true or false" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.preferences = { language, messages, notifications };
+    await user.save();
+    return res.status(200).json(serializePublicUser(user));
+  } catch (error) {
+    console.error("Error updating preferences:", error.message);
+    return res.status(500).json({ message: "Unable to update preferences" });
+  }
+};
+
+const getBlockedUsers = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .populate("blockedUsers", "fullName username profilePic")
+      .lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json(user.blockedUsers || []);
+  } catch (error) {
+    console.error("Error fetching blocked users:", error.message);
+    return res.status(500).json({ message: "Unable to load blocked users" });
+  }
+};
+
+const blockUser = async (req, res) => {
+  try {
+    const blockedUserId = req.params.userId;
+    if (String(blockedUserId) === String(req.user._id)) {
+      return res.status(400).json({ message: "You cannot block your own account" });
+    }
+    const blockedUser = await User.findById(blockedUserId).select("_id");
+    if (!blockedUser) return res.status(404).json({ message: "User not found" });
+
+    await User.updateOne(
+      { _id: req.user._id },
+      { $addToSet: { blockedUsers: blockedUserId } }
+    );
+    return res.status(200).json({ message: "User blocked", id: blockedUserId });
+  } catch (error) {
+    return res.status(400).json({ message: error.message || "Unable to block user" });
+  }
+};
+
+const unblockUser = async (req, res) => {
+  try {
+    const result = await User.updateOne(
+      { _id: req.user._id },
+      { $pull: { blockedUsers: req.params.userId } }
+    );
+    if (!result.matchedCount) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json({ message: "User unblocked", id: req.params.userId });
+  } catch (error) {
+    return res.status(400).json({ message: error.message || "Unable to unblock user" });
+  }
+};
+
 const removeProfilePhoto = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("+profilePicPublicId");
@@ -406,7 +503,7 @@ const removeProfilePhoto = async (req, res) => {
 
 const checkAuth = (req, res) => {
   try {
-    res.status(200).json(req.user);
+    res.status(200).json(serializePublicUser(req.user));
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -418,6 +515,11 @@ export {
   login,
   logout,
   updateProfile,
+  updateProfileDetails,
+  updatePreferences,
+  getBlockedUsers,
+  blockUser,
+  unblockUser,
   removeProfilePhoto,
   checkAuth,
   verifyEmail,

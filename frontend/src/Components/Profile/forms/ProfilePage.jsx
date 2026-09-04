@@ -1,113 +1,66 @@
-import { useEffect, useState } from "react";
-import { useAuthStore } from "../../store/useAuthStore";
-import { Camera, LogOut, LogIn, Trash2, X } from "lucide-react";
-import toast from "react-hot-toast";
-import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
+import { useEffect, useRef, useState } from "react";
+import { Camera, Check, LogIn, Pencil, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "./ProfilePage.css";
+import { useAuthStore } from "../../store/useAuthStore";
+import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import { axiosInstance } from "../../lib/axios";
 import ProfileAvatar from "../../common/ProfileAvatar";
 import LoadingSpinner from "../../common/LoadingSpinner";
+import "./ProfilePage.css";
+
+const MAX_PROFILE_PHOTO_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_PROFILE_PHOTO_TYPES = new Set([
+  "image/avif", "image/gif", "image/jpeg", "image/png", "image/webp",
+]);
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const {
-    authUser,
-    updateProfile,
-    removeProfilePhoto,
-    logout,
-    isUpdatingProfile,
-    isRemovingProfilePhoto,
-  } = useAuthStore();
-
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [showRemovePhotoConfirm, setShowRemovePhotoConfirm] = useState(false);
-
-  // Listings are kept in their own database collections and combined only for display.
+  const fileInputRef = useRef(null);
+  const { authUser, updateProfile, isUpdatingProfile } = useAuthStore();
   const [myListings, setMyListings] = useState([]);
   const [loadingItems, setLoadingItems] = useState(true);
   const [itemsError, setItemsError] = useState("");
+  const [photoError, setPhotoError] = useState("");
+  const [pendingPhoto, setPendingPhoto] = useState("");
+  const authUserId = authUser?._id || authUser?.id;
+  const authFullName = authUser?.fullName || "";
+  const authProfilePic = authUser?.profilePic || "";
 
-  // If logged out, clear everything (acts like a refresh)
   useEffect(() => {
     if (!authUser) {
-      setSelectedFile(null);
-      setPreview(null);
-      setShowLogoutConfirm(false);
-      setShowRemovePhotoConfirm(false);
       setMyListings([]);
       setLoadingItems(false);
       setItemsError("");
+      setPhotoError("");
+      setPendingPhoto("");
     }
   }, [authUser]);
 
-  // Generate preview when a file is selected
   useEffect(() => {
-    if (!selectedFile) return;
-
-    const reader = new FileReader();
-    reader.onload = () => setPreview(reader.result);
-    reader.readAsDataURL(selectedFile);
-  }, [selectedFile]);
-
-  const handleFileSelect = (event) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file.");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Profile picture must be 5 MB or smaller.");
-      return;
-    }
-    setSelectedFile(file);
-  };
-
-  useEffect(() => {
-    const userId = authUser?._id || authUser?.id;
-    if (!userId) return undefined;
-
+    if (!authUserId) return undefined;
     const controller = new AbortController();
 
     const fetchMyListings = async () => {
       try {
         setLoadingItems(true);
         setItemsError("");
-
         const [itemsResponse, accommodationsResponse] = await Promise.all([
           axiosInstance.get("/items/mine", { signal: controller.signal }),
           axiosInstance.get("/accommodations/mine", { signal: controller.signal }),
         ]);
-
         const items = Array.isArray(itemsResponse.data)
-          ? itemsResponse.data
-          : itemsResponse.data?.items || [];
+          ? itemsResponse.data : itemsResponse.data?.items || [];
         const accommodations = Array.isArray(accommodationsResponse.data)
-          ? accommodationsResponse.data
-          : accommodationsResponse.data?.accommodations || [];
+          ? accommodationsResponse.data : accommodationsResponse.data?.accommodations || [];
         const listings = [
           ...items.map((item) => ({ ...item, listingType: "item" })),
-          ...accommodations.map((listing) => ({
-            ...listing,
-            listingType: "accommodation",
-          })),
-        ].sort(
-          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-        );
-
+          ...accommodations.map((listing) => ({ ...listing, listingType: "accommodation" })),
+        ].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         if (!controller.signal.aborted) setMyListings(listings);
-      } catch (err) {
+      } catch (error) {
         if (controller.signal.aborted) return;
-
-        console.error("Fetch my items error:", err);
-        setItemsError(
-          err?.response?.data?.message ||
-            "Unable to load your listings. Please try again."
-        );
+        console.error("Fetch my listings error:", error);
+        setItemsError(error?.response?.data?.message || "Unable to load your listings. Please try again.");
       } finally {
         if (!controller.signal.aborted) setLoadingItems(false);
       }
@@ -115,193 +68,158 @@ export default function ProfilePage() {
 
     fetchMyListings();
     return () => controller.abort();
-  }, [authUser?._id, authUser?.id]);
+  }, [authUserId]);
 
-  // Upload photo
-  const handleUploadPhoto = async () => {
-    if (!selectedFile) return;
+  // Make the new photo visible in this user's listing cards without a refresh.
+  useEffect(() => {
+    if (!authUserId) return;
+    setMyListings((listings) => listings.map((listing) => ({
+      ...listing,
+      user: listing.user && typeof listing.user === "object"
+        ? { ...listing.user, fullName: authFullName, profilePic: authProfilePic }
+        : listing.user,
+      seller: {
+        ...(listing.seller || {}),
+        id: listing.seller?.id || authUserId,
+        fullName: authFullName,
+        profilePic: authProfilePic,
+      },
+    })));
+  }, [authUserId, authFullName, authProfilePic]);
 
+  const handlePhotoChange = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!ACCEPTED_PROFILE_PHOTO_TYPES.has(file.type)) {
+      setPhotoError("Choose an AVIF, GIF, JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > MAX_PROFILE_PHOTO_SIZE) {
+      setPhotoError("Profile photos must be 5 MB or smaller.");
+      return;
+    }
+
+    setPhotoError("");
+    const reader = new FileReader();
+    reader.onerror = () => setPhotoError("Unable to read that image. Please try another file.");
+    reader.onload = () => {
+      if (typeof reader.result !== "string") return;
+      setPendingPhoto(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSavePhoto = async () => {
+    if (!pendingPhoto || isUpdatingProfile) return;
     try {
-      await updateProfile({ profilePic: preview });
-      setSelectedFile(null);
-      setPreview(null);
-    } catch (err) {
-      console.error("Upload error:", err);
+      setPhotoError("");
+      await updateProfile({ profilePic: pendingPhoto });
+      setPendingPhoto("");
+    } catch (error) {
+      setPhotoError(error?.response?.data?.message || "Unable to update your profile photo.");
     }
   };
 
-  const handleRemovePhoto = async () => {
-    try {
-      await removeProfilePhoto();
-      setSelectedFile(null);
-      setPreview(null);
-      setShowRemovePhotoConfirm(false);
-    } catch (err) {
-      console.error("Remove photo error:", err);
-    }
+  const cancelPhotoSelection = () => {
+    setPendingPhoto("");
+    setPhotoError("");
   };
 
-  const handleLogoutClick = () => setShowLogoutConfirm(true);
-  const handleCancelLogout = () => setShowLogoutConfirm(false);
-
-  const handleConfirmLogout = async () => {
-    await logout();          
-    setShowLogoutConfirm(false);
-    navigate("/login");      
-  };
-
-  // LOGGED OUT VIEW (no data)
   if (!authUser) {
     return (
-      <div className="profile-container">
-        <header className="profile-header">
-          <h1 className="brand">Profile</h1>
-        </header>
-
-        <div className="photo-section">
-          <div className="photo-wrapper">
-            <ProfileAvatar
-              alt="profile"
-              className="profile-photo"
-            />
+      <main className="profile-page">
+        <section className="profile-hero profile-hero--guest">
+          <ProfileAvatar alt="Profile" className="profile-photo" />
+          <div className="profile-identity">
+            <span className="profile-eyebrow">Your account</span>
+            <h1>Welcome to UniMarket</h1>
+            <p>Log in to manage your profile and marketplace listings.</p>
           </div>
-
-          <p className="username">User</p>
-
-          <button
-            className="menu-btn logout"
-            type="button"
-            onClick={() => navigate("/login")}
-          >
-            <LogIn size={18} style={{ marginRight: "6px" }} />
-            Log In
+          <button className="profile-primary-action" type="button" onClick={() => navigate("/login")}>
+            <LogIn aria-hidden="true" /> Log In
           </button>
-        </div>
-
-        <section className="sell-items-section">
-          <h2>Your Listed Items</h2>
-          <p style={{ opacity: 0.7 }}>Please log in to see your listings.</p>
         </section>
-      </div>
+        <section className="profile-listings-panel">
+          <div className="profile-section-heading"><div><h2>Your listings</h2></div></div>
+          <div className="profile-empty-state"><p>Please log in to see and manage your listings.</p></div>
+        </section>
+      </main>
     );
   }
 
-  //  LOGGED IN VIEW 
+  const profileName = authUser.username ? `@${authUser.username}` : authUser.fullName;
+  const itemCount = myListings.filter((listing) => listing.listingType === "item").length;
+  const accommodationCount = myListings.filter((listing) => listing.listingType === "accommodation").length;
   return (
-    <div className="profile-container">
-      <header className="profile-header">
-        <h1 className="brand">Profile</h1>
-      </header>
-
-      <div className="photo-section">
+    <main className="profile-page">
+      <section className="profile-hero profile-hero--member" aria-labelledby="profile-title">
         <div className="photo-wrapper">
-          <ProfileAvatar
-            profilePic={preview || authUser?.profilePic}
-            alt="profile"
-            className="profile-photo"
-          />
-
-        </div>
-
-        <p className="username">{authUser?.fullName}</p>
-
-        <div className="profile-photo-actions">
-          <label className="change-photo-btn">
-            <Camera size={17} aria-hidden="true" />
-            {authUser?.profilePic ? "Change Photo" : "Upload Photo"}
-            <input type="file" accept="image/*" onChange={handleFileSelect} />
-          </label>
-
-          {authUser?.profilePic && !selectedFile && (
-            <button
-              type="button"
-              className="remove-photo-btn"
-              onClick={() => setShowRemovePhotoConfirm(true)}
-            >
-              <Trash2 size={17} aria-hidden="true" />
-              Remove Photo
-            </button>
-          )}
-        </div>
-
-        {selectedFile && <div className="profile-photo-save-actions">
-          <button onClick={handleUploadPhoto} disabled={isUpdatingProfile || !preview} className="save-photo-btn">
-            {isUpdatingProfile ? "Uploading..." : preview ? "Save Photo" : "Preparing..."}
-          </button>
+          <ProfileAvatar profilePic={pendingPhoto || authUser.profilePic} alt={authUser.fullName || "Profile"} className="profile-photo" />
           <button
+            className="profile-photo-edit"
             type="button"
-            className="cancel-photo-btn"
+            aria-label="Edit profile photo"
+            onClick={() => fileInputRef.current?.click()}
             disabled={isUpdatingProfile}
-            onClick={() => { setSelectedFile(null); setPreview(null); }}
           >
-            <X size={16} aria-hidden="true" /> Cancel
+            <Camera aria-hidden="true" /><span>Edit</span>
           </button>
-        </div>}
-      </div>
-
-      <section className="sell-items-section">
-        <h2>Your Listed Items</h2>
-
-        {loadingItems ? (
-          <LoadingSpinner
-            className="profile-items-loading"
-            label="Loading your items…"
+          <input
+            ref={fileInputRef}
+            className="profile-photo-input"
+            type="file"
+            accept="image/avif,image/gif,image/jpeg,image/png,image/webp"
+            onChange={handlePhotoChange}
+            tabIndex={-1}
           />
-        ) : itemsError ? (
-          <p className="profile-items-error" role="alert">
-            {itemsError}
-          </p>
-        ) : myListings.length === 0 ? (
-          <p style={{ opacity: 0.7 }}>No listings posted yet.</p>
-        ) : (
-          <ItemCarousel items={myListings} />
+        </div>
+        <div className="profile-identity">
+          <h1 id="profile-title">{profileName}</h1>
+          {authUser.username && <p>{authUser.fullName}</p>}
+        </div>
+
+        <dl className="profile-stats" aria-label="Profile listing summary">
+          <div><dt>Listings</dt><dd>{myListings.length}</dd></div>
+          <div><dt>Items</dt><dd>{itemCount}</dd></div>
+          <div><dt>Accommodation</dt><dd>{accommodationCount}</dd></div>
+        </dl>
+
+        {photoError && <p className="profile-photo-error" role="alert">{photoError}</p>}
+        {pendingPhoto && (
+          <div className="profile-photo-actions" aria-label="Save selected profile photo">
+            <button className="profile-save-photo" type="button" onClick={handleSavePhoto} disabled={isUpdatingProfile}>
+              <Check aria-hidden="true" /> {isUpdatingProfile ? "Saving…" : "Save photo"}
+            </button>
+            <button className="profile-cancel-photo" type="button" onClick={cancelPhotoSelection} disabled={isUpdatingProfile}>
+              <X aria-hidden="true" /> Cancel
+            </button>
+          </div>
         )}
+        <button className="profile-secondary-action" type="button" onClick={() => navigate("/profile/settings")}>
+          <Pencil aria-hidden="true" /> Edit profile
+        </button>
       </section>
 
-      <div className="menu-section">
-        {/* Upcoming Features */}
-        {/* <button className="menu-btn">Purchase History</button>
-        <button className="menu-btn">Language</button> */}
-
-        <button className="menu-btn logout" onClick={handleLogoutClick}>
-          <LogOut size={18} style={{ marginRight: "6px" }} />
-          Log Out
-        </button>
-      </div>
-
-      {showLogoutConfirm && (
-        <div className="confirm-overlay">
-          <div className="confirm-box">
-            <p>Are you sure you want to log out?</p>
-
-            <div className="confirm-buttons">
-              <button className="cancel-btn" onClick={handleCancelLogout}>
-                Cancel
-              </button>
-              <button className="yes-btn" onClick={handleConfirmLogout}>
-                Yes
-              </button>
-            </div>
-          </div>
+      <section className="profile-listings-panel">
+        <div className="profile-section-heading">
+          <div><h2>Your listings</h2></div>
         </div>
-      )}
-
-      {showRemovePhotoConfirm && (
-        <div className="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="remove-photo-title">
-          <div className="confirm-box">
-            <p id="remove-photo-title">Remove your profile photo?</p>
-            <span className="confirm-description">Your default profile icon will be shown across UniMarket.</span>
-            <div className="confirm-buttons">
-              <button className="cancel-btn" type="button" onClick={() => setShowRemovePhotoConfirm(false)} disabled={isRemovingProfilePhoto}>
-                Cancel
-              </button>
-              <button className="yes-btn" type="button" onClick={handleRemovePhoto} disabled={isRemovingProfilePhoto}>
-                {isRemovingProfilePhoto ? "Removing..." : "Remove"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        {loadingItems ? (
+          <LoadingSpinner className="profile-items-loading" label="Loading your listings…" />
+        ) : itemsError ? (
+          <p className="profile-items-error" role="alert">{itemsError}</p>
+        ) : myListings.length === 0 ? (
+          <div className="profile-empty-state"><strong>No listings yet</strong><p>Your items and accommodation posts will appear here.</p></div>
+        ) : (
+          <ItemCarousel
+            items={myListings}
+            onItemsChange={(listingId) => setMyListings((listings) =>
+              listings.filter((listing) => String(listing._id || listing.id) !== String(listingId))
+            )}
+          />
+        )}
+      </section>
+    </main>
   );
 }

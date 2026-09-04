@@ -42,7 +42,8 @@
   overflow-wrap: anywhere;
   white-space: normal;
 }
-.ip-card-price { width: fit-content; padding: 4px 8px; border: 1px solid rgba(16,129,81,.2); border-radius: var(--radius-pill); background: rgba(16,185,129,.1); color: #087443; font-size: .75rem; font-weight: 800; }
+.ip-title-price { width: 100%; }
+.ip-card-price { flex: 0 0 auto; }
 .ip-seller { min-width: 0; display: flex; align-items: center; gap: 7px; margin-top: auto; color: var(--color-text-muted); font-size: .78rem; }
 .ip-seller span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ip-seller-avatar { width: 24px; height: 24px; flex: 0 0 auto; border: 1px solid var(--color-border); border-radius: 50%; object-fit: cover; }

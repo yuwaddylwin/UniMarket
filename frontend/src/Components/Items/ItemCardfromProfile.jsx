@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import ProfileAvatar from "../common/ProfileAvatar";
 import { normalizeSeller } from "../Logics/useItemsList";
+import { formatListingPrice } from "../common/listingPrice";
+import "../common/ListingPrice.css";
 import { normalizeAccommodationSeller } from "../Logics/useAccommodations";
 import "./ItemCardfromProfile.css";
 
@@ -17,11 +19,12 @@ function getCoverSrc(item) {
   return url;
 }
 
-export default function ItemCard({ item, onDeleteItem }) {
+export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveMode = false }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const menuRef = useRef(null);
 
   const coverSrc = getCoverSrc(item);
@@ -75,9 +78,10 @@ export default function ItemCard({ item, onDeleteItem }) {
     try {
       setIsDeleting(true);
 
-      await axiosInstance.delete(`/items/${itemId}`);
+      const resource = isAccommodation ? "accommodations" : "items";
+      await axiosInstance.delete(`/${resource}/${itemId}`);
 
-      toast.success("Item deleted");
+      toast.success("Listing deleted");
       setConfirmOpen(false);
       onDeleteItem?.(itemId);
     } catch (err) {
@@ -90,20 +94,37 @@ export default function ItemCard({ item, onDeleteItem }) {
     }
   };
 
+  const handleStatusChange = async () => {
+    if (!itemId) return;
+    const nextStatus = archiveMode ? "active" : "sold";
+    const resource = isAccommodation ? "accommodations" : "items";
+    try {
+      setIsUpdatingStatus(true);
+      await axiosInstance.patch(`/${resource}/${itemId}/status`, { status: nextStatus });
+      toast.success(archiveMode ? "Listing restored" : "Listing moved to Archive");
+      setMenuOpen(false);
+      onArchiveChange?.(itemId);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Unable to update listing status");
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
   return (
     <div
       className="profile-item-card"
-      onClick={openListing}
+      onClick={archiveMode ? undefined : openListing}
       onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
+        if (!archiveMode && (event.key === "Enter" || event.key === " ")) {
           event.preventDefault();
           openListing();
         }
       }}
-      role="link"
-      tabIndex={0}
+      role={archiveMode ? "article" : "link"}
+      tabIndex={archiveMode ? undefined : 0}
     >
-      {!isAccommodation && <div className="profile-item-actions" ref={menuRef}>
+      <div className="profile-item-actions" ref={menuRef}>
         <button
           type="button"
           className="profile-kebab-btn"
@@ -113,38 +134,49 @@ export default function ItemCard({ item, onDeleteItem }) {
             event.stopPropagation();
             setMenuOpen((v) => !v);
           }}
-          disabled={isDeleting}
+          disabled={isDeleting || isUpdatingStatus}
         >
           ⋮
         </button>
 
         {menuOpen && (
           <div className="profile-kebab-menu" role="menu" aria-label={`Actions for ${title}`}>
-            <button
+            {!archiveMode && <button
               type="button"
               className="profile-kebab-item"
               onClick={(event) => {
                 event.stopPropagation();
                 handleEdit();
               }}
-              disabled={isDeleting}
+              disabled={isDeleting || isUpdatingStatus}
             >
               Edit
-            </button>
-            <button
+            </button>}
+            {!archiveMode && <button
               type="button"
               className="profile-kebab-item danger"
               onClick={(event) => {
                 event.stopPropagation();
                 handleDeleteClick();
               }}
-              disabled={isDeleting}
+              disabled={isDeleting || isUpdatingStatus}
             >
               Delete
+            </button>}
+            <button
+              type="button"
+              className="profile-kebab-item"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleStatusChange();
+              }}
+              disabled={isDeleting || isUpdatingStatus}
+            >
+              {isUpdatingStatus ? "Saving…" : archiveMode ? "Restore listing" : "Mark as done"}
             </button>
           </div>
         )}
-      </div>}
+      </div>
 
       <div className="profile-item-img">
         <img
@@ -152,13 +184,14 @@ export default function ItemCard({ item, onDeleteItem }) {
           alt={title}
           onError={(e) => (e.currentTarget.src = "/Images/placeholder.png")}
         />
+        {archiveMode && <span className="profile-item-sold-badge">Sold · Archived</span>}
       </div>
 
       <div className="profile-item-body">
-        <div className="profile-item-title-row">
+        <div className="profile-item-title-row listing-title-price-row">
           <h3 className="profile-item-title">{title}</h3>
-          <p className="profile-item-price">
-            ฿{Number(item?.price || 0).toLocaleString()}
+          <p className="profile-item-price listing-price">
+            {formatListingPrice(item?.price, isAccommodation ? item?.pricePeriod || "month" : undefined)}
           </p>
         </div>
         <p className="profile-item-kind">
@@ -171,7 +204,7 @@ export default function ItemCard({ item, onDeleteItem }) {
             profilePic={seller.profilePic}
             alt={seller.fullName}
           />
-          <span>Listed by {seller.fullName}</span>
+          <span>{seller.fullName}</span>
         </div>}
       </div>
 

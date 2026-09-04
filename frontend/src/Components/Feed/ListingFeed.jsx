@@ -11,8 +11,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import ProfileAvatar from "../common/ProfileAvatar";
 import LoadingSpinner from "../common/LoadingSpinner";
+import { formatListingPrice } from "../common/listingPrice";
 import { useAuthStore } from "../store/useAuthStore";
 import FeedDescription from "./FeedDescription";
+import "../common/ListingPrice.css";
 import "./ListingFeed.css";
 
 const ITEM_PLACEHOLDER = "/Images/placeholder.png";
@@ -191,13 +193,11 @@ function ListingFeedPost({ listing, listingType, isMine, onAddToCart, onChat }) 
     setFullscreen(false);
   };
 
-  const numericPrice = Number(listing?.price);
-  const price = Number.isFinite(numericPrice)
-    ? `${new Intl.NumberFormat("en-US").format(numericPrice)} Baht${isAccommodation ? ` / ${listing.pricePeriod || "month"}` : ""}`
-    : "Price on request";
-  const meta = isAccommodation
-    ? listing.location
-    : listing.category;
+  const price = formatListingPrice(
+    listing?.price,
+    isAccommodation ? listing.pricePeriod || "month" : undefined
+  );
+  const meta = isAccommodation ? listing.location : null;
 
   return (
     <article className="listing-feed-post" data-listing-id={listing._id || listing.id}>
@@ -286,9 +286,9 @@ function ListingFeedPost({ listing, listingType, isMine, onAddToCart, onChat }) 
           {isMine && <span className="listing-feed-own-note">This is your listing</span>}
         </div>
 
-        <div className="listing-feed-heading">
+        <div className="listing-feed-heading listing-title-price-row">
           <h2>{listing.title || listing.name || "Untitled listing"}</h2>
-          <strong>{price}</strong>
+          <strong className="listing-price">{price}</strong>
         </div>
 
         <FeedDescription description={listing?.description} sellerName={sellerName} />

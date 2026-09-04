@@ -1,6 +1,7 @@
-import { ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProfileAvatar from "../common/ProfileAvatar";
+import { formatListingPrice } from "../common/listingPrice";
+import "../common/ListingPrice.css";
 import "./ItemsList.css";
 
 const API_BASE = "http://localhost:8000";
@@ -38,10 +39,12 @@ export default function ItemListingCard({ item, showTypeLabel = false }) {
           onError={(event) => { event.currentTarget.src = "/Images/placeholder.png"; }}
         />
         {showTypeLabel && <span className="item-type-badge">Item</span>}
-        <div className="item-price">{item.price} Baht</div>
       </div>
       <div className="item-body">
-        <h3 className="item-title">{item.title}</h3>
+        <div className="item-title-price listing-title-price-row">
+          <h3 className="item-title">{item.title}</h3>
+          <div className="item-price listing-price">{formatListingPrice(item.price)}</div>
+        </div>
         {item?.seller?.fullName && (
           <div className="seller-row">
             <ProfileAvatar
@@ -50,14 +53,10 @@ export default function ItemListingCard({ item, showTypeLabel = false }) {
               alt={item.seller.fullName}
               loading="lazy"
             />
-            <span className="seller-name">Listed by {item.seller.fullName}</span>
+            <span className="seller-name">{item.seller.fullName}</span>
           </div>
         )}
         <p className="item-desc">{item.description}</p>
-        <div className="item-card-footer" aria-hidden="true">
-          <span>View details</span>
-          <ArrowUpRight />
-        </div>
       </div>
     </article>
   );

@@ -4,6 +4,11 @@ import {
   login,
   logout,
   updateProfile,
+  updateProfileDetails,
+  updatePreferences,
+  getBlockedUsers,
+  blockUser,
+  unblockUser,
   removeProfilePhoto,
   checkAuth,
   verifyEmail,
@@ -23,18 +28,27 @@ router.post("/resend-verification", resendVerificationEmail);
 router.post("/logout", logout);
 
 router.post("/update-profile", ProtectRoute, updateProfile);
+router.patch("/profile", ProtectRoute, updateProfileDetails);
+router.patch("/preferences", ProtectRoute, updatePreferences);
+router.get("/blocked-users", ProtectRoute, getBlockedUsers);
+router.post("/blocked-users/:userId", ProtectRoute, blockUser);
+router.delete("/blocked-users/:userId", ProtectRoute, unblockUser);
 router.delete("/profile-photo", ProtectRoute, removeProfilePhoto);
 
 router.get("/check", ProtectRoute, checkAuth);
 
-// new route
 router.get("/me", ProtectRoute, (req, res) => {
-  // return only what frontend needs
   res.json({
     _id: req.user._id,
     fullName: req.user.fullName,
-    profilePic: req.user.profilePic,
+    username: req.user.username || "",
+    profilePic: req.user.profilePic || "",
     email: req.user.email,
+    preferences: {
+      language: req.user.preferences?.language || "en",
+      messages: req.user.preferences?.messages !== false,
+      notifications: req.user.preferences?.notifications !== false,
+    },
   });
 });
 

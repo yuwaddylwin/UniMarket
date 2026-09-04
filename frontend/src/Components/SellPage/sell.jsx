@@ -23,7 +23,7 @@ function Sell() {
     handleCancel,
   } = useSellLogic();
 
-  const isAccommodation = listingType === "accommodation" && !isEditMode;
+  const isAccommodation = listingType === "accommodation";
   const currentListing = isAccommodation ? accommodation : item;
 
   return (
@@ -31,7 +31,7 @@ function Sell() {
       <div className="post-container">
         <header className="post-header">
           <span className="post-eyebrow">Create a listing</span>
-          <h1 className="post-title">{isEditMode ? "Edit your item" : "What do you want to post?"}</h1>
+          <h1 className="post-title">{isEditMode ? `Edit your ${isAccommodation ? "accommodation" : "item"}` : "What do you want to post?"}</h1>
           <p>{isEditMode ? "Update your listing details below." : "Choose a listing type and share it with your university community."}</p>
         </header>
 

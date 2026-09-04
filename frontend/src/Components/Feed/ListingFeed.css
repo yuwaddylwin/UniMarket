@@ -34,9 +34,9 @@
 .listing-feed-actions button.is-primary { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
 .listing-feed-actions button.is-primary:hover { background: var(--color-primary-hover); }
 .listing-feed-own-note { padding: 7px 10px; border-radius: 9px; background: #f2f4f7; color: #667085; font-size: .72rem; font-weight: 750; }
-.listing-feed-heading { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-top: 12px; }
+.listing-feed-heading { min-width: 0; display: flex; align-items: baseline; justify-content: flex-start; gap: 7px; margin-top: 12px; }
 .listing-feed-heading h2 { min-width: 0; margin: 0; color: #182230; font-size: 1rem; line-height: 1.35; overflow-wrap: anywhere; }
-.listing-feed-heading > strong { flex: 0 0 auto; color: #087443; font-size: .78rem; white-space: nowrap; }
+.listing-feed-heading > strong { flex: 0 0 auto; }
 .listing-feed-description-shell { display: block; width: 100%; height: auto; }
 .listing-feed-description { margin: 10px 0 0; color: #485467; font-size: .82rem; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
 .listing-feed-description > strong { color: #182230; }
@@ -59,7 +59,6 @@
   .listing-feed-owner { padding-inline: 13px; }
   .listing-feed-content { padding: 14px 13px 19px; }
   .listing-feed-actions button { flex: 1 1 150px; }
-  .listing-feed-heading { flex-direction: column; gap: 5px; }
   .listing-feed-missing { border-width: 0 0 1px; }
 }
 

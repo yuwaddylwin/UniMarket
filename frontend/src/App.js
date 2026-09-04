@@ -6,6 +6,7 @@ import Sell from "./Components/SellPage/sell";
 import CartPage from "./Components/BottomNavBar/ShoppingCart/CartPage";
 import ProductsDetails from "./Components/Products/ProductsDetails";
 import ProfilePage from "./Components/Profile/forms/ProfilePage";
+import ProfileSettingsPage from "./Components/Profile/forms/ProfileSettingsPage";
 import LoginForm from "./Components/Profile/forms/LoginForm";
 import SignUpForm from "./Components/Profile/forms/SignUpForm";
 import ChatHomePage from "./Components/Chat/ChatHomePage";
@@ -15,6 +16,7 @@ import AccommodationDetails from "./Components/Accommodation/AccommodationDetail
 import SearchPage from "./Components/Search/SearchPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ResendVerificationPage from "./pages/ResendVerificationPage";
+import { PrivacyPage, TermsPage } from "./pages/LegalPage";
 
 import { useHomeLogic } from "./Components/Logics/useHome";
 import { useAuthStore } from "./Components/store/useAuthStore";
@@ -27,12 +29,16 @@ import "./App.css";
 
 export default function App() {
   const [cartItems, setCartItems] = useState([]);
-  const { checkAuth, isCheckingAuth } = useAuthStore();
+  const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
   const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    document.documentElement.lang = authUser?.preferences?.language || "en";
+  }, [authUser?.preferences?.language]);
 
   if (isCheckingAuth) {
     return (
@@ -71,10 +77,20 @@ export default function App() {
           />
           <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/profile/settings"
+            element={
+              <RequireAuth>
+                <ProfileSettingsPage />
+              </RequireAuth>
+            }
+          />
           <Route path="/products" element={<ItemsPage AddtoCart={AddtoCart} />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/accommodations" element={<AccommodationsPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetails />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
           <Route path="/products/:id"
             element={
               <ProductsDetails

@@ -6,6 +6,8 @@ import {
   getItems,
   getItemById,
   getMyItems,
+  getMyArchivedItems,
+  updateItemStatus,
   updateItem,
   deleteItem,
 } from "../controllers/items.controller.js";
@@ -25,10 +27,12 @@ const uploadItemImages = (req, res, next) => {
 
 router.get("/", getItems);
 router.get("/mine", ProtectRoute, getMyItems);
+router.get("/mine/archive", ProtectRoute, getMyArchivedItems);
 router.get("/:id", getItemById);
 
 router.post("/", ProtectRoute, uploadItemImages, createItem);
 router.put("/:id", ProtectRoute, uploadItemImages, updateItem);
+router.patch("/:id/status", ProtectRoute, updateItemStatus);
 
 router.delete("/:id", ProtectRoute, deleteItem);
 

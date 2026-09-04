@@ -1,5 +1,7 @@
 import "./footer.css";
 import { ArrowUpRight, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CONTACT } from "../../config/contact";
 
 export default function Footer() {
   return (
@@ -15,24 +17,24 @@ export default function Footer() {
           <h4>Help</h4>
           <ul>
             <li><a href="/#home-discovery">How it works <ArrowUpRight aria-hidden="true" /></a></li>
-            <li><a href="mailto:unimarket.app.official@gmail.com?subject=UniMarket%20Safety">Safety help <ArrowUpRight aria-hidden="true" /></a></li>
-            <li><a href="mailto:unimarket.app.official@gmail.com?subject=UniMarket%20Support">Get support <ArrowUpRight aria-hidden="true" /></a></li>
+            <li><Link to="/privacy">Privacy <ArrowUpRight aria-hidden="true" /></Link></li>
+            <li><Link to="/terms">Terms <ArrowUpRight aria-hidden="true" /></Link></li>
           </ul>
         </section>
 
         <section className="footer-section footer-contact">
           <h4>Contact</h4>
-          <a href="mailto:unimarket.app.official@gmail.com">
+          <a href={CONTACT.emailHref}>
             <Mail aria-hidden="true" />
-            <span>unimarket.app.official@gmail.com</span>
+            <span>{CONTACT.email}</span>
           </a>
-          <a href="tel:+66817374337">
+          <a href={CONTACT.phoneHref}>
             <Phone aria-hidden="true" />
-            <span>+66 817-374-337</span>
+            <span>{CONTACT.phone}</span>
           </a>
           <p>
             <MapPin aria-hidden="true" />
-            <span>Bangkok, Thailand</span>
+            <span>{CONTACT.address}</span>
           </p>
         </section>
       </div>

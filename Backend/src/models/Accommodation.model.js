@@ -5,6 +5,8 @@ const accommodationSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     location: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
+    status: { type: String, enum: ["active", "sold"], default: "active", index: true },
+    soldAt: { type: Date, default: null },
     pricePeriod: {
       type: String,
       required: true,

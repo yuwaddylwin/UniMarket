@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import "./ItemsPage.css";
+import "../common/ListingPrice.css";
 import { useItemsList } from "../Logics/useItemsList";
+import { formatListingPrice } from "../common/listingPrice";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ProfileAvatar from "../common/ProfileAvatar";
@@ -112,8 +114,10 @@ export default function ItemsPage() {
                   />
                 </div>
                 <div className="ip-card-body">
-                  <div className="ip-card-price">{item.price} Baht</div>
-                  <h3>{item.title}</h3>
+                  <div className="ip-title-price listing-title-price-row">
+                    <h3>{item.title}</h3>
+                    <div className="ip-card-price listing-price">{formatListingPrice(item.price)}</div>
+                  </div>
                   {item?.seller?.fullName && (
                     <div className="ip-seller">
                       <ProfileAvatar

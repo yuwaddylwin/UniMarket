@@ -73,16 +73,31 @@ export function useSellLogic() {
       return;
     }
 
-    setListingType("item");
+    const type = editPayload?.listingType === "accommodation" ? "accommodation" : "item";
+    setListingType(type);
     setIsEditMode(true);
     setEditingId(editPayload?._id || editPayload?.id || null);
-    setItem({
-      images: normalizeImages(editPayload.images),
-      name: editPayload.title || editPayload.name || "",
-      category: editPayload.category || "",
-      price: editPayload.price ?? 0,
-      description: editPayload.description || "",
-    });
+    if (type === "accommodation") {
+      setAccommodation({
+        images: normalizeImages(editPayload.images),
+        title: editPayload.title || "",
+        location: editPayload.location || "",
+        price: editPayload.price ?? 0,
+        pricePeriod: editPayload.pricePeriod || "month",
+        description: editPayload.description || "",
+        accommodationType: editPayload.accommodationType || "",
+        bedrooms: editPayload.bedrooms ?? "",
+        contactInfo: editPayload.contactInfo || "",
+      });
+    } else {
+      setItem({
+        images: normalizeImages(editPayload.images),
+        name: editPayload.title || editPayload.name || "",
+        category: editPayload.category || "",
+        price: editPayload.price ?? 0,
+        description: editPayload.description || "",
+      });
+    }
   }, [editPayload]);
 
   const handleListingTypeChange = (type) => {
@@ -212,7 +227,10 @@ export function useSellLogic() {
     if (accommodation.bedrooms !== "" && !/^\d+$/.test(String(accommodation.bedrooms))) {
       throw new Error("Bedrooms must be a valid whole number.");
     }
-    if (!accommodation.images.some((image) => image.file)) {
+    const hasImage = accommodation.images.some(
+      (image) => image.file || (isEditMode && image.publicId)
+    );
+    if (!hasImage) {
       throw new Error("Please upload at least one accommodation image.");
     }
 
@@ -227,6 +245,19 @@ export function useSellLogic() {
       "bedrooms",
       "contactInfo",
     ].forEach((field) => formData.append(field, accommodation[field]));
+    if (isEditMode) {
+      const existing = accommodation.images
+        .filter((image) => !image.file && image.publicId)
+        .map((image) => ({ url: image.url, publicId: image.publicId }));
+      formData.append("existingImages", JSON.stringify(existing));
+      if (!editingId) throw new Error("Missing accommodation id for edit.");
+      appendNewImages(formData, accommodation.images);
+      await axiosInstance.put(`/accommodations/${editingId}`, formData);
+      toast.success("Accommodation updated successfully");
+      navigate(-1);
+      return;
+    }
+
     appendNewImages(formData, accommodation.images);
 
     await axiosInstance.post("/accommodations", formData);
@@ -242,7 +273,7 @@ export function useSellLogic() {
     setIsSubmitting(true);
 
     try {
-      if (listingType === "accommodation" && !isEditMode) await submitAccommodation();
+      if (listingType === "accommodation") await submitAccommodation();
       else await submitItem();
     } catch (error) {
       console.error(error);

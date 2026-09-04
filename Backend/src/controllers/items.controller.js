@@ -158,7 +158,7 @@ export const createItem = async (req, res) => {
 
 export const getItems = async (req, res) => {
   try {
-    const items = await Item.find()
+    const items = await Item.find({ status: { $ne: "sold" } })
       .sort({ createdAt: -1 })
       .populate("user", "fullName username name email profilePic avatar photo")
       .lean();
@@ -191,7 +191,7 @@ export const getMyItems = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const items = await Item.find({ user: req.user._id })
+    const items = await Item.find({ user: req.user._id, status: { $ne: "sold" } })
       .sort({ createdAt: -1 })
       .populate("user", "fullName username name email profilePic avatar photo")
       .lean();
@@ -220,7 +220,7 @@ export const getMyItems = async (req, res) => {
 
 export const getItemById = async (req, res) => {
   try {
-    const item = await Item.findById(req.params.id)
+    const item = await Item.findOne({ _id: req.params.id, status: { $ne: "sold" } })
       .populate("user", "fullName username name email profilePic avatar photo")
       .lean();
 
@@ -241,6 +241,45 @@ export const getItemById = async (req, res) => {
     return res.status(200).json({ ...item, seller });
   } catch (err) {
     return res.status(400).json({ message: err.message || "Error fetching item" });
+  }
+};
+
+export const getMyArchivedItems = async (req, res) => {
+  try {
+    if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
+    const items = await Item.find({ user: req.user._id, status: "sold" })
+      .sort({ soldAt: -1, updatedAt: -1 })
+      .populate("user", "fullName username name email profilePic avatar photo")
+      .lean();
+    return res.status(200).json(items.map((item) => {
+      const user = item.user && typeof item.user === "object" ? item.user : null;
+      return {
+        ...item,
+        seller: user ? buildSellerSnapshot(user) : item.seller || null,
+      };
+    }));
+  } catch (error) {
+    return res.status(500).json({ message: error.message || "Error fetching archived items" });
+  }
+};
+
+export const updateItemStatus = async (req, res) => {
+  try {
+    const status = req.body?.status;
+    if (!["active", "sold"].includes(status)) {
+      return res.status(400).json({ message: "Status must be active or sold" });
+    }
+    const item = await Item.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    if (String(item.user) !== String(req.user?._id)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    item.status = status;
+    item.soldAt = status === "sold" ? new Date() : null;
+    await item.save();
+    return res.status(200).json({ message: status === "sold" ? "Item archived" : "Item restored", item });
+  } catch (error) {
+    return res.status(400).json({ message: error.message || "Unable to update item status" });
   }
 };
 

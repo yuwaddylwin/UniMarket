@@ -15,6 +15,8 @@ export const useAuthStore = create((set, get) => ({
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
+  isUpdatingAccount: false,
+  isUpdatingPreferences: false,
   isRemovingProfilePhoto: false,
   isCheckingAuth: true,
   socket: null,
@@ -106,6 +108,36 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  updateAccount: async (data) => {
+    set({ isUpdatingAccount: true });
+    try {
+      const res = await axiosInstance.patch("/auth/profile", { fullName: data.fullName });
+      set({ authUser: res.data });
+      toast.success("Profile settings updated");
+      return res.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to update your profile. Please try again.");
+      throw error;
+    } finally {
+      set({ isUpdatingAccount: false });
+    }
+  },
+
+  updatePreferences: async (preferences) => {
+    set({ isUpdatingPreferences: true });
+    try {
+      const res = await axiosInstance.patch("/auth/preferences", preferences);
+      set({ authUser: res.data });
+      toast.success("Preferences saved");
+      return res.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to save preferences");
+      throw error;
+    } finally {
+      set({ isUpdatingPreferences: false });
+    }
+  },
+
   removeProfilePhoto: async () => {
     set({ isRemovingProfilePhoto: true });
     try {
@@ -141,6 +173,8 @@ export const useAuthStore = create((set, get) => ({
 
     newSocket.on("newMessage", (message) => {
       if (!message?.senderName) return;
+      const preferences = get().authUser?.preferences;
+      if (preferences?.messages === false || preferences?.notifications === false) return;
       toast.success(`${message.senderName} sent you a message`);
     });
 

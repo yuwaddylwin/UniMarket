@@ -6,6 +6,8 @@ const itemSchema = new mongoose.Schema(
     category: { type: String, required: true },
     description: { type: String, required: true, trim: true },
     price: { type: Number, required: true },
+    status: { type: String, enum: ["active", "sold"], default: "active", index: true },
+    soldAt: { type: Date, default: null },
 
     images: [
       {

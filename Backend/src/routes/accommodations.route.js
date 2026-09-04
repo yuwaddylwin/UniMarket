@@ -1,9 +1,13 @@
 import express from "express";
 import {
   createAccommodation,
+  deleteAccommodation,
   getAccommodations,
   getAccommodationById,
   getMyAccommodations,
+  getMyArchivedAccommodations,
+  updateAccommodationStatus,
+  updateAccommodation,
 } from "../controllers/accommodations.controller.js";
 import { ProtectRoute } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/upload.middleware.js";
@@ -22,7 +26,11 @@ const uploadAccommodationImages = (req, res, next) => {
 
 router.get("/", getAccommodations);
 router.get("/mine", ProtectRoute, getMyAccommodations);
+router.get("/mine/archive", ProtectRoute, getMyArchivedAccommodations);
 router.get("/:id", getAccommodationById);
 router.post("/", ProtectRoute, uploadAccommodationImages, createAccommodation);
+router.put("/:id", ProtectRoute, uploadAccommodationImages, updateAccommodation);
+router.patch("/:id/status", ProtectRoute, updateAccommodationStatus);
+router.delete("/:id", ProtectRoute, deleteAccommodation);
 
 export default router;

@@ -4,6 +4,7 @@ import { useAuthStore } from "./Components/store/useAuthStore";
 jest.mock("./Components/lib/axios.js", () => ({
   axiosInstance: {
     post: jest.fn(),
+    patch: jest.fn(),
     delete: jest.fn(),
   },
   setAuthToken: jest.fn(),
@@ -25,12 +26,46 @@ const userWithPhoto = {
 
 beforeEach(() => {
   axiosInstance.post.mockReset();
+  axiosInstance.patch.mockReset();
   axiosInstance.delete.mockReset();
   useAuthStore.setState({
     authUser: userWithoutPhoto,
     isUpdatingProfile: false,
     isRemovingProfilePhoto: false,
+    isUpdatingPreferences: false,
   });
+});
+
+test("updating account details immediately updates authenticated user state", async () => {
+  const updatedUser = {
+    ...userWithoutPhoto,
+    fullName: "Updated User",
+    username: "updated.user",
+  };
+  axiosInstance.patch.mockResolvedValue({ data: updatedUser });
+
+  await useAuthStore.getState().updateAccount({
+    fullName: "Updated User",
+    username: "updated.user",
+  });
+
+  expect(axiosInstance.patch).toHaveBeenCalledWith("/auth/profile", {
+    fullName: "Updated User",
+  });
+  expect(useAuthStore.getState().authUser).toEqual(updatedUser);
+  expect(useAuthStore.getState().isUpdatingAccount).toBe(false);
+});
+
+test("persisting preferences immediately updates authenticated user state", async () => {
+  const preferences = { language: "th", messages: false, notifications: true };
+  const updatedUser = { ...userWithoutPhoto, preferences };
+  axiosInstance.patch.mockResolvedValue({ data: updatedUser });
+
+  await useAuthStore.getState().updatePreferences(preferences);
+
+  expect(axiosInstance.patch).toHaveBeenCalledWith("/auth/preferences", preferences);
+  expect(useAuthStore.getState().authUser).toEqual(updatedUser);
+  expect(useAuthStore.getState().isUpdatingPreferences).toBe(false);
 });
 
 test("uploading a profile photo immediately updates authenticated user state", async () => {
