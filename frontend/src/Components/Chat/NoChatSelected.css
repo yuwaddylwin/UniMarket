@@ -9,24 +9,44 @@
 .no-chat-content {
   text-align: center;
   opacity: 0.9;
+  font-family: var(--font-ui);
 }
 
 /* CHAT ICON */
 .chat-icon {
-  color: #1b4a91;
+  color: var(--color-primary);
   margin-bottom: 14px;
 }
 
 /* TITLE */
 .no-chat-content h2 {
+  margin: 0 0 7px;
+  color: var(--color-text);
+  font-family: var(--font-ui);
   font-size: 22px;
   font-weight: 600;
-  color: #1b4a91;
-  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.no-chat-welcome {
+  color: var(--color-text-secondary);
+}
+
+.no-chat-brand {
+  color: var(--color-primary);
+  font-family: var(--font-brand);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.no-chat-brand span {
+  color: var(--color-text);
 }
 
 /* SUBTEXT */
 .no-chat-content p {
+  margin: 0;
   font-size: 14px;
-  color: #3e79ca;
+  font-weight: 500;
+  color: var(--color-text-muted);
 }

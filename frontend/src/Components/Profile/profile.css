@@ -60,7 +60,7 @@
   
   /* Title */
   .login-form h1 {
-    color: #1b4a91;
+    color: var(--color-primary);
     margin-bottom: 25px;
     font-size: 32px;
     font-weight: 600;
@@ -145,7 +145,7 @@
   }
   
   .login-form button[type="submit"]:hover {
-    background-color: #3e79ca;
+    background-color: var(--color-primary-muted);
   }
 
   p{

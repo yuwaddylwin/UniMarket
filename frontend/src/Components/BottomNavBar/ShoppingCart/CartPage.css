@@ -6,7 +6,7 @@
 .cart-page ul { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
 .cart-page li { min-width: 0; display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; box-shadow: var(--shadow-xs); transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition); }
 .cart-page li:hover { border-color: rgba(27,74,145,.22); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
-.cart-page li img { width: 84px; height: 72px; border-radius: var(--radius-sm); background: #eef1f5; object-fit: cover; }
+.cart-page li img { width: 84px; height: 72px; border-radius: var(--radius-sm); background: var(--color-surface-subtle); object-fit: cover; }
 .cart-title { min-width: 0; overflow: hidden; color: var(--color-text); font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
 .cart-price { color: #087443; font-size: .88rem; font-weight: 800; white-space: nowrap; }
 .cart-page-btns { grid-column: 2 / -1; display: flex; justify-content: flex-end; gap: 9px; }
@@ -16,7 +16,7 @@
 .talk-btn:hover, .cart-empty button:hover { background: var(--color-primary-hover); }
 .delete-btn { border: 1px solid #e3a8a3; background: #fff; color: #a52a22; }
 .delete-btn:hover { background: #fff5f4; }
-.cart-empty { min-height: 340px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; border: 1px dashed #cfd6e2; border-radius: var(--radius-md); background: #fafbfc; text-align: center; }
+.cart-empty { min-height: 340px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; border: 1px dashed var(--color-border); border-radius: var(--radius-md); background: #fafbfc; text-align: center; }
 .cart-empty h2 { margin: 0 0 6px; color: var(--color-text); font-size: 1.25rem; }
 .cart-empty p { margin: 0 0 20px; color: var(--color-text-muted); font-size: .92rem; }
 

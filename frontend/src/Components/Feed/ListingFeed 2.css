@@ -1,17 +1,17 @@
-.listing-feed-page { width: 100%; min-width: 0; min-height: 100vh; padding: 0 14px 24px; background: #eef1f4; }
+.listing-feed-page { width: 100%; min-width: 0; min-height: 100vh; padding: 0 14px 24px; background: var(--color-surface-subtle); }
 .listing-feed { width: min(100%, 680px); display: flex; flex-direction: column; gap: 0; margin: 0 auto; background: #fff; }
 .listing-feed-post { overflow: hidden; border: 1px solid rgba(17, 24, 39, .11); border-radius: 0; background: #fff; box-shadow: none; }
 .listing-feed-post + .listing-feed-post { border-top: 0; }
 .listing-feed-owner { min-width: 0; min-height: 70px; display: flex; align-items: center; gap: 11px; padding: 12px 15px; }
-.listing-feed-avatar { width: 42px; height: 42px; flex: 0 0 auto; border: 2px solid #fff; border-radius: 50%; object-fit: cover; background: #eef1f5; box-shadow: 0 0 0 1px rgba(27, 74, 145, .22); }
+.listing-feed-avatar { width: 42px; height: 42px; flex: 0 0 auto; border: 2px solid #fff; border-radius: 50%; object-fit: cover; background: var(--color-surface-subtle); box-shadow: 0 0 0 1px rgba(27, 74, 145, .22); }
 .listing-feed-owner > div { min-width: 0; display: flex; flex: 1; flex-direction: column; gap: 2px; }
 .listing-feed-owner strong { overflow: hidden; color: #182230; font-size: .86rem; text-overflow: ellipsis; white-space: nowrap; }
-.listing-feed-owner > div span { min-width: 0; display: flex; align-items: center; gap: 3px; overflow: hidden; color: #7a8596; font-size: .7rem; text-overflow: ellipsis; white-space: nowrap; }
+.listing-feed-owner > div span { min-width: 0; display: flex; align-items: center; gap: 3px; overflow: hidden; color: var(--color-text-muted); font-size: .7rem; text-overflow: ellipsis; white-space: nowrap; }
 .listing-feed-owner-badge { flex: 0 0 auto; padding: 5px 8px; border: 1px solid rgba(16, 129, 81, .18); border-radius: 999px; background: rgba(16, 185, 129, .09); color: #087443; font-size: .65rem; font-weight: 800; }
-.listing-feed-gallery { position: relative; width: 100%; aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; background: #eef1f4; touch-action: pan-y; }
+.listing-feed-gallery { position: relative; width: 100%; aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; background: var(--color-surface-subtle); touch-action: pan-y; }
 .listing-feed-gallery > img { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; user-select: none; }
 .listing-feed-gallery-arrow,
-.listing-feed-lightbox-arrow { position: absolute; top: 50%; z-index: 2; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; transform: translateY(-50%); border: 1px solid rgba(17, 24, 39, .11); border-radius: 50%; background: rgba(255, 255, 255, .92); color: #344054; cursor: pointer; box-shadow: 0 5px 16px rgba(17, 24, 39, .13); }
+.listing-feed-lightbox-arrow { position: absolute; top: 50%; z-index: 2; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; transform: translateY(-50%); border: 1px solid rgba(17, 24, 39, .11); border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--color-text-secondary); cursor: pointer; box-shadow: 0 5px 16px rgba(17, 24, 39, .13); }
 .listing-feed-gallery-arrow.is-left,
 .listing-feed-lightbox-arrow.is-left { left: 12px; }
 .listing-feed-gallery-arrow.is-right,
@@ -32,7 +32,7 @@
 .listing-feed-description { margin: 10px 0 0; color: #485467; font-size: .82rem; line-height: 1.55; overflow-wrap: anywhere; white-space: pre-wrap; }
 .listing-feed-description > strong { color: #182230; }
 .listing-feed-description button { margin-left: 4px; padding: 0; border: 0; background: transparent; color: #7b8492; font: inherit; font-weight: 750; cursor: pointer; }
-.listing-feed-extra { margin: 8px 0 0; color: #7a8596; font-size: .72rem; font-weight: 650; }
+.listing-feed-extra { margin: 8px 0 0; color: var(--color-text-muted); font-size: .72rem; font-weight: 650; }
 .listing-feed-state { min-height: min(64vh, 560px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; color: #667085; text-align: center; }
 .listing-feed-state--error { color: #991b1b; }
 .listing-feed-missing { padding: 13px 15px; border: 1px solid #f5d68c; border-bottom: 0; background: #fffaeb; color: #8a5714; font-size: .78rem; font-weight: 700; text-align: center; }

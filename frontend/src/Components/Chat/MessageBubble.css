@@ -41,7 +41,7 @@
 }
 
 .own-bubble {
-  background: #1b4a91;
+  background: var(--color-primary);
   color: #fff;
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 18px;

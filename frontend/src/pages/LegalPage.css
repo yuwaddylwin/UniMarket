@@ -22,14 +22,14 @@
 
 .legal-card h1 {
   margin: 8px 0 28px;
-  color: #14233c;
+  color: var(--color-text);
   font-size: clamp(2.25rem, 6vw, 4rem);
   letter-spacing: -0.045em;
   line-height: 1;
 }
 
 .legal-content { max-width: 680px; }
-.legal-content h2 { margin: 28px 0 8px; color: #17263e; font-size: 1.15rem; }
+.legal-content h2 { margin: 28px 0 8px; color: var(--color-text); font-size: 1.15rem; }
 .legal-content p { justify-content: flex-start; margin: 0; color: var(--color-text-muted); line-height: 1.75; }
 
 .legal-home-link {

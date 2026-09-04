@@ -1,0 +1,540 @@
+/* UniMarket visual system — derived from the Chat interface. */
+
+body,
+.app-shell,
+.app-content {
+  background: var(--color-page);
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-ui);
+}
+
+h1, h2, h3, h4, h5, h6,
+p, label, input, textarea, select, button, a, small, strong {
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text);
+  font-family: var(--font-ui);
+}
+
+a { color: var(--color-primary); }
+
+/* Wordmark */
+.logo,
+.desktop-chat-brand,
+.footer-brand h3 {
+  color: var(--color-primary);
+  font-family: var(--font-brand);
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.logo span,
+.desktop-chat-brand span,
+.footer-brand h3 span {
+  color: var(--color-text);
+}
+
+/* Navigation */
+.navbar-container,
+.bottom-nav,
+.desktop-chat-nav {
+  border-color: var(--color-border);
+  background: rgba(255, 255, 255, .97);
+  color: var(--color-text);
+  box-shadow: var(--shadow-xs);
+}
+
+.navbar-icon-button,
+.bottom-nav-item,
+.bottom-nav-sell,
+.desktop-chat-nav-item {
+  color: var(--color-text-secondary);
+}
+
+.navbar-icon-button:hover,
+.bottom-nav-item:hover,
+.desktop-chat-nav-item:hover,
+.desktop-chat-nav-item.is-active,
+.bottom-nav-item.is-active {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.desktop-chat-nav-item.is-active {
+  background: var(--color-surface-active);
+}
+
+.navbar-menu {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.navbar-menu-list > li,
+.navbar-menu-footer {
+  border-color: var(--color-border);
+}
+
+/* Footer — the same light, restrained surface treatment as Chat navigation. */
+.footer {
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.footer-brand .footer-tagline,
+.footer-brand p,
+.footer-section p,
+.footer-section li a,
+.footer-contact a,
+.footer-contact p,
+.footer-bottom p {
+  color: var(--color-text-muted);
+}
+
+.footer-section h4 {
+  color: var(--color-text);
+}
+
+.footer-trust {
+  border-color: rgba(27, 74, 145, .16);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.footer-section li a:hover,
+.footer-contact a:hover,
+.footer-contact svg {
+  color: var(--color-primary);
+}
+
+.footer-bottom {
+  border-color: var(--color-border);
+}
+
+.navbar-menu-item { color: var(--color-text); }
+.navbar-menu-number { color: var(--color-text-subtle); }
+.navbar-submenu a { color: var(--color-text-secondary); }
+
+/* Search and form controls */
+.search-form,
+.search-page-bar,
+.accommodations-search,
+.sidebar-search input,
+.message-input-row,
+.login-form input,
+.post-form input[type="text"],
+.post-form input[type="number"],
+.post-form textarea,
+.post-form select,
+.settings-name-form input,
+.verification-card input {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  box-shadow: none;
+}
+
+/* Search controls use a consistent pill silhouette at every breakpoint. */
+.search-form,
+.search-page-bar,
+.accommodations-search,
+.sidebar-search input,
+input[type="search"] {
+  border-radius: var(--radius-pill);
+}
+
+.search-form .search-button {
+  border-radius: var(--radius-pill);
+}
+
+.search-form:focus-within,
+.search-page-bar:focus-within,
+.sidebar-search input:focus,
+.message-input-row:focus-within,
+.login-form input:focus,
+.post-form input:focus,
+.post-form textarea:focus,
+.post-form select:focus,
+.settings-name-form input:focus,
+.verification-card input:focus {
+  border-color: rgba(27, 74, 145, .58);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px rgba(27, 74, 145, .10);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-subtle);
+  opacity: 1;
+}
+
+.form-group > label,
+.login-form > label,
+.verification-card label,
+.settings-name-form label {
+  color: var(--color-text-secondary);
+  font-weight: 700;
+}
+
+/* Panels and cards */
+.item-card,
+.accommodation-card,
+.ip-card,
+.profile-item-card,
+.cart-page,
+.cart-page li,
+.item-summary,
+.seller-card,
+.profile-hero,
+.profile-listings-panel,
+.settings-section,
+.login-form,
+.verification-card,
+.legal-card,
+.post-container,
+.confirm-modal {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-xs);
+}
+
+.item-card,
+.accommodation-card,
+.ip-card,
+.profile-item-card,
+.cart-page li {
+  border-radius: var(--radius-md);
+}
+
+.item-card:hover,
+.accommodation-card:hover,
+.ip-card:hover,
+.profile-item-card:hover,
+.cart-page li:hover {
+  border-color: rgba(27, 74, 145, .22);
+  box-shadow: var(--shadow-sm);
+}
+
+.item-card .item-img,
+.accommodation-image,
+.ip-img,
+.profile-item-img,
+.product-image,
+.no-image {
+  background: var(--color-surface-subtle);
+}
+
+.item-card .item-title,
+.accommodation-body h3,
+.ip-card-body h3,
+.profile-item-title,
+.listing-feed-heading h2,
+.item-title,
+.cart-title {
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-weight: 700;
+}
+
+.item-card .item-desc,
+.accommodation-details,
+.accommodation-location,
+.item-description,
+.listing-feed-description,
+.ip-seller,
+.profile-item-seller {
+  color: var(--color-text-muted);
+}
+
+.listing-feed-page { background: var(--color-page); }
+.listing-feed,
+.listing-feed-post,
+.listing-feed-carousel-dots { background: var(--color-surface); }
+.listing-feed-post { border-color: var(--color-border); }
+
+/* Buttons */
+.search-button,
+.send_button,
+.submit-btn,
+.talk-btn,
+.talk-to-seller,
+.add-to-cart,
+.cart-empty button,
+.profile-primary-action,
+.profile-save-photo,
+.settings-name-form button[type="submit"],
+.verification-card button,
+.legal-home-link,
+.listing-feed-actions button.is-primary {
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: none;
+}
+
+.search-button:hover,
+.send_button:hover,
+.submit-btn:hover,
+.talk-btn:hover,
+.talk-to-seller:hover,
+.add-to-cart:hover,
+.cart-empty button:hover,
+.profile-primary-action:hover,
+.profile-save-photo:hover,
+.settings-name-form button[type="submit"]:hover,
+.verification-card button:hover,
+.legal-home-link:hover,
+.listing-feed-actions button.is-primary:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 8px 18px rgba(27, 74, 145, .18);
+}
+
+.secondary_button,
+.profile-secondary-action,
+.profile-cancel-photo,
+.settings-text-button,
+.settings-name-form button,
+.listing-feed-actions button,
+.item-back-button,
+.carousel-btn,
+.il-arrow {
+  border-color: var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: none;
+}
+
+.secondary_button:hover,
+.profile-secondary-action:hover,
+.profile-cancel-photo:hover,
+.settings-text-button:hover,
+.settings-name-form button:hover,
+.listing-feed-actions button:hover,
+.item-back-button:hover,
+.carousel-btn:hover,
+.il-arrow:hover {
+  border-color: rgba(27, 74, 145, .22);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.delete-btn,
+.confirm-btn.danger,
+.profile-kebab-item.danger,
+.navbar-logout,
+.blocked-user button {
+  border-color: rgba(180, 35, 24, .22);
+  background: #fff7f6;
+  color: #b42318;
+}
+
+/* States, badges, and supporting copy */
+.items-state,
+.accommodation-state,
+.ip-state,
+.listing-feed-state,
+.profile-empty-state,
+.archive-empty,
+.cart-empty,
+.conversation-empty,
+.no-users {
+  color: var(--color-text-muted);
+}
+
+.profile-empty-state,
+.archive-empty,
+.cart-empty,
+.conversation-empty,
+.no-users {
+  border-color: var(--color-border);
+  background: var(--color-surface-subtle);
+}
+
+.items-state--error,
+.accommodation-state--error,
+.ip-state--error,
+.listing-feed-state--error,
+.item-load-error,
+.profile-items-error,
+.archive-error {
+  color: #991b1b;
+}
+
+.items-eyebrow,
+.accommodation-eyebrow,
+.post-eyebrow,
+.cart-eyebrow,
+.profile-eyebrow,
+.profile-settings-header > span,
+.legal-eyebrow,
+.item-details-eyebrow,
+.sidebar-heading span,
+.search-results-header > div > span {
+  color: var(--color-primary);
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.listing-price,
+.item-price,
+.cart-price,
+.ip-card-price,
+.profile-item-price {
+  font-weight: 800;
+}
+
+.home-value-icon,
+.settings-row-icon,
+.password-toggle,
+.cart-count {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.settings-switch[aria-checked="true"],
+.bottom-nav-sell-icon,
+.send-btn,
+.own-bubble {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.settings-switch[aria-checked="true"]:hover,
+.bottom-nav-sell:hover .bottom-nav-sell-icon,
+.send-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+.loading-spinner__ring { border-top-color: var(--color-primary); }
+
+.ip-title,
+.items-header h2,
+.accommodation-header h2,
+.accommodations-page-header h1,
+.search-results-header h2,
+.post-title,
+.cart-page h1,
+.profile-identity h1,
+.profile-section-heading h2,
+.profile-settings-header h1,
+.settings-section-title h2,
+.legal-card h1,
+.legal-content h2,
+.verification-card h1 {
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: -.025em;
+}
+
+/* Keep media-heavy Home content, but use the same UI typography and controls. */
+.home-slide-copy h1,
+.home-discovery-intro h2,
+.home-signup h2 {
+  font-family: var(--font-ui);
+  font-weight: 650;
+}
+
+.home-slide-copy h1 {
+  color: #fff;
+}
+
+.home-carousel-arrow {
+  border-color: rgba(255, 255, 255, .6);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-value-strip {
+  border-color: var(--color-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, .97);
+  box-shadow: var(--shadow-md);
+}
+
+.home-signup {
+  background: var(--color-page);
+  color: var(--color-text);
+}
+
+.home-signup-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-md);
+}
+
+.home-signup-card::before,
+.home-signup-card::after {
+  border-color: rgba(27, 74, 145, .10);
+}
+
+.home-signup-eyebrow,
+.home-signup h2 em {
+  color: var(--color-primary);
+}
+
+.home-signup h2 { color: var(--color-text); }
+.home-signup p { color: var(--color-text-muted); }
+
+.home-signup button {
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: none;
+}
+
+.home-signup button:hover {
+  background: var(--color-primary-hover);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(27, 74, 145, .18);
+}
+
+.post-type-toggle {
+  border-color: var(--color-border);
+  background: var(--color-surface-subtle);
+}
+
+.post-type-toggle > button { color: var(--color-text-muted); }
+.post-type-toggle > button strong { color: var(--color-text); }
+.post-type-toggle > button:hover { background: var(--color-primary-soft); }
+.post-type-toggle > button.is-active {
+  border-color: rgba(27, 74, 145, .22);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.upload-box {
+  border-color: rgba(27, 74, 145, .35);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+@media (max-width: 640px) {
+  .logo { max-width: calc(100vw - 132px); font-size: 1.32rem; }
+  .navbar-inner { overflow: visible; }
+  .item-card,
+  .accommodation-card,
+  .ip-card,
+  .profile-item-card { border-radius: var(--radius-md); }
+}

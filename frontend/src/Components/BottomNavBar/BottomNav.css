@@ -31,7 +31,7 @@
   border: 0;
   border-radius: 12px;
   background: transparent;
-  color: #475467;
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: color var(--transition), background var(--transition), transform var(--transition);
 }
@@ -47,7 +47,7 @@
   place-items: center;
 }
 .bottom-nav-icon svg { width: 24px; height: 24px; }
-.bottom-nav-profile-photo { width: 26px; height: 26px; border: 2px solid currentColor; border-radius: 50%; object-fit: cover; background: #eef1f5; }
+.bottom-nav-profile-photo { width: 26px; height: 26px; border: 2px solid currentColor; border-radius: 50%; object-fit: cover; background: var(--color-surface-subtle); }
 .bottom-nav-label { font-size: 0.68rem; font-weight: 750; line-height: 1; }
 
 .bottom-nav-badge {

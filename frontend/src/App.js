@@ -26,6 +26,7 @@ import RequireAuth from "./Components/common/RequireAuth";
 import MainLayout from "./Components/layouts/MainLayout";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
+import "./theme.css";
 
 export default function App() {
   const [cartItems, setCartItems] = useState([]);

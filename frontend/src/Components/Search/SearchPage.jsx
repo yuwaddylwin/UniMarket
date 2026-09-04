@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { useItemsList } from "../Logics/useItemsList";
 import { useAccommodations } from "../Logics/useAccommodations";
 import ItemListingCard from "../ItemsList/ItemListingCard";
@@ -21,14 +22,22 @@ function matchesQuery(listing, query) {
 }
 
 export default function SearchPage() {
+  const [searchParams] = useSearchParams();
+  const incomingSearch = searchParams.get("search") || "";
   const [search, setSearch] = useState("");
+  const [activeSearch, setActiveSearch] = useState(incomingSearch);
   const { items, isLoading: itemsLoading, error: itemsError } = useItemsList();
   const {
     accommodations,
     isLoading: accommodationsLoading,
     error: accommodationsError,
   } = useAccommodations();
-  const query = search.trim().toLowerCase();
+  const query = activeSearch.trim().toLowerCase();
+
+  useEffect(() => {
+    setSearch("");
+    setActiveSearch(incomingSearch);
+  }, [incomingSearch]);
 
   const results = useMemo(() => [
     ...items.map((listing) => ({ ...listing, searchResultType: "item" })),
@@ -52,7 +61,10 @@ export default function SearchPage() {
         <input
           type="search"
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setActiveSearch(event.target.value);
+          }}
           placeholder="What are you looking for?"
           aria-label="Search items and accommodation"
           autoComplete="off"

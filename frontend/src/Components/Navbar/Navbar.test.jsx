@@ -23,6 +23,21 @@ function renderNavbar(authUser = null) {
   return { logout: mockLogout };
 }
 
+test("home search opens the combined Search page with the entered query", () => {
+  mockAuthUser = null;
+  mockNavigate.mockReset();
+  render(<Navbar />);
+
+  const searchInput = screen.getByRole("searchbox", { name: "Search UniMarket" });
+  fireEvent.change(searchInput, {
+    target: { value: "study desk" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Search UniMarket" }));
+
+  expect(mockNavigate).toHaveBeenCalledWith("/search?search=study%20desk");
+  expect(searchInput).toHaveValue("");
+});
+
 test("profile settings and help routes are available from the menu", () => {
   renderNavbar();
 

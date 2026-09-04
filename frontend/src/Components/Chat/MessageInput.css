@@ -2,7 +2,7 @@
   flex-shrink: 0;
   margin: 0;
   padding: 12px clamp(14px, 3vw, 28px) calc(12px + env(safe-area-inset-bottom));
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border);
   background: #fff;
 }
 
@@ -37,9 +37,9 @@
   align-items: center;
   gap: 6px;
   padding: 5px 6px 5px 17px;
-  border: 1px solid #d8dee8;
+  border: 1px solid var(--color-border);
   border-radius: 27px;
-  background: #f8fafc;
+  background: var(--color-surface-subtle);
   transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
 }
 .message-input-row:focus-within { border-color: rgba(27, 74, 145, .58); background: #fff; box-shadow: 0 0 0 3px rgba(27, 74, 145, .1); }
