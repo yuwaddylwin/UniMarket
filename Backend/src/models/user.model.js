@@ -49,6 +49,7 @@ const userSchema = new mongoose.Schema(
         default: true,
       },
     },
+    chatRevision: { type: Number, default: 0, select: false },
     blockedUsers: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

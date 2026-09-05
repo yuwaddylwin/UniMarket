@@ -57,7 +57,7 @@ test("profile settings and help routes are available from the menu", () => {
   expect(helpToggle).toHaveAttribute("aria-expanded", "true");
   expect(screen.getByRole("link", { name: "How it works" })).toHaveAttribute(
     "href",
-    "/#home-discovery"
+    "/how-it-works"
   );
   expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/privacy");
   expect(screen.getByRole("link", { name: "Terms" })).toHaveAttribute("href", "/terms");

@@ -1,3 +1,4 @@
+import ChatSafetyMenu from "./ChatSafetyMenu";
 import { ArrowLeft } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
@@ -51,6 +52,7 @@ const ChatHeader = () => {
           </span>
         </div>
       </div>
+      <ChatSafetyMenu key={selectedUser._id} user={selectedUser} />
     </div>
   );
 };

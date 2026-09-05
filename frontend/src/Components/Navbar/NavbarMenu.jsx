@@ -128,7 +128,7 @@ export default function NavbarMenu({ menuId = "navbar-menu", onOpenChange }) {
                   <ChevronDown className={helpOpen ? "is-open" : ""} aria-hidden="true" />
                 </button>
                 <ul id={helpId} className="navbar-submenu" hidden={!helpOpen}>
-                  <li><a href="/#home-discovery" onClick={closeMenu}>How it works</a></li>
+                  <li><Link to="/how-it-works" onClick={closeMenu}>How it works</Link></li>
                   <li><Link to="/privacy" onClick={closeMenu}>Privacy</Link></li>
                   <li><Link to="/terms" onClick={closeMenu}>Terms</Link></li>
                 </ul>

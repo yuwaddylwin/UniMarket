@@ -1,3 +1,5 @@
+import { withChatTransaction, chatError, blockState } from "../services/chatSafety.js";
+import { io, getReceiverSocketId } from "../lib/socket.js";
 import cloudinary from "../lib/cloudinary.js";
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
@@ -446,37 +448,23 @@ const getBlockedUsers = async (req, res) => {
   }
 };
 
-const blockUser = async (req, res) => {
+const changeBlock = (blocked) => async (req, res) => {
+  const other = req.params.userId;
   try {
-    const blockedUserId = req.params.userId;
-    if (String(blockedUserId) === String(req.user._id)) {
-      return res.status(400).json({ message: "You cannot block your own account" });
+    const safety = await withChatTransaction(req.user._id, other, async (session, me, partner) => {
+      const updated = await User.findOneAndUpdate({ _id: req.user._id }, blocked
+        ? { $addToSet: { blockedUsers: other } }
+        : { $pull: { blockedUsers: other } }, { session, new: true });
+      return blockState(updated, partner);
+    });
+    for (const id of [String(req.user._id), other]) {
+      io.to(getReceiverSocketId(id)).emit('blockChanged', { userId: id === other ? String(req.user._id) : other });
     }
-    const blockedUser = await User.findById(blockedUserId).select("_id");
-    if (!blockedUser) return res.status(404).json({ message: "User not found" });
-
-    await User.updateOne(
-      { _id: req.user._id },
-      { $addToSet: { blockedUsers: blockedUserId } }
-    );
-    return res.status(200).json({ message: "User blocked", id: blockedUserId });
-  } catch (error) {
-    return res.status(400).json({ message: error.message || "Unable to block user" });
-  }
+    res.json({ message: blocked ? 'User blocked' : 'User unblocked', id: other, ...safety });
+  } catch (error) { chatError(res, error); }
 };
-
-const unblockUser = async (req, res) => {
-  try {
-    const result = await User.updateOne(
-      { _id: req.user._id },
-      { $pull: { blockedUsers: req.params.userId } }
-    );
-    if (!result.matchedCount) return res.status(404).json({ message: "User not found" });
-    return res.status(200).json({ message: "User unblocked", id: req.params.userId });
-  } catch (error) {
-    return res.status(400).json({ message: error.message || "Unable to unblock user" });
-  }
-};
+const blockUser = changeBlock(true);
+const unblockUser = changeBlock(false);
 
 const removeProfilePhoto = async (req, res) => {
   try {

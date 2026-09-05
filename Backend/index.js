@@ -1,3 +1,4 @@
+import { startReportNotifications } from "./src/services/reportNotifications.js";
 import express, { Router } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -59,6 +60,7 @@ mongoose
     console.log("Connected DB name:", mongoose.connection.name);
 
 
+    startReportNotifications();
     server.listen(PORT, ()=>{
         console.log(`Server is running on port ${PORT}`);
     });

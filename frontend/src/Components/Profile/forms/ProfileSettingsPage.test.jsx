@@ -14,6 +14,8 @@ jest.mock("../../store/useAuthStore", () => ({
 }));
 
 beforeEach(() => {
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); };
   mockAuthUser = { _id: "user-a", fullName: "User A", username: "user.a", email: "user@example.com", profilePic: "", preferences: { language: "en", messages: true, notifications: true } };
   mockUpdateAccount.mockReset().mockResolvedValue(undefined);
   mockUpdatePreferences.mockReset().mockResolvedValue(undefined);
@@ -85,6 +87,8 @@ test("opens blocked accounts and allows an account to be unblocked", async () =>
   expect(screen.getByText("@blocked.user")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Unblock" }));
 
+  expect(axiosInstance.delete).not.toHaveBeenCalled();
+  fireEvent.click(screen.getAllByRole("button", { name: "Unblock" }).at(-1));
   await waitFor(() => expect(axiosInstance.delete).toHaveBeenCalledWith("/auth/blocked-users/user-b"));
   await waitFor(() => expect(screen.queryByText("Blocked User")).not.toBeInTheDocument());
   expect(screen.getByText("No blocked accounts")).toBeInTheDocument();

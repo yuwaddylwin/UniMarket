@@ -3,8 +3,8 @@ import {
   BadgeCheck,
   ChevronLeft,
   ChevronRight,
-  MapPin,
-  MessageCircle,
+  GraduationCap,
+  Heart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AccommodationSection from "../Accommodation/AccommodationSection";
@@ -15,19 +15,19 @@ import "./Home.css";
 
 const SLIDES = [
   {
-    image: "/Images/unimarket/buy-sell.jpg",
+    image: "/Images/unimarket/hero-marketplace.webp",
     eyebrow: "A marketplace made for students",
     title: "Buy and sell within your campus community.",
     description: "Pass useful items on, discover affordable finds, and keep good things in student hands.",
-    alt: "Two university students exchanging books and a desk lamp on campus",
+    alt: "Books, a keyboard and headphones on a study table in a bright campus lounge",
     position: "center",
   },
   {
-    image: "/Images/unimarket/accommodation.jpg",
+    image: "/Images/unimarket/hero-student-room.webp",
     eyebrow: "Student-friendly accommodation",
     title: "Find a place that feels like home.",
     description: "Explore practical places near university that fit student life and student budgets.",
-    alt: "University students viewing a welcoming room near campus",
+    alt: "A bright student studio with a study desk and blue-and-white bedding",
     position: "center",
   },
   {
@@ -142,24 +142,24 @@ export default function Home() {
 
         <section className="home-value-strip" aria-label="Why students use UniMarket">
           <article>
+            <span className="home-value-icon"><GraduationCap aria-hidden="true" /></span>
+            <div>
+              <h2>Student-exclusive</h2>
+              <p>A marketplace made for student life.</p>
+            </div>
+          </article>
+          <article>
             <span className="home-value-icon"><BadgeCheck aria-hidden="true" /></span>
             <div>
-              <h2>Student-focused</h2>
-              <p>Built around university life.</p>
+              <h2>Email verified</h2>
+              <p>Verify your email to post and chat.</p>
             </div>
           </article>
           <article>
-            <span className="home-value-icon"><MapPin aria-hidden="true" /></span>
+            <span className="home-value-icon"><Heart aria-hidden="true" /></span>
             <div>
-              <h2>Close to campus</h2>
-              <p>Find useful things nearby.</p>
-            </div>
-          </article>
-          <article>
-            <span className="home-value-icon"><MessageCircle aria-hidden="true" /></span>
-            <div>
-              <h2>Connect directly</h2>
-              <p>Chat student to student.</p>
+              <h2>Built by a student</h2>
+              <p>Created for our university community.</p>
             </div>
           </article>
         </section>
@@ -168,7 +168,6 @@ export default function Home() {
           <header className="home-discovery-intro">
             <span>Explore UniMarket</span>
             <h2>Everything students need,<br />right around campus.</h2>
-            <p>From your next room to your next everyday essential, discover listings shaped around student life.</p>
           </header>
           <AccommodationSection />
           <ItemsList />

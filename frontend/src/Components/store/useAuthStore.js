@@ -83,6 +83,9 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
+      const { useChatStore } = await import("./useChatStore");
+      useChatStore.getState().setSelectedUser(null);
+      useChatStore.setState({ users: [] });
     } catch (error) {
       toast.error(error.response?.data?.message || "Logout Failed!");
     }
@@ -156,9 +159,7 @@ export const useAuthStore = create((set, get) => ({
     if (!authUser || socket) return;
 
     const newSocket = io(SOCKET_URL, {
-      query: {
-        userId: authUser._id,
-      },
+      auth: { token: getAuthToken() },
       withCredentials: true,
       transports: ["websocket"],
     });
@@ -187,6 +188,7 @@ export const useAuthStore = create((set, get) => ({
       socket.disconnect();
     }
     get().unsubscribeFromUnreadUpdates();
+    set({ socket: null, onlineUsers: [], unreadCount: {}, totalUnread: 0 });
   },
 
   getUnreadCount: async () => {
@@ -220,25 +222,17 @@ export const useAuthStore = create((set, get) => ({
       });
     });
 
-    socket.on("messagesSeen", ({ userId }) => {
-      set((state) => {
-        const newUnreadCount = { ...state.unreadCount };
-        delete newUnreadCount[userId];
-        const totalUnread = Object.values(newUnreadCount).reduce((sum, count) => sum + count, 0);
-        
-        return {
-          unreadCount: newUnreadCount,
-          totalUnread,
-        };
-      });
-    });
+    socket.on("unreadChanged", () => get().getUnreadCount());
+    socket.on("chatDeleted", () => get().getUnreadCount());
+
   },
 
   unsubscribeFromUnreadUpdates: () => {
     const socket = get().socket;
     if (!socket) return;
     socket.off("unreadCountUpdate");
-    socket.off("messagesSeen");
+    socket.off("unreadChanged");
+    socket.off("chatDeleted");
   },
   
 }));

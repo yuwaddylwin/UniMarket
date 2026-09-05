@@ -1,3 +1,4 @@
+import SafetyDialog from "../../common/SafetyDialog";
 import { useEffect, useState } from "react";
 import { Archive, Bell, ChevronDown, Mail, Pencil, ShieldBan, SlidersHorizontal, UserRound } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -33,6 +34,7 @@ export default function ProfileSettingsPage() {
   const [blockedUsers, setBlockedUsers] = useState([]);
   const [blockedLoading, setBlockedLoading] = useState(false);
   const [blockedError, setBlockedError] = useState("");
+  const [confirmUnblock, setConfirmUnblock] = useState(null);
   const [unblockingId, setUnblockingId] = useState("");
 
   useEffect(() => {
@@ -131,7 +133,7 @@ export default function ProfileSettingsPage() {
       await axiosInstance.delete(`/auth/blocked-users/${userId}`);
       setBlockedUsers((users) => users.filter((user) => String(user._id || user.id) !== String(userId)));
     } catch (error) {
-      setBlockedError(error?.response?.data?.message || "Unable to unblock this account.");
+      throw error;
     } finally {
       setUnblockingId("");
     }
@@ -139,6 +141,7 @@ export default function ProfileSettingsPage() {
 
   return (
     <main className="profile-settings-page">
+      {confirmUnblock && <SafetyDialog title="Unblock this user?" description="You can message each other again unless this user has also blocked you." confirmLabel="Unblock" onConfirm={() => unblockUser(confirmUnblock)} onClose={() => setConfirmUnblock(null)} />}
       <header className="profile-settings-header">
         <span>Account</span>
         <h1>Profile Settings</h1>
@@ -184,7 +187,7 @@ export default function ProfileSettingsPage() {
               return <div className="blocked-user" key={userId}>
                 <ProfileAvatar className="blocked-user-avatar" profilePic={user.profilePic} alt={user.fullName || user.username || "Blocked user"} />
                 <div><strong>{user.fullName || user.username || "User"}</strong>{user.username && <span>@{user.username}</span>}</div>
-                <button type="button" onClick={() => unblockUser(userId)} disabled={unblockingId === userId}>{unblockingId === userId ? "Unblocking…" : "Unblock"}</button>
+                <button type="button" onClick={() => setConfirmUnblock(userId)} disabled={unblockingId === userId}>{unblockingId === userId ? "Unblocking…" : "Unblock"}</button>
               </div>;
             })}
           </div>}

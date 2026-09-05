@@ -16,7 +16,7 @@ export default function Footer() {
         <section className="footer-section">
           <h4>Help</h4>
           <ul>
-            <li><a href="/#home-discovery">How it works <ArrowUpRight aria-hidden="true" /></a></li>
+            <li><Link to="/how-it-works">How it works <ArrowUpRight aria-hidden="true" /></Link></li>
             <li><Link to="/privacy">Privacy <ArrowUpRight aria-hidden="true" /></Link></li>
             <li><Link to="/terms">Terms <ArrowUpRight aria-hidden="true" /></Link></li>
           </ul>

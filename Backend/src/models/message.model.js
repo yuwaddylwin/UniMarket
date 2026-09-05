@@ -18,6 +18,7 @@ const messageSchema = new mongoose.Schema(
         image: {
             type: String,
         },
+        seenAt: { type: Date, default: null },
         seen: {
             type: Boolean,
             default: false,
@@ -25,6 +26,8 @@ const messageSchema = new mongoose.Schema(
     },
     { timestamps: true} // createdAt , updatedAt 
 );
+
+messageSchema.index({ senderId: 1, receivedId: 1, createdAt: 1 });
 
 const Message = mongoose.model("Message", messageSchema);
 

@@ -3,7 +3,7 @@ import ProfileAvatar from "../common/ProfileAvatar";
 
 const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
   return (
-    <div className={`message-row ${isOwn ? "own" : "other"}`}>
+    <div data-unread-message={!isOwn && !message.seen ? message._id : undefined} className={`message-row ${isOwn ? "own" : "other"}`}>
       {!isOwn && (
         <ProfileAvatar
           className="message-avatar"
@@ -38,6 +38,7 @@ const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
               minute: "2-digit",
             })}
           </span>
+          {isOwn && <span> · {message.seen ? "Seen" : "Sent"}</span>}
         </div>
       </div>
 

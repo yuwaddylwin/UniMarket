@@ -155,3 +155,13 @@ export const sendVerificationEmail = async (email, token) => {
     `,
   });
 };
+
+export const sendReportEmail = async (report, reporter, reported) => {
+  const config = getEmailConfig();
+  return sendMail(config, {
+    from: config.from,
+    to: process.env.ADMIN_EMAIL?.trim() || 'unimarket.app.official@gmail.com',
+    subject: 'UniMarket User Report',
+    text: `Report: ${report._id}\nReporter: ${reporter?.fullName || 'Deleted user'} (${reporter?.email || ''}; ${report.reporterId})\nReported user: ${reported?.fullName || 'Deleted user'} (${reported?.email || ''}; ${report.reportedId})\nConversation: ${report.conversationId}\nDate: ${report.createdAt.toISOString()}\nStatus: ${report.status}\n\nReason:\n${report.reason}`,
+  });
+};

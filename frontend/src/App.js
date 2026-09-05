@@ -16,6 +16,7 @@ import AccommodationDetails from "./Components/Accommodation/AccommodationDetail
 import SearchPage from "./Components/Search/SearchPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ResendVerificationPage from "./pages/ResendVerificationPage";
+import HowItWorksPage from "./pages/HowItWorksPage";
 import { PrivacyPage, TermsPage } from "./pages/LegalPage";
 
 import { useHomeLogic } from "./Components/Logics/useHome";
@@ -90,6 +91,7 @@ export default function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/accommodations" element={<AccommodationsPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetails />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/products/:id"

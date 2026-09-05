@@ -4,6 +4,7 @@ import { useChatStore } from "../store/useChatStore";
 import "./MessageInput.css";
 
 const MessageInput = () => {
+  const [sending, setSending] = useState(false);
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -29,15 +30,16 @@ const MessageInput = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!text.trim() && !imagePreview) return;
+    if (sending || (!text.trim() && !imagePreview)) return;
+    setSending(true);
 
-    await sendMessage({
+    const sent = await sendMessage({
       text,
       image: imagePreview,
     });
 
-    setText("");
-    removeImage();
+    setSending(false);
+    if (sent) { setText(""); removeImage(); }
   };
 
   return (
@@ -58,6 +60,7 @@ const MessageInput = () => {
           type="text"
           placeholder="Type a message..."
           aria-label="Type a message"
+          disabled={sending}
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
@@ -77,7 +80,7 @@ const MessageInput = () => {
           type="submit"
           className="send-btn"
           aria-label="Send message"
-          disabled={!text.trim() && !imagePreview}
+          disabled={sending || (!text.trim() && !imagePreview)}
         >
           <Send size={18} />
         </button>
