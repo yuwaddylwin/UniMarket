@@ -22,16 +22,16 @@ export default function AccommodationSection({ searchQuery = "", listingPage = f
   const hasState = isLoading || Boolean(error) || visibleAccommodations.length === 0;
 
   return (
-    <section className={`accommodation-section${listingPage ? " accommodation-section--page" : ""}`} aria-labelledby="accommodation-title">
-      <div className="accommodation-header">
+    <section className={`accommodation-section${listingPage ? " accommodation-section--page" : ""}`} aria-labelledby={listingPage ? undefined : "accommodation-title"} aria-label={listingPage ? "Accommodation listings" : undefined}>
+      {!listingPage && <div className="accommodation-header">
         <div>
           <span className="accommodation-eyebrow">Live close to campus</span>
           <h2 id="accommodation-title">Accommodation</h2>
         </div>
         {!listingPage && <button type="button" onClick={() => navigate("/accommodations")}>View All <span aria-hidden="true">&gt;</span></button>}
-      </div>
+      </div>}
 
-      <div className={`accommodation-row${hasState ? " accommodation-row--state" : ""}`}>
+      <div className={`accommodation-row${listingPage ? " listing-page-grid" : ""}${hasState ? " accommodation-row--state" : ""}`}>
         {isLoading ? (
           <LoadingSpinner label="Loading accommodation…" />
         ) : error ? (

@@ -28,7 +28,7 @@ const getEmailConfig = () => {
   }
 
   const port = Number(process.env.SMTP_PORT);
-  if (!Number.isInteger(port) || port <= 0) {
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) {
     throw new Error("SMTP_PORT must be a valid port number");
   }
 
@@ -58,29 +58,15 @@ const createTransporter = ({ host, port, user, pass }) =>
   });
 
 const getTransporter = async (config) => {
-  const configKey = `${config.host}:${config.port}:${config.user}`;
+  const configKey = JSON.stringify([config.host, config.port, config.user, config.pass]);
 
   if (!transporter || transporterConfigKey !== configKey) {
     transporter?.close();
     transporter = createTransporter(config);
     transporterConfigKey = configKey;
 
-    // Verify the connection before the first message. This prevents the first
-    // signup request from also being the SMTP connection/authentication probe.
-    transporterVerification = transporter.verify().catch((error) => {
-      console.error("========== SMTP VERIFY ERROR ==========");
-      console.error(error);
-      console.error("message:", error.message);
-      console.error("code:", error.code);
-      console.error("command:", error.command);
-      console.error("stack:", error.stack);
-      console.error("=======================================");
-      transporter?.close();
-      transporter = undefined;
-      transporterConfigKey = undefined;
-      transporterVerification = undefined;
-      throw error;
-    });
+    // Share the authentication probe across concurrent requests.
+    transporterVerification = transporter.verify();
   }
 
   await transporterVerification;
@@ -97,8 +83,8 @@ const resetTransporter = () => {
 const sendMail = async (config, message) => {
   let lastError;
 
-  // A cold SMTP connection can fail once while the provider is waking up.
-  // Recreate and re-verify it once rather than making the user press resend.
+  // Retry temporary failures only; authentication and policy failures need
+  // configuration changes at the provider.
   for (let attempt = 1; attempt <= 2; attempt += 1) {
     try {
       const smtpTransporter = await getTransporter(config);
@@ -115,6 +101,21 @@ const sendMail = async (config, message) => {
     } catch (error) {
       lastError = error;
       resetTransporter();
+      const response = `${error.response || ""} ${error.message || ""}`;
+      if (/unauthorized ip|ip not authorized/i.test(response)) {
+        throw new Error(
+          "SMTP access blocked: authorize this backend's outbound IP in Brevo Settings > Security > Authorized IPs, then retry.",
+          { cause: error }
+        );
+      }
+      if (
+        error.code === "EAUTH" ||
+        Number(error.responseCode) >= 500 ||
+        !["ETIMEDOUT", "ECONNECTION", "ESOCKET"].includes(error.code) &&
+          !(Number(error.responseCode) >= 400 && Number(error.responseCode) < 500)
+      ) {
+        throw error;
+      }
     }
   }
 
@@ -153,15 +154,5 @@ export const sendVerificationEmail = async (email, token) => {
         </body>
       </html>
     `,
-  });
-};
-
-export const sendReportEmail = async (report, reporter, reported) => {
-  const config = getEmailConfig();
-  return sendMail(config, {
-    from: config.from,
-    to: process.env.ADMIN_EMAIL?.trim() || 'unimarket.app.official@gmail.com',
-    subject: 'UniMarket User Report',
-    text: `Report: ${report._id}\nReporter: ${reporter?.fullName || 'Deleted user'} (${reporter?.email || ''}; ${report.reporterId})\nReported user: ${reported?.fullName || 'Deleted user'} (${reported?.email || ''}; ${report.reportedId})\nConversation: ${report.conversationId}\nDate: ${report.createdAt.toISOString()}\nStatus: ${report.status}\n\nReason:\n${report.reason}`,
   });
 };

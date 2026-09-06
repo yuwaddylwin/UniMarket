@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
 import { io as client } from '../../frontend/node_modules/socket.io-client/build/esm-debug/index.js';
 import User from '../src/models/user.model.js';
 import Message from '../src/models/message.model.js';
@@ -11,11 +10,10 @@ import Report from '../src/models/report.model.js';
 import { app, server } from '../src/lib/socket.js';
 import messageRoutes from '../src/routes/message.route.js';
 import authRoutes from '../src/routes/auth.route.js';
-import { deliverReportNotifications } from '../src/services/reportNotifications.js';
 
 // Explicit isolated database only; never load application .env credentials.
 const uri = process.env.CHAT_TEST_MONGO_URL;
-test('authenticated chat safety, persistence, realtime and report delivery', { skip: !uri }, async () => {
+test('authenticated chat safety, persistence, realtime and report persistence', { skip: !uri }, async () => {
   assert.match(uri, /127\.0\.0\.1:27029/);
   process.env.JWT_SECRET = 'isolated-chat-test-secret';
   const init = await mongoose.createConnection(`${uri}/admin?directConnection=true`).asPromise();
@@ -95,18 +93,10 @@ test('authenticated chat safety, persistence, realtime and report delivery', { s
     const report = await request(a, 'POST', `/messages/report/${b}`, { reason: 'Abusive messages' });
     assert.equal(report.status, 201);
     assert.equal((await request(a, 'POST', `/messages/report/${b}`, { reason: 'duplicate' })).status, 409);
-    // First attempt fails due to missing SMTP configuration; report remains durable.
-    await new Promise(resolve => setTimeout(resolve, 100));
     assert.equal(await Report.countDocuments(), 1);
-    let delivered;
-    Object.assign(process.env, { SMTP_HOST: 'smtp.example.test', SMTP_PORT: '465', SMTP_USER: 'test', SMTP_PASS: 'test', EMAIL_FROM: 'test@example.test', CLIENT_URL: 'http://localhost:3000' });
-    nodemailer.createTransport = () => ({ verify: async () => true, close() {}, sendMail: async mail => { delivered = mail; return { accepted: [mail.to], rejected: [] }; } });
-    await Report.updateMany({}, { $set: { notificationRetryAt: new Date(0) } });
-    await deliverReportNotifications();
-    assert.equal(delivered.subject, 'UniMarket User Report');
-    assert.equal(delivered.to, 'unimarket.app.official@gmail.com');
-    assert.match(delivered.text, /Abusive messages/);
-    assert.ok((await Report.findOne()).notificationSentAt);
+    const savedReport = await Report.findById(report.data.id);
+    assert.equal(savedReport.reason, 'Abusive messages');
+    assert.equal(savedReport.status, 'pending');
     assert.equal((await request(a, 'DELETE', `/messages/${b}`)).status, 200);
     assert.equal(await Message.countDocuments(), 0);
     assert.equal((await request(a, 'GET', `/messages/${b}`)).data.length, 0);

@@ -1,34 +1,20 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./ItemsPage.css";
 import "../common/ListingPrice.css";
 import { useItemsList } from "../Logics/useItemsList";
-import { formatListingPrice } from "../common/listingPrice";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import ItemListingCard from "../ItemsList/ItemListingCard";
+import ListingPageHeader from "../common/ListingPageHeader";
+import { useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../common/LoadingSpinner";
-import ProfileAvatar from "../common/ProfileAvatar";
-import { resolveApiAssetUrl } from "../../config/api";
 
-
-function getFirstImageSrc(item) {
-  const first = item?.images?.[0];
-
-  let url =
-    typeof first === "string"
-      ? first
-      : typeof first === "object"
-      ? first?.url
-      : "";
-
-  if (!url) return "/Images/placeholder.png";
-  return resolveApiAssetUrl(url, "/Images/placeholder.png");
-}
 
 export default function ItemsPage() {
   const { items, isLoading, error } = useItemsList();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const rawSearch = searchParams.get("search") || "";
+  const incomingSearch = searchParams.get("search") || "";
+  const [rawSearch, setRawSearch] = useState(incomingSearch);
+  useEffect(() => setRawSearch(incomingSearch), [incomingSearch]);
   const searchQuery = rawSearch.trim().toLowerCase();
 
   const { orderedItems, matchedCount } = useMemo(() => {
@@ -55,17 +41,9 @@ export default function ItemsPage() {
   }, [items, searchQuery]);
 
   return (
-    <div className="ip-page">
-      <div className="ip-header">
-        <h2 className="ip-title">All Items</h2>
-
-        {searchQuery && (
-          <div className="ip-chip">
-            Search: <b>{rawSearch}</b>
-          </div>
-        )}
-      </div>
-
+    <main className="listing-page ip-page">
+      <ListingPageHeader title="All Items" searchLabel="Search items"
+        placeholder="Search by name or seller" query={rawSearch} onQueryChange={setRawSearch} />
       {!isLoading && !error && searchQuery && matchedCount === 0 && (
         <div className="ip-result">
           <p className="ip-notfound">No matched item :(</p>
@@ -76,7 +54,7 @@ export default function ItemsPage() {
       )}
 
       <div className="ip-wrap">
-        <div className="ip-row">
+        <div className="ip-row listing-page-grid">
           {isLoading ? (
             <LoadingSpinner className="ip-loading" label="Loading items…" />
           ) : error ? (
@@ -88,51 +66,11 @@ export default function ItemsPage() {
             <p className="ip-state">No items found.</p>
           ) : (
             orderedItems.map((item) => (
-              <div
-                className="ip-card"
-                key={item._id}
-                onClick={() => navigate(`/products/${item._id}`)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    navigate(`/products/${item._id}`);
-                  }
-                }}
-                role="link"
-                tabIndex={0}
-              >
-                <div className="ip-img">
-                  <img
-                    src={getFirstImageSrc(item)}
-                    alt={item.title}
-                    loading="lazy"
-                    onError={(e) => {
-                      e.currentTarget.src = "/Images/placeholder.png";
-                    }}
-                  />
-                </div>
-                <div className="ip-card-body">
-                  <div className="ip-title-price listing-title-price-row">
-                    <h3>{item.title}</h3>
-                    <div className="ip-card-price listing-price">{formatListingPrice(item.price)}</div>
-                  </div>
-                  {item?.seller?.fullName && (
-                    <div className="ip-seller">
-                      <ProfileAvatar
-                        profilePic={item.seller.profilePic}
-                        alt=""
-                        className="ip-seller-avatar"
-                        loading="lazy"
-                      />
-                      <span>{item.seller.fullName}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ItemListingCard item={item} imageOnly key={item._id} />
             ))
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

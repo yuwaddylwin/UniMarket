@@ -16,6 +16,8 @@ import "./Home.css";
 const SLIDES = [
   {
     image: "/Images/unimarket/hero-marketplace.webp",
+    phoneImage: "/Images/unimarket/hero-marketplace-phone.jpg",
+    tabletImage: "/Images/unimarket/hero-marketplace-tablet.jpg",
     eyebrow: "A marketplace made for students",
     title: "Buy and sell within your campus community.",
     description: "Pass useful items on, discover affordable finds, and keep good things in student hands.",
@@ -24,6 +26,8 @@ const SLIDES = [
   },
   {
     image: "/Images/unimarket/hero-student-room.webp",
+    phoneImage: "/Images/unimarket/hero-room-phone.jpg",
+    tabletImage: "/Images/unimarket/hero-room-tablet.jpg",
     eyebrow: "Student-friendly accommodation",
     title: "Find a place that feels like home.",
     description: "Explore practical places near university that fit student life and student budgets.",
@@ -31,7 +35,9 @@ const SLIDES = [
     position: "center",
   },
   {
-    image: "/Images/unimarket/connect.jpg",
+    image: "/Images/unimarket/hero-connect.jpg",
+    phoneImage: "/Images/unimarket/hero-connect-phone.jpg",
+    tabletImage: "/Images/unimarket/hero-connect-tablet.jpg",
     eyebrow: "Direct student connections",
     title: "Chat, connect, and make it happen.",
     description: "Speak directly with other students to ask questions, arrange details, and build trust.",
@@ -85,15 +91,19 @@ export default function Home() {
         >
           {SLIDES.map((slide, index) => (
             <article
-              className={`home-slide${index === activeSlide ? " is-active" : ""}`}
+              className={`home-slide${index === 2 ? " home-slide--connect" : ""}${index === activeSlide ? " is-active" : ""}`}
               aria-hidden={index !== activeSlide}
               key={slide.title}
             >
-              <img
-                src={slide.image}
-                alt={index === activeSlide ? slide.alt : ""}
-                style={{ objectPosition: slide.position }}
-              />
+              <picture>
+                <source media="(max-width: 600px) and (orientation: portrait)" srcSet={slide.phoneImage} />
+                <source media="(orientation: portrait)" srcSet={slide.tabletImage} />
+                <img
+                  src={slide.image}
+                  alt={index === activeSlide ? slide.alt : ""}
+                  style={{ objectPosition: slide.position }}
+                />
+              </picture>
               <div className="home-slide-overlay" aria-hidden="true" />
               <div className="home-slide-copy">
                 <span>{slide.eyebrow}</span>

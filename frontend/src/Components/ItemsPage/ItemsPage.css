@@ -1,61 +1,34 @@
-.ip-page { width: min(calc(100% - 40px), var(--content-wide)); margin: 0 auto; padding: clamp(32px, 5vw, 60px) 0 56px; }
-.ip-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.ip-title { margin: 0; color: var(--color-text); font-family: inherit; font-size: clamp(1.7rem, 3vw, 2.35rem); letter-spacing: -0.025em; }
-.ip-chip { max-width: min(100%, 420px); overflow: hidden; padding: 7px 12px; border: 1px solid rgba(27,74,145,.18); border-radius: var(--radius-pill); background: var(--color-primary-soft); color: var(--color-text-secondary); font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
-.ip-result { margin: -8px 0 24px; padding: 16px 18px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; }
+.ip-result { margin: 0 0 24px; padding: 16px 18px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; overflow-wrap: anywhere; }
 .ip-notfound { margin: 0; color: var(--color-text); font-size: 1rem; font-weight: 800; }
 .ip-notfound-sub { margin: 4px 0 0; color: var(--color-text-muted); font-size: .84rem; }
-.ip-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: clamp(14px, 2vw, 24px); align-items: stretch; }
 .ip-loading, .ip-state { grid-column: 1 / -1; min-height: clamp(280px, 48vh, 520px); }
 .ip-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; margin: 0; padding: 24px; color: var(--color-text-muted); text-align: center; }
 .ip-state--error { color: #991b1b; }
 .ip-state--error span { font-size: .9rem; }
 
-.ip-card {
+/* Compact marketplace grid at every viewport; the document scrolls naturally. */
+.listing-page.ip-page .listing-page-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(5px, 1vw, 12px);
+}
+.ip-page .item-card--image-only {
   min-width: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: #fff;
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  animation: ip-fade-in 300ms ease-out both;
-  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+  border-radius: 10px;
+  box-shadow: none;
+  animation: none;
 }
-.ip-card:hover { transform: translateY(-4px) scale(1.008); border-color: rgba(27,74,145,.2); box-shadow: var(--shadow-md); }
-.ip-img { width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: var(--color-surface-subtle); }
-.ip-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 350ms ease; }
-.ip-card:hover .ip-img img { transform: scale(1.035); }
-.ip-card-body { display: flex; flex: 1; flex-direction: column; gap: 8px; padding: 15px; }
-.ip-card-body h3 {
-  min-height: 2.7em;
-  margin: 0;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+.ip-page .item-card--image-only:hover { transform: none; }
+.ip-page .item-card--image-only .item-img { aspect-ratio: 1; }
+.ip-page .item-card--image-only .item-img::after { display: none; }
+.ip-page .item-grid-price {
+  padding: 8px 10px;
   color: var(--color-text);
-  font-size: 1rem;
-  line-height: 1.35;
+  font-size: clamp(.72rem, 1.8vw, 1rem);
+  font-weight: 750;
+  line-height: 1.25;
   overflow-wrap: anywhere;
-  white-space: normal;
 }
-.ip-title-price { width: 100%; }
-.ip-card-price { flex: 0 0 auto; }
-.ip-seller { min-width: 0; display: flex; align-items: center; gap: 7px; margin-top: auto; color: var(--color-text-muted); font-size: .78rem; }
-.ip-seller span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ip-seller-avatar { width: 24px; height: 24px; flex: 0 0 auto; border: 1px solid var(--color-border); border-radius: 50%; object-fit: cover; }
-
-@keyframes ip-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 600px) {
-  .ip-page { width: min(calc(100% - 24px), var(--content-wide)); padding-top: 28px; }
-  .ip-header { align-items: flex-start; flex-direction: column; margin-bottom: 18px; }
-  .ip-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
-  .ip-card-body { padding: 11px; }
-  .ip-seller { font-size: .72rem; }
+  .ip-page .item-card--image-only { border-radius: 7px; }
+  .ip-page .item-grid-price { padding: 6px; }
 }
-
-@media (max-width: 340px) { .ip-row { grid-template-columns: 1fr; } }

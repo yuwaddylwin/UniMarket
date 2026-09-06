@@ -12,13 +12,14 @@ function getFirstImageSrc(item) {
   return resolveApiAssetUrl(url, "/Images/placeholder.png");
 }
 
-export default function ItemListingCard({ item, showTypeLabel = false }) {
+export default function ItemListingCard({ item, showTypeLabel = false, imageOnly = false }) {
   const navigate = useNavigate();
   const openListing = () => navigate(`/products/${item._id}`);
 
   return (
     <article
-      className="item-card"
+      className={`item-card${imageOnly ? " item-card--image-only" : ""}`}
+      aria-label={imageOnly ? `${item.title}, ${formatListingPrice(item.price)}` : undefined}
       onClick={openListing}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -36,8 +37,11 @@ export default function ItemListingCard({ item, showTypeLabel = false }) {
           loading="lazy"
           onError={(event) => { event.currentTarget.src = "/Images/placeholder.png"; }}
         />
-        {showTypeLabel && <span className="item-type-badge">Item</span>}
+        {!imageOnly && showTypeLabel && <span className="item-type-badge">Item</span>}
       </div>
+      {imageOnly ? (
+        <div className="item-grid-price">{formatListingPrice(item.price)}</div>
+      ) : (
       <div className="item-body">
         <div className="item-title-price listing-title-price-row">
           <h3 className="item-title">{item.title}</h3>
@@ -56,6 +60,7 @@ export default function ItemListingCard({ item, showTypeLabel = false }) {
         )}
         <p className="item-desc">{item.description}</p>
       </div>
+      )}
     </article>
   );
 }

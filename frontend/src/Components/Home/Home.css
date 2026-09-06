@@ -12,8 +12,9 @@
 
 .home-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 700ms ease, visibility 700ms ease; }
 .home-slide.is-active { opacity: 1; visibility: visible; z-index: 1; }
-.home-slide img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.015); transition: transform 7s linear; }
-.home-slide.is-active img { transform: scale(1.055); }
+.home-slide picture { display: block; width: 100%; height: 100%; }
+.home-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.home-slide--connect img { filter: brightness(1.08); }
 .home-slide-overlay {
   position: absolute;
   inset: 0;
@@ -184,8 +185,6 @@
     height: calc(100dvh - var(--header-mobile-height) - var(--bottom-nav-height));
     min-height: 500px;
   }
-  .home-slide img { transform: scale(1.01); }
-  .home-slide.is-active img { transform: scale(1.035); }
   .home-slide-copy { top: 34px; width: calc(100% - 48px); }
   .home-slide-copy > span { font-size: 0.65rem; }
   .home-slide-copy h1 { font-size: clamp(2rem, 10vw, 3rem); }

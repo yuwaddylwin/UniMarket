@@ -6,6 +6,7 @@ import { useAccommodations } from "../Logics/useAccommodations";
 import ItemListingCard from "../ItemsList/ItemListingCard";
 import AccommodationListingCard from "../Accommodation/AccommodationListingCard";
 import LoadingSpinner from "../common/LoadingSpinner";
+import "../common/ListingPage.css";
 import "./SearchPage.css";
 
 function matchesQuery(listing, query) {
@@ -56,7 +57,7 @@ export default function SearchPage() {
   return (
     <main className="search-page">
       <h1 className="search-page-title">Search UniMarket</h1>
-      <div className="search-page-bar">
+      <div className="search-page-bar listing-search">
         <Search size={21} aria-hidden="true" />
         <input
           type="search"
@@ -96,9 +97,9 @@ export default function SearchPage() {
         ) : (
           <div className="search-results-grid">
             {results.map((listing) => listing.searchResultType === "item" ? (
-              <ItemListingCard item={listing} showTypeLabel key={`item-${listing._id}`} />
+              <ItemListingCard item={listing} key={`item-${listing._id}`} />
             ) : (
-              <AccommodationListingCard listing={listing} showTypeLabel key={`accommodation-${listing._id}`} />
+              <AccommodationListingCard listing={listing} hideTypeLabel key={`accommodation-${listing._id}`} />
             ))}
           </div>
         )}

@@ -1,5 +1,4 @@
 import Report from '../models/report.model.js';
-import { deliverReportNotifications } from '../services/reportNotifications.js';
 import { pairFilter, conversationId, validatePartner, withChatTransaction, isBlocked, blockState, fail, chatError } from '../services/chatSafety.js';
 import cloudinary from "../lib/cloudinary.js";
 import User from "../models/user.model.js";
@@ -148,7 +147,6 @@ export const reportUser = async (req, res) => {
       const [created] = await Report.create([{ reporterId: req.user._id, reportedId: req.params.id, conversationId: conversationId(req.user._id, req.params.id), reason: reason.trim() }], { session });
       return created;
     });
-    void deliverReportNotifications();
     res.status(201).json({ id: report._id, status: report.status, message: 'Report submitted. Thank you for helping keep UniMarket safe.' });
   } catch (error) {
     if (error.code === 11000) return res.status(409).json({ message: 'You already have a pending report for this user' });

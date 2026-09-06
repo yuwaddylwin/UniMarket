@@ -14,7 +14,7 @@ function buildDetails(listing) {
   ].filter(Boolean).join(" · ");
 }
 
-export default function AccommodationListingCard({ listing, showTypeLabel = false }) {
+export default function AccommodationListingCard({ listing, showTypeLabel = false, hideTypeLabel = false }) {
   const navigate = useNavigate();
   const openListing = () => navigate(`/accommodations/${listing._id}`);
   const details = buildDetails(listing);
@@ -42,7 +42,7 @@ export default function AccommodationListingCard({ listing, showTypeLabel = fals
           loading="lazy"
           onError={(event) => { event.currentTarget.src = "/Images/unimarket/accommodation.jpg"; }}
         />
-        {badge && <span>{badge}</span>}
+        {!hideTypeLabel && badge && <span>{badge}</span>}
       </div>
       <div className="accommodation-body">
         <div className="accommodation-title-price listing-title-price-row">

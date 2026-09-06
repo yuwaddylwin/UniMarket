@@ -119,8 +119,8 @@ test("the items page includes both the signed-in user's listing and other users'
     </MemoryRouter>
   );
 
-  expect(screen.getByText("User A Desk")).toBeInTheDocument();
-  expect(screen.getByText("User B Lamp")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /User A Desk/ })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /User B Lamp/ })).toBeInTheDocument();
 });
 
 test("an owner can open their item without being offered a self-chat", () => {
@@ -473,8 +473,9 @@ test("search page mixes and filters database-backed items and accommodations", (
   expect(screen.getByText("User A Desk")).toBeInTheDocument();
   expect(screen.getByText("User B Lamp")).toBeInTheDocument();
   expect(screen.getByText("User A Studio")).toBeInTheDocument();
-  expect(screen.getAllByText("Item")).toHaveLength(2);
-  expect(screen.getByText("Accommodation · Studio")).toBeInTheDocument();
+  expect(screen.queryByText("Item")).not.toBeInTheDocument();
+  expect(screen.queryByText("Accommodation · Studio")).not.toBeInTheDocument();
+  expect(document.querySelector(".accommodation-image > span, .item-type-badge")).toBeNull();
 
   fireEvent.change(screen.getByPlaceholderText("What are you looking for?"), {
     target: { value: "desk" },
