@@ -1,3 +1,4 @@
+import { useSavedStore } from "./useSavedStore";
 import { disableDevicePush } from "../Chat/push";
 import { create } from "zustand";
 import { axiosInstance, setAuthToken, removeAuthToken, getAuthToken } from "../lib/axios.js";
@@ -239,3 +240,10 @@ export const useAuthStore = create((set, get) => ({
   },
   
 }));
+
+// Reset account-specific saved state immediately on login, logout, or account change.
+useAuthStore.subscribe((state, previous) => {
+  if (state.authUser?._id !== previous.authUser?._id) {
+    useSavedStore.getState().setUser(state.authUser?._id || null);
+  }
+});

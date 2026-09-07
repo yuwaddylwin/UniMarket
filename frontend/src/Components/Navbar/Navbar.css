@@ -126,7 +126,7 @@
 .navbar-icon-button:hover { color: var(--color-primary); background: var(--color-primary-soft); transform: translateY(-1px); }
 .navbar-icon-button svg { width: 25px; height: 25px; }
 
-.navbar-cart-badge {
+.navbar-saved-badge {
   position: absolute;
   top: 1px;
   right: 0;

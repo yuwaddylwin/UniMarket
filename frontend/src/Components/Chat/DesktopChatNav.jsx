@@ -1,3 +1,4 @@
+import { useSavedStore } from "../store/useSavedStore";
 import BrandLogo from "../common/BrandLogo";
 import { useLocation, useNavigate } from "react-router-dom";
 import { primaryNavigationItems, getNavigationTarget, isNavigationItemActive } from "../../config/navigation";
@@ -6,9 +7,10 @@ import ProfileAvatar from "../common/ProfileAvatar";
 import NavbarMenu from "../Navbar/NavbarMenu";
 import "./DesktopChatNav.css";
 
-const VISIBLE_RAIL_ITEMS = new Set(["home", "chat", "post", "search", "cart"]);
+const VISIBLE_RAIL_ITEMS = new Set(["home", "chat", "post", "search", "saved"]);
 
-export default function DesktopChatNav({ cartCount = 0 }) {
+export default function DesktopChatNav() {
+  const savedCount = useSavedStore(state => state.entries.length);
   const navigate = useNavigate();
   const location = useLocation();
   const { authUser, totalUnread } = useAuthStore();
@@ -23,7 +25,7 @@ export default function DesktopChatNav({ cartCount = 0 }) {
         {railItems.map((item) => {
           const Icon = item.icon;
           const active = isNavigationItemActive(item, location.pathname);
-          const badge = item.id === "chat" ? (location.pathname.startsWith("/chat") ? 0 : totalUnread) : item.id === "cart" ? cartCount : 0;
+          const badge = item.id === "chat" ? (location.pathname.startsWith("/chat") ? 0 : totalUnread) : item.id === "saved" ? savedCount : 0;
           return (
             <button
               key={item.id}

@@ -1,11 +1,10 @@
-import { ReportButton } from '../common/ReportDialog';
+import SaveButton from "../common/SaveButton";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
   MapPin,
   MessageCircle,
-  ShoppingCart,
   X,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -50,7 +49,6 @@ export default function ListingFeed({
   listingType,
   isLoading,
   error,
-  onAddToCart,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -85,11 +83,6 @@ export default function ListingFeed({
     navigate(`/chat/${ownerId}`);
   };
 
-  const handleAddToCart = (listing) => {
-    if (!requireAuthentication()) return;
-    if (String(getOwnerId(listing)) === String(currentUserId)) return;
-    onAddToCart?.(listing);
-  };
 
   return (
     <main className="listing-feed-page">
@@ -123,7 +116,6 @@ export default function ListingFeed({
                 listing={listing}
                 listingType={listingType}
                 isMine={isMine}
-                onAddToCart={() => handleAddToCart(listing)}
                 onChat={() => handleChat(listing)}
               />
             );
@@ -134,7 +126,7 @@ export default function ListingFeed({
   );
 }
 
-function ListingFeedPost({ listing, listingType, isMine, onAddToCart, onChat }) {
+function ListingFeedPost({ listing, listingType, isMine, onChat }) {
   const isAccommodation = listingType === "accommodation";
   const seller = listing?.seller || (typeof listing?.user === "object" ? listing.user : null);
   const sellerName = seller?.fullName || seller?.name || seller?.username || "Seller";
@@ -272,16 +264,11 @@ function ListingFeedPost({ listing, listingType, isMine, onAddToCart, onChat }) 
 
       <div className="listing-feed-content">
         <div className="listing-feed-actions">
-          {!isAccommodation && !isMine && (
-            <button type="button" className="is-primary" onClick={onAddToCart}>
-              <ShoppingCart size={18} aria-hidden="true" />
-              Add to Cart
-            </button>
-          )}
+          <SaveButton listing={listing} listingType={listingType} listingId={listing._id || listing.id} />
           {!isMine && (
             <button type="button" onClick={onChat}>
               <MessageCircle size={18} aria-hidden="true" />
-              Chat with {isAccommodation ? "Host" : "Seller"}
+              Chat with Seller
             </button>
           )}
           {isMine && <span className="listing-feed-own-note">This is your listing</span>}
@@ -292,7 +279,6 @@ function ListingFeedPost({ listing, listingType, isMine, onAddToCart, onChat }) 
           <strong className="listing-price">{price}</strong>
         </div>
 
-        <ReportButton targetKind={listingType} targetId={listing._id || listing.id} ownerId={getOwnerId(listing)} />
         <FeedDescription description={listing?.description} sellerName={sellerName} />
 
         {isAccommodation && Number.isInteger(listing.bedrooms) && (

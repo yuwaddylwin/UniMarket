@@ -1,3 +1,4 @@
+import SaveButton from "../common/SaveButton";
 import { MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProfileAvatar from "../common/ProfileAvatar";
@@ -42,6 +43,7 @@ export default function AccommodationListingCard({ listing, showTypeLabel = fals
           loading="lazy"
           onError={(event) => { event.currentTarget.src = "/Images/unimarket/accommodation.jpg"; }}
         />
+        <SaveButton listing={listing} listingType="accommodation" listingId={listing._id} compact />
         {!hideTypeLabel && badge && <span>{badge}</span>}
       </div>
       <div className="accommodation-body">

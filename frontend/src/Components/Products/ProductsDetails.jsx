@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useItemsList } from "../Logics/useItemsList";
 import ListingFeed from "../Feed/ListingFeed";
 
-export default function ProductsDetails({ AddtoCart }) {
+export default function ProductsDetails() {
   const { id } = useParams();
   const { items, isLoading, error } = useItemsList();
 
@@ -13,7 +13,6 @@ export default function ProductsDetails({ AddtoCart }) {
       listingType="item"
       isLoading={isLoading}
       error={error}
-      onAddToCart={AddtoCart}
     />
   );
 }

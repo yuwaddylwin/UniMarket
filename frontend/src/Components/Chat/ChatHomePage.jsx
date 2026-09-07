@@ -9,7 +9,7 @@ import "./ChatHomePage.css";
 import { useIsMobile } from "./IsMobile";
 import DesktopChatNav from "./DesktopChatNav";
 
-const ChatHomePage = ({ cartCount = 0 }) => {
+const ChatHomePage = () => {
   const { sellerId } = useParams(); 
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.authUser);
@@ -91,7 +91,7 @@ const ChatHomePage = ({ cartCount = 0 }) => {
   // DESKTOP: show BOTH sidebar + chat
   return (
     <div className="chat-desktop-shell">
-      <DesktopChatNav cartCount={cartCount} />
+      <DesktopChatNav />
       <div className="chat-layout">
         <div className="chat-sidebar">
           <Sidebar />

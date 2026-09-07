@@ -192,8 +192,8 @@ textarea::placeholder {
 .accommodation-card,
 .ip-card,
 .profile-item-card,
-.cart-page,
-.cart-page li,
+.saved-page,
+.saved-page li,
 .item-summary,
 .seller-card,
 .profile-hero,
@@ -214,7 +214,7 @@ textarea::placeholder {
 .accommodation-card,
 .ip-card,
 .profile-item-card,
-.cart-page li {
+.saved-page li {
   border-radius: var(--radius-md);
 }
 
@@ -222,7 +222,7 @@ textarea::placeholder {
 .accommodation-card:hover,
 .ip-card:hover,
 .profile-item-card:hover,
-.cart-page li:hover {
+.saved-page li:hover {
   border-color: rgba(27, 74, 145, .22);
   box-shadow: var(--shadow-sm);
 }
@@ -242,7 +242,7 @@ textarea::placeholder {
 .profile-item-title,
 .listing-feed-heading h2,
 .item-title,
-.cart-title {
+.saved-title {
   color: var(--color-text);
   font-family: var(--font-ui);
   font-weight: 700;
@@ -270,8 +270,7 @@ textarea::placeholder {
 .submit-btn,
 .talk-btn,
 .talk-to-seller,
-.add-to-cart,
-.cart-empty button,
+.saved-empty button,
 .profile-primary-action,
 .profile-save-photo,
 .settings-name-form button[type="submit"],
@@ -291,8 +290,7 @@ textarea::placeholder {
 .submit-btn:hover,
 .talk-btn:hover,
 .talk-to-seller:hover,
-.add-to-cart:hover,
-.cart-empty button:hover,
+.saved-empty button:hover,
 .profile-primary-action:hover,
 .profile-save-photo:hover,
 .settings-name-form button[type="submit"]:hover,
@@ -350,7 +348,7 @@ textarea::placeholder {
 .listing-feed-state,
 .profile-empty-state,
 .archive-empty,
-.cart-empty,
+.saved-empty,
 .conversation-empty,
 .no-users {
   color: var(--color-text-muted);
@@ -358,7 +356,7 @@ textarea::placeholder {
 
 .profile-empty-state,
 .archive-empty,
-.cart-empty,
+.saved-empty,
 .conversation-empty,
 .no-users {
   border-color: var(--color-border);
@@ -378,7 +376,7 @@ textarea::placeholder {
 .items-eyebrow,
 .accommodation-eyebrow,
 .post-eyebrow,
-.cart-eyebrow,
+.saved-eyebrow,
 .profile-eyebrow,
 .profile-settings-header > span,
 .legal-eyebrow,
@@ -393,7 +391,7 @@ textarea::placeholder {
 
 .listing-price,
 .item-price,
-.cart-price,
+.saved-price,
 .ip-card-price,
 .profile-item-price {
   font-weight: 800;
@@ -402,7 +400,7 @@ textarea::placeholder {
 .home-value-icon,
 .settings-row-icon,
 .password-toggle,
-.cart-count {
+.saved-count {
   background: var(--color-primary-soft);
   color: var(--color-primary);
 }
@@ -429,7 +427,7 @@ textarea::placeholder {
 .accommodations-page-header h1,
 .search-results-header h2,
 .post-title,
-.cart-page h1,
+.saved-page h1,
 .profile-identity h1,
 .profile-section-heading h2,
 .profile-settings-header h1,
@@ -538,3 +536,5 @@ textarea::placeholder {
   .ip-card,
   .profile-item-card { border-radius: var(--radius-md); }
 }
+
+.listing-feed-actions .save-listing-button.is-saved { background: var(--color-primary-soft); border-color: var(--color-primary); }

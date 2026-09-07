@@ -1,3 +1,5 @@
+import savedRoutes from "./src/routes/saved.route.js";
+import SavedListing from "./src/models/savedListing.model.js";
 import adminRoutes from './src/routes/admin.route.js';
 import reportRoutes from './src/routes/reports.route.js';
 import { startChatAlertWorker } from './src/services/chatAlerts.js';
@@ -39,6 +41,7 @@ const MONGOURL = process.env.MONGO_URL;
 
 
 // Routes
+app.use("/api/saved", savedRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/items", ItemsList);
@@ -66,6 +69,7 @@ app.use((error, req, res, next) => {
 mongoose
 .connect(MONGOURL)
 .then(async ()=>{
+    await SavedListing.init();
     await migrateReports();
     startChatAlertWorker();
     startModerationMaintenance();

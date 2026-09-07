@@ -6,7 +6,8 @@ import ProfilePage from "./Components/Profile/forms/ProfilePage";
 import AccommodationDetails from "./Components/Accommodation/AccommodationDetails";
 import AccommodationSection from "./Components/Accommodation/AccommodationSection";
 import BottomNav from "./Components/BottomNavBar/BottomNav";
-import CartPage from "./Components/BottomNavBar/ShoppingCart/CartPage";
+import SavedPage from "./Components/Saved/SavedPage";
+import { useSavedStore } from "./Components/store/useSavedStore";
 import SearchPage from "./Components/Search/SearchPage";
 import { normalizeSeller } from "./Components/Logics/useItemsList";
 import { normalizeAccommodationSeller } from "./Components/Logics/useAccommodations";
@@ -102,6 +103,7 @@ const ownAccommodation = {
 
 beforeEach(() => {
   mockItems = [ownItem, otherItem];
+  useSavedStore.setState({ userId: userA._id, entries: [], pending: {}, loaded: true, loading: false, error: "" });
   mockAuthUser = userA;
   mockRouteId = null;
   mockAccommodations = [];
@@ -129,7 +131,7 @@ test("an owner can open their item without being offered a self-chat", () => {
   const { container } = render(
     <MemoryRouter initialEntries={["/products/item-a"]}>
       <Routes>
-        <Route path="/products/:id" element={<ProductsDetails AddtoCart={jest.fn()} />} />
+        <Route path="/products/:id" element={<ProductsDetails />} />
       </Routes>
     </MemoryRouter>
   );
@@ -140,11 +142,10 @@ test("an owner can open their item without being offered a self-chat", () => {
 
 test("another user still sees the chat action on a listing", () => {
   mockRouteId = "item-b";
-  const addToCart = jest.fn();
   const { container } = render(
     <MemoryRouter initialEntries={["/products/item-b"]}>
       <Routes>
-        <Route path="/products/:id" element={<ProductsDetails AddtoCart={addToCart} />} />
+        <Route path="/products/:id" element={<ProductsDetails />} />
       </Routes>
     </MemoryRouter>
   );
@@ -155,8 +156,9 @@ test("another user still sees the chat action on a listing", () => {
   expect(within(posts[0]).queryByText("Items")).not.toBeInTheDocument();
   expect(within(posts[0]).getByText("฿200")).toHaveClass("listing-price");
   expect(within(posts[0]).getByRole("button", { name: /chat with seller/i })).toBeInTheDocument();
-  fireEvent.click(within(posts[0]).getByRole("button", { name: /add to cart/i }));
-  expect(addToCart).toHaveBeenCalledWith(otherItem);
+  expect(within(posts[0]).getByRole("button", { name: "Save" })).toBeInTheDocument();
+  fireEvent.click(within(posts[0]).getByRole("button", { name: /chat with seller/i }));
+  expect(mockNavigate).toHaveBeenCalledWith("/chat/user-b");
 });
 
 test("selected-first ordering keeps every listing once", () => {
@@ -172,7 +174,7 @@ test("long feed descriptions expand and collapse without losing content", () => 
 
   render(
     <MemoryRouter>
-      <ProductsDetails AddtoCart={jest.fn()} />
+      <ProductsDetails />
     </MemoryRouter>
   );
 
@@ -205,7 +207,7 @@ test("description expansion stays in natural post flow and is independent", () =
 
   const { container } = render(
     <MemoryRouter>
-      <ProductsDetails AddtoCart={jest.fn()} />
+      <ProductsDetails />
     </MemoryRouter>
   );
 
@@ -229,7 +231,7 @@ test("empty descriptions add no empty area or controls", () => {
 
   const { container } = render(
     <MemoryRouter>
-      <ProductsDetails AddtoCart={jest.fn()} />
+      <ProductsDetails />
     </MemoryRouter>
   );
 
@@ -246,7 +248,7 @@ test("feed carousel updates arrows, swipe position, counter, and indicator dots"
 
   const { container } = render(
     <MemoryRouter>
-      <ProductsDetails AddtoCart={jest.fn()} />
+      <ProductsDetails />
     </MemoryRouter>
   );
 
@@ -280,7 +282,7 @@ test("an accommodation owner can open their listing without a self-chat action",
   );
 
   expect(screen.getByText("My Listing")).toBeInTheDocument();
-  expect(within(container.querySelector('[data-listing-id="stay-a"]')).queryByRole("button", { name: /chat with host/i })).not.toBeInTheDocument();
+  expect(within(container.querySelector('[data-listing-id="stay-a"]')).queryByRole("button", { name: /chat with seller/i })).not.toBeInTheDocument();
 });
 
 test("another user can chat with an accommodation owner", async () => {
@@ -294,7 +296,7 @@ test("another user can chat with an accommodation owner", async () => {
     </MemoryRouter>
   );
 
-  expect(screen.getByRole("button", { name: /chat with host/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /chat with seller/i })).toBeInTheDocument();
 });
 
 test("profile retrieves and displays items and accommodations from their own APIs", async () => {
@@ -489,7 +491,7 @@ test("search page mixes and filters database-backed items and accommodations", (
   expect(mockNavigate).toHaveBeenCalledWith("/products/item-a");
 });
 
-test("bottom Search opens its dedicated active page and empty Cart browses Home", () => {
+test("bottom Search opens its dedicated active page and empty Saved browses Home", () => {
   mockPathname = "/search";
   const { unmount } = render(<MemoryRouter><BottomNav /></MemoryRouter>);
   const searchButton = screen.getByRole("button", { name: "Search" });
@@ -499,7 +501,48 @@ test("bottom Search opens its dedicated active page and empty Cart browses Home"
   unmount();
 
   mockNavigate.mockClear();
-  render(<MemoryRouter><CartPage cartItems={[]} setCartItems={jest.fn()} /></MemoryRouter>);
-  fireEvent.click(screen.getByRole("button", { name: "Browse items" }));
+  render(<MemoryRouter><SavedPage /></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button", { name: "Browse listings" }));
   expect(mockNavigate).toHaveBeenCalledWith("/");
+});
+
+test("Saved includes item and accommodation links, seller chat, and unsave controls", () => {
+  useSavedStore.setState({ entries: [
+    { listingType: "item", listingId: otherItem._id, listing: otherItem },
+    { listingType: "accommodation", listingId: ownAccommodation._id, listing: ownAccommodation },
+  ] });
+  render(<SavedPage />);
+  expect(screen.getByRole("link", { name: otherItem.title })).toHaveAttribute("href", `/products/${otherItem._id}`);
+  expect(screen.getByRole("link", { name: ownAccommodation.title })).toHaveAttribute("href", `/accommodations/${ownAccommodation._id}`);
+  expect(screen.getAllByRole("button", { name: "Save" })).toHaveLength(2);
+  fireEvent.click(screen.getByRole("button", { name: "Chat with Seller" }));
+  expect(mockNavigate).toHaveBeenCalledWith(`/chat/${userB._id}`);
+});
+
+test("a card bookmark saves without navigating to the listing", async () => {
+  axiosInstance.put = jest.fn().mockResolvedValue({ data: { listingType: "item", listingId: otherItem._id, listing: otherItem } });
+  const { container } = render(<ItemsPage />);
+  const card = [...container.querySelectorAll('.item-card')].find(card => card.textContent.includes(otherItem.title) || card.getAttribute('aria-label')?.includes(otherItem.title));
+  fireEvent.click(within(card).getByRole('button', { name: 'Save' }));
+  await waitFor(() => expect(within(card).getByRole('button', { name: 'Save' })).toHaveAttribute('aria-pressed', 'true'));
+  expect(mockNavigate).not.toHaveBeenCalled();
+});
+
+test.each(['item', 'accommodation'])('Saved asks before removing %s and Cancel keeps it saved', async listingType => {
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', ''); };
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
+  const listing = listingType === 'item' ? otherItem : ownAccommodation;
+  useSavedStore.setState({ entries: [{ listingType, listingId: listing._id, listing }] });
+  render(<SavedPage />);
+  fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+  expect(screen.getByRole('dialog', { name: 'Remove from Saved?' })).toBeInTheDocument();
+  expect(axiosInstance.delete).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(useSavedStore.getState().entries).toHaveLength(1);
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(axiosInstance.delete).toHaveBeenCalledTimes(1);
+  expect(useSavedStore.getState().entries).toHaveLength(0);
 });

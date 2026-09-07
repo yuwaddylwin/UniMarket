@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Navbar from "./Navbar";
 
+jest.mock("../lib/axios", () => ({ axiosInstance: { get: jest.fn(), put: jest.fn(), delete: jest.fn() } }));
+
 let mockAuthUser = null;
 const mockLogout = jest.fn();
 const mockNavigate = jest.fn();
@@ -106,4 +108,11 @@ test("authenticated users can log out from the menu", async () => {
   fireEvent.click(screen.getByRole("button", { name: /logout/i }));
 
   await waitFor(() => expect(logout).toHaveBeenCalledTimes(1));
+});
+
+test("bookmark navigation opens Saved in the existing action position", () => {
+  render(<Navbar />);
+  const saved = screen.getByRole('link', { name: 'Saved listings with 0 listings' });
+  expect(saved).toHaveAttribute('href', '/saved');
+  expect(saved.querySelector('.lucide-bookmark')).not.toBeNull();
 });

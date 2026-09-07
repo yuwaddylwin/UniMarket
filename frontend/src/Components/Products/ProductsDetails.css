@@ -204,7 +204,7 @@
 .item-description { margin: 0; color: #536071; font-size: 0.92rem; line-height: 1.7; overflow-wrap: anywhere; white-space: pre-wrap; }
 
 .bottom-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: auto; padding-top: 30px; }
-.add-to-cart,
+.save-listing-button,
 .talk-to-seller {
   min-width: 0;
   min-height: 50px;
@@ -219,11 +219,11 @@
   cursor: pointer;
   transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
-.add-to-cart { border: 1px solid var(--pd-blue); background: var(--pd-blue); color: #fff; box-shadow: 0 9px 20px rgba(27, 74, 145, 0.2); }
-.add-to-cart:hover { background: var(--pd-blue-hover); border-color: var(--pd-blue-hover); box-shadow: 0 12px 24px rgba(27, 74, 145, 0.26); transform: translateY(-1px); }
+.save-listing-button { border: 1px solid var(--pd-blue); background: var(--pd-blue); color: #fff; box-shadow: 0 9px 20px rgba(27, 74, 145, 0.2); }
+.save-listing-button:hover { background: var(--pd-blue-hover); border-color: var(--pd-blue-hover); box-shadow: 0 12px 24px rgba(27, 74, 145, 0.26); transform: translateY(-1px); }
 .talk-to-seller { border: 1px solid rgba(27, 74, 145, 0.28); background: #fff; color: var(--pd-blue); }
 .talk-to-seller:hover { border-color: rgba(27, 74, 145, 0.46); background: var(--color-primary-soft); transform: translateY(-1px); }
-.add-to-cart:active,
+.save-listing-button:active,
 .talk-to-seller:active { transform: translateY(0) scale(0.98); }
 
 .fullscreen-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: clamp(14px, 3vw, 28px); background: rgba(5, 9, 17, 0.94); }
@@ -254,7 +254,7 @@
   .item-summary { min-height: 0; padding: 25px 16px 28px; border-radius: 16px; }
   .item-title { font-size: clamp(1.65rem, 8vw, 2.1rem); }
   .bottom-buttons { grid-template-columns: 1fr; padding-top: 28px; }
-  .add-to-cart, .talk-to-seller { min-height: 50px; }
+  .save-listing-button, .talk-to-seller { min-height: 50px; }
   .nav-btn { width: 38px; height: 38px; }
   .nav-btn.left { left: 9px; }
   .nav-btn.right { right: 9px; }

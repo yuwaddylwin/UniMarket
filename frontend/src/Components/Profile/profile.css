@@ -14,7 +14,7 @@
     animation: fadeIn 0.3s ease-in-out;
   }
 
-  /* PROFILE — match cart size & behavior exactly */
+  /* PROFILE — responsive page layout */
 .profile-icon {
     width: clamp(38px, 4vw, 46px);
     height: clamp(38px, 4vw, 46px);

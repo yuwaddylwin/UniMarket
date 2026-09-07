@@ -1,11 +1,12 @@
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import ChatActivityBridge from './Components/Chat/ChatActivityBridge';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import Home from "./Components/Home/Home";
 import Sell from "./Components/SellPage/sell";
-import CartPage from "./Components/BottomNavBar/ShoppingCart/CartPage";
+import SavedPage from "./Components/Saved/SavedPage";
+import { useSavedStore } from "./Components/store/useSavedStore";
 import ProductsDetails from "./Components/Products/ProductsDetails";
 import ProfilePage from "./Components/Profile/forms/ProfilePage";
 import ProfileSettingsPage from "./Components/Profile/forms/ProfileSettingsPage";
@@ -21,7 +22,6 @@ import ResendVerificationPage from "./pages/ResendVerificationPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import { PrivacyPage, TermsPage } from "./pages/LegalPage";
 
-import { useHomeLogic } from "./Components/Logics/useHome";
 import { useAuthStore } from "./Components/store/useAuthStore";
 import LoadingSpinner from "./Components/common/LoadingSpinner";
 import RequireAuth from "./Components/common/RequireAuth";
@@ -32,9 +32,10 @@ import "./App.css";
 import "./theme.css";
 
 export default function App() {
-  const [cartItems, setCartItems] = useState([]);
   const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
-  const { AddtoCart } = useHomeLogic(cartItems, setCartItems);
+  useEffect(() => {
+    useSavedStore.getState().setUser(authUser?._id || null);
+  }, [authUser?._id]);
 
   useEffect(() => {
     checkAuth();
@@ -61,8 +62,8 @@ export default function App() {
       <Routes>
         <Route path="/admin/*" element={<AdminDashboard />} />
         {/* ROUTES WITH BottomNav */}
-        <Route element={<MainLayout cartItems={cartItems} />}>
-          <Route path="/" element={<Home cartItems={cartItems} setCartItems={setCartItems} />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginForm/>} /> 
           <Route path="/signup" element={<SignUpForm/>} />
           <Route
@@ -81,7 +82,7 @@ export default function App() {
               </RequireAuth>
             }
           />
-          <Route path="/cart" element={<CartPage cartItems={cartItems} setCartItems={setCartItems} />} />
+          <Route path="/saved" element={<RequireAuth><SavedPage /></RequireAuth>} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route
             path="/profile/settings"
@@ -91,32 +92,24 @@ export default function App() {
               </RequireAuth>
             }
           />
-          <Route path="/products" element={<ItemsPage AddtoCart={AddtoCart} />} />
+          <Route path="/products" element={<ItemsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/accommodations" element={<AccommodationsPage />} />
           <Route path="/accommodations/:id" element={<AccommodationDetails />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
-          <Route path="/products/:id"
-            element={
-              <ProductsDetails
-              AddtoCart={AddtoCart}
-              cartItems={cartItems}
-              setCartItems={setCartItems}
-              />
-            }
-          />
+          <Route path="/products/:id" element={<ProductsDetails />} />
         </Route>
 
         {/* ROUTES WITHOUT BottomNav */}
         <Route
           element={
-            <MainLayout cartItems={cartItems} showBottomNav={false} />
+            <MainLayout showBottomNav={false} />
           }
         >
-            <Route path="/chat" element={<RequireAuth><ChatHomePage cartCount={cartItems.length} /></RequireAuth>} />
-            <Route path="/chat/:sellerId" element={<RequireAuth><ChatHomePage cartCount={cartItems.length} /></RequireAuth>} />
+            <Route path="/chat" element={<RequireAuth><ChatHomePage /></RequireAuth>} />
+            <Route path="/chat/:sellerId" element={<RequireAuth><ChatHomePage /></RequireAuth>} />
             <Route path="/verify/:token" element={<VerifyEmailPage />} />
             <Route path="/resend-verification" element={<ResendVerificationPage />} />
         </Route>

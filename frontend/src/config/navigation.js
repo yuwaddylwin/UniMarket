@@ -6,7 +6,7 @@ import {
   Plus,
   Search,
   Settings,
-  ShoppingCart,
+  Bookmark,
   User,
 } from "lucide-react";
 
@@ -18,7 +18,7 @@ export const primaryNavigationItems = [
   { id: "profile", label: "Profile", to: "/profile", icon: User, mobile: true, auth: true },
   { id: "products", label: "Browse items", to: "/products", icon: PackageSearch },
   { id: "accommodations", label: "Accommodation", to: "/accommodations", icon: Building2 },
-  { id: "cart", label: "Cart", to: "/cart", icon: ShoppingCart },
+  { id: "saved", label: "Saved", to: "/saved", icon: Bookmark, auth: true },
   { id: "settings", label: "Settings", to: "/profile/settings", icon: Settings, auth: true },
 ];
 

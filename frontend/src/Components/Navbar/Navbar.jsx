@@ -1,11 +1,13 @@
+import { useSavedStore } from "../store/useSavedStore";
 import BrandLogo from "../common/BrandLogo";
 import "./Navbar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Search as SearchIcon, ShoppingCart } from "lucide-react";
+import { Search as SearchIcon, Bookmark } from "lucide-react";
 import NavbarMenu from "./NavbarMenu";
 
-export default function Navbar({ cartCount = 0 }) {
+export default function Navbar() {
+  const savedCount = useSavedStore(state => state.entries.length);
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -34,12 +36,12 @@ export default function Navbar({ cartCount = 0 }) {
         <div className="navbar-actions">
           {!isMenuOpen && (
             <Link
-              className="navbar-icon-button navbar-cart-button"
-              to="/cart"
-              aria-label={`Cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}
+              className="navbar-icon-button navbar-saved-button"
+              to="/saved"
+              aria-label={`Saved listings with ${savedCount} listing${savedCount === 1 ? "" : "s"}`}
             >
-              <ShoppingCart aria-hidden="true" />
-              {cartCount > 0 && <span className="navbar-cart-badge">{cartCount > 99 ? "99+" : cartCount}</span>}
+              <Bookmark aria-hidden="true" />
+              {savedCount > 0 && <span className="navbar-saved-badge">{savedCount > 99 ? "99+" : savedCount}</span>}
             </Link>
           )}
           <NavbarMenu menuId="navbar-menu" onOpenChange={setIsMenuOpen} />

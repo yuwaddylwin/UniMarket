@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import BottomNav from "../BottomNavBar/BottomNav";
 import Navbar from "../Navbar/Navbar";
 
-const MainLayout = ({ cartItems, showBottomNav = true }) => {
+const MainLayout = ({ showBottomNav = true }) => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isChatRoute = location.pathname === "/chat" || location.pathname.startsWith("/chat/");
@@ -12,7 +12,7 @@ const MainLayout = ({ cartItems, showBottomNav = true }) => {
 
   return (
     <div className={`app-shell${isChatRoute ? " app-shell--chat" : ""}${isActiveMobileChat ? " app-shell--active-chat" : ""}`}>
-      <Navbar cartCount={cartItems.length} />
+      <Navbar />
       <div
         className={`app-content${isHome ? " app-content--home" : ""}${
           renderBottomNav ? " app-content--with-bottom" : " app-content--without-bottom"

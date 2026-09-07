@@ -1,3 +1,4 @@
+import SaveButton from "../common/SaveButton";
 import { useNavigate } from "react-router-dom";
 import ProfileAvatar from "../common/ProfileAvatar";
 import { formatListingPrice } from "../common/listingPrice";
@@ -37,6 +38,7 @@ export default function ItemListingCard({ item, showTypeLabel = false, imageOnly
           loading="lazy"
           onError={(event) => { event.currentTarget.src = "/Images/placeholder.png"; }}
         />
+        <SaveButton listing={item} listingType="item" listingId={item._id} compact />
         {!imageOnly && showTypeLabel && <span className="item-type-badge">Item</span>}
       </div>
       {imageOnly ? (

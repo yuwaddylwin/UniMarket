@@ -1,5 +1,5 @@
 import { useChatStore } from "../store/useChatStore";
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageBubble from "./MessageBubble";
@@ -60,15 +60,38 @@ const ChatContainer = () => {
         {messages.length === 0 && (
           <div className="conversation-empty">Send a message to start the conversation.</div>
         )}
-        {messages.map((message) => (
+        {messages.map((message, index) => {
+          const date = new Date(message.createdAt);
+          const previousDate = index > 0 ? new Date(messages[index - 1].createdAt) : null;
+          const showDate = !Number.isNaN(date.getTime()) && (
+            !previousDate || date.toDateString() !== previousDate.toDateString()
+          );
+
+          return (
+          <Fragment key={message._id}>
+            {showDate && (
+              <div className="chat-date-divider">
+                <time dateTime={date.toISOString()}>
+                  {date.toLocaleDateString([], {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                    ...(date.getFullYear() !== new Date().getFullYear() ? { year: "numeric" } : {}),
+                  })}
+                  {" · "}
+                  {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </time>
+              </div>
+            )}
           <MessageBubble
-            key={message._id}
             message={message}
             isOwn={message.senderId === authUser._id}
             authUser={authUser}
             selectedUser={selectedUser}
           />
-        ))}
+          </Fragment>
+          );
+        })}
       <div ref={messageEndRef} style={{ height: 0 }} />
       </div>
 
