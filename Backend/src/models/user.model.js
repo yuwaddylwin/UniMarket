@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    role: { type: String, enum: ["user", "admin"], default: "user", index: true },
+    warningCount: { type: Number, default: 0 },
+    restriction: {
+      status: { type: String, enum: ["active", "frozen", "suspended"], default: "active" },
+      until: Date, reason: String,
+    },
     fullName: {
         type: String,
         required: true,
@@ -35,16 +41,13 @@ const userSchema = new mongoose.Schema(
         select: false,
     },
     preferences: {
+      browserPush: { type: Boolean, default: false },
       language: {
         type: String,
         enum: ["en", "th"],
         default: "en",
       },
       messages: {
-        type: Boolean,
-        default: true,
-      },
-      notifications: {
         type: Boolean,
         default: true,
       },

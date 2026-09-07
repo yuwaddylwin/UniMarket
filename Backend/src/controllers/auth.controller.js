@@ -1,3 +1,4 @@
+import { accountStatus } from '../services/moderationPolicy.js';
 import { withChatTransaction, chatError, blockState } from "../services/chatSafety.js";
 import { io, getReceiverSocketId } from "../lib/socket.js";
 import cloudinary from "../lib/cloudinary.js";
@@ -39,14 +40,17 @@ const destroyProfileImage = async (publicId) => {
 
 const serializePublicUser = (user) => ({
   _id: user._id,
+  role: user.role || "user",
+  accountStatus: accountStatus(user),
+  restriction: user.restriction,
   fullName: user.fullName,
   username: user.username || "",
   email: user.email,
   profilePic: user.profilePic || "",
   preferences: {
+    browserPush: user.preferences?.browserPush === true,
     language: user.preferences?.language || "en",
     messages: user.preferences?.messages !== false,
-    notifications: user.preferences?.notifications !== false,
   },
   verified: user.verified,
   createdAt: user.createdAt,
@@ -414,19 +418,20 @@ const updatePreferences = async (req, res) => {
   try {
     const language = req.body?.language;
     const messages = req.body?.messages;
-    const notifications = req.body?.notifications;
 
     if (!['en', 'th'].includes(language)) {
       return res.status(400).json({ message: "Language must be English or Thai" });
     }
-    if (typeof messages !== "boolean" || typeof notifications !== "boolean") {
-      return res.status(400).json({ message: "Notification preferences must be true or false" });
+    if (typeof messages !== "boolean") {
+      return res.status(400).json({ message: "Message alert preference must be true or false" });
     }
 
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    user.preferences = { language, messages, notifications };
+    const { browserPush = user.preferences?.browserPush === true } = req.body;
+    if (typeof browserPush !== "boolean") return res.status(400).json({ message: "Invalid message alert preference" });
+    user.preferences = { language, messages, browserPush };
     await user.save();
     return res.status(200).json(serializePublicUser(user));
   } catch (error) {

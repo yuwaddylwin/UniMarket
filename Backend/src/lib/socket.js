@@ -35,6 +35,7 @@ io.on('connection', socket => {
   socket.join(getReceiverSocketId(id));
   online.set(id, (online.get(id) || 0) + 1);
   io.emit('getOnlineUsers', [...online.keys()]);
+  socket.on('chat:activity', active => { socket.data.chatActiveUntil = active === true ? Date.now() + 45000 : 0; });
   socket.on('disconnect', () => {
     const count = online.get(id) - 1;
     if (count) online.set(id, count); else online.delete(id);

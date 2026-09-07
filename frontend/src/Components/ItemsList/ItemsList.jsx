@@ -1,13 +1,12 @@
+import ViewAllLink from "../common/ViewAllLink";
 import React, { useEffect, useRef, useState } from "react";
 import "./ItemsList.css";
 import { useItemsList } from "../Logics/useItemsList";
-import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ItemListingCard from "./ItemListingCard";
 
 export default function ItemsList() {
   const { items, isLoading, error } = useItemsList();
-  const navigate = useNavigate();
 
   const scrollerRef = useRef(null);
   const [showArrows, setShowArrows] = useState(false);
@@ -57,9 +56,7 @@ export default function ItemsList() {
           <span className="items-eyebrow">Fresh from your community</span>
           <h2>Popular Items</h2>
         </div>
-        <button className="items-view-link" type="button" onClick={() => navigate("/products")}>
-          View All <span aria-hidden="true">&gt;</span>
-        </button>
+        <ViewAllLink to="/products" label="View all items" />
       </div>
 
       <div className="il-wrap">

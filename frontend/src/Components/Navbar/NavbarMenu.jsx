@@ -112,7 +112,7 @@ export default function NavbarMenu({ menuId = "navbar-menu", onOpenChange }) {
           <div className="navbar-menu-content">
             <span className="navbar-menu-eyebrow">Explore UniMarket</span>
             <ul className="navbar-menu-list">
-              {MAIN_MENU_ITEMS.map((item) => (
+              {[...MAIN_MENU_ITEMS, ...(authUser?.role === "admin" ? [{ number: "", label: "Admin Dashboard", to: "/admin" }] : [])].map((item) => (
                 <li key={item.label}>
                   <Link className="navbar-menu-item" to={item.to} onClick={closeMenu}>
                     <span className="navbar-menu-number">{item.number}</span>

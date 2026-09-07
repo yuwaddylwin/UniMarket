@@ -40,7 +40,7 @@ export default function BottomNav() {
             icon={icon}
             active={active}
             onClick={() => navigate(getNavigationTarget(item, authUser))}
-            badge={item.id === "chat" && totalUnread > 0 ? (totalUnread > 99 ? "99+" : totalUnread) : null}
+            badge={item.id === "chat" && !location.pathname.startsWith("/chat") && totalUnread > 0 ? (totalUnread > 99 ? "99+" : totalUnread) : null}
           />
         );
       })}

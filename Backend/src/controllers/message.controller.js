@@ -1,5 +1,8 @@
-import Report from '../models/report.model.js';
-import { pairFilter, conversationId, validatePartner, withChatTransaction, isBlocked, blockState, fail, chatError } from '../services/chatSafety.js';
+import { assertActive } from '../services/moderationPolicy.js';
+import { addChatAlert, isChatPageActive } from '../services/chatAlerts.js';
+import { ChatAlert } from '../models/chatAlert.model.js';
+import { createReport } from '../routes/reports.route.js';
+import { pairFilter, validatePartner, withChatTransaction, isBlocked, blockState, fail, chatError } from '../services/chatSafety.js';
 import cloudinary from "../lib/cloudinary.js";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
@@ -92,8 +95,11 @@ export const sendMessage = async (req, res) => {
       imageUrl = (await cloudinary.uploader.upload(image)).secure_url;
     }
     const message = await withChatTransaction(req.user._id, other, async (session, me, partner) => {
+      assertActive(me);
       if (isBlocked(me, partner)) fail(403, 'Messaging is unavailable because one of you has blocked the other');
-      const [created] = await Message.create([{ senderId: me._id, receivedId: partner._id, text: text?.trim(), image: imageUrl }], { session });
+      const seen = await isChatPageActive(partner._id);
+      const [created] = await Message.create([{ senderId: me._id, receivedId: partner._id, text: text?.trim(), image: imageUrl, seen, seenAt: seen ? new Date() : null }], { session });
+      if (!seen) await addChatAlert({ userId: partner._id, eventKey: `message:${created._id}`, kind: "message", senderId: me._id, messageId: created._id, title: `${me.fullName} sent you a message`, body: "Open the conversation to read your message.", url: `/chat/${me._id}` }, session);
       return created;
     });
     io.to(getReceiverSocketId(other)).emit('newMessage', { ...message.toObject(), senderName: req.user.fullName, senderProfilePic: req.user.profilePic });
@@ -112,6 +118,7 @@ export const markMessagesAsSeen = async (req, res) => {
       const filter = { _id: { $in: ids }, senderId: req.params.id, receivedId: req.user._id, seen: { $ne: true } };
       const messages = await Message.find(filter).select('_id').session(session);
       await Message.updateMany(filter, { $set: { seen: true, seenAt } }, { session });
+      await ChatAlert.updateMany({ userId: req.user._id, messageId: { $in: messages.map(m => m._id) }, readAt: null }, { $set: { readAt: seenAt } }, { session });
       return messages.map(m => String(m._id));
     });
     io.to(getReceiverSocketId(req.params.id)).emit('messagesSeen', { userId: String(req.user._id), messageIds, seenAt });
@@ -138,20 +145,12 @@ export const deleteChat = async (req, res) => {
     res.json({ message: 'Messages deleted' });
   } catch (error) { chatError(res, error); }
 };
-export const reportUser = async (req, res) => {
-  try {
-    const reason = req.body.reason;
-    if (typeof reason !== 'string' || !reason.trim() || reason.trim().length > 2000) fail(400, 'Enter a report reason of up to 2,000 characters');
-    const report = await withChatTransaction(req.user._id, req.params.id, async session => {
-      if (!await Message.exists(pairFilter(req.user._id, req.params.id)).session(session)) fail(404, 'Conversation not found');
-      const [created] = await Report.create([{ reporterId: req.user._id, reportedId: req.params.id, conversationId: conversationId(req.user._id, req.params.id), reason: reason.trim() }], { session });
-      return created;
-    });
-    res.status(201).json({ id: report._id, status: report.status, message: 'Report submitted. Thank you for helping keep UniMarket safe.' });
-  } catch (error) {
-    if (error.code === 11000) return res.status(409).json({ message: 'You already have a pending report for this user' });
-    chatError(res, error);
-  }
+export const reportUser = (req, res) => {
+  // Preserve the existing chat-report URL and free-text payload.
+  const legacy = req.body.reason;
+  if (typeof legacy !== 'string' || !legacy.trim() || legacy.length > 2000) return res.status(400).json({ message: 'Enter a report reason of up to 2,000 characters' });
+  req.body = { targetKind: 'user', targetId: req.params.id, reason: 'Other', description: legacy };
+  return createReport(req, res);
 };
 
 export const getUnreadCount = async (req, res) => {
@@ -192,3 +191,18 @@ export const getUnreadCount = async (req, res) => {
         chatError(res, error);
     }
 }
+
+// Visiting the active Chat page acknowledges incoming messages across its inbox.
+export const markAllMessagesAsSeen = async (req, res) => {
+  try {
+    const seenAt = new Date();
+    const messages = await Message.find({ receivedId: req.user._id, seen: { $ne: true } }).select('_id senderId').limit(500);
+    const ids = messages.map(message => message._id);
+    await Message.updateMany({ _id: { $in: ids }, receivedId: req.user._id }, { $set: { seen: true, seenAt } });
+    await ChatAlert.updateMany({ userId: req.user._id, messageId: { $in: ids }, readAt: null }, { $set: { readAt: seenAt } });
+    const senders = [...new Set(messages.map(message => String(message.senderId)))];
+    for (const senderId of senders) io.to(getReceiverSocketId(senderId)).emit('messagesSeen', { userId: String(req.user._id), messageIds: messages.filter(message => String(message.senderId) === senderId).map(message => String(message._id)), seenAt });
+    io.to(getReceiverSocketId(req.user._id)).emit('unreadChanged');
+    res.json({ count: messages.length, hasMore: messages.length === 500 });
+  } catch (error) { chatError(res, error); }
+};

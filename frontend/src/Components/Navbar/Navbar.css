@@ -273,3 +273,19 @@
   .navbar-menu-shell { width: calc(100% - 28px); }
   .navbar-menu-footer { flex-direction: column; gap: 4px; }
 }
+
+.logo { display: inline-flex; align-items: center; gap: 9px; }
+.logo .brand-monogram { width: 42px; height: 42px; flex: 0 0 auto; }
+.logo .brand-wordmark { font-family: var(--font-ui); font-size: 1.1rem; font-weight: 800; letter-spacing: -.04em; }
+@media (max-width: 480px) {
+  .logo .brand-monogram { width: 36px; height: 36px; }
+  .logo .brand-wordmark { font-size: .98rem; }
+}
+
+@media (max-width: 640px) {
+  .navbar-contact-submenu { padding-left: 0 !important; }
+  .navbar-contact-submenu a { padding: 10px 8px; min-width: 0; }
+  .navbar-contact-submenu small { font-size: .8rem; line-height: 1.5; overflow-wrap: break-word; }
+  .navbar-menu-footer { flex-direction: column; gap: 8px; }
+  .navbar-menu-footer p { overflow-wrap: anywhere; }
+}

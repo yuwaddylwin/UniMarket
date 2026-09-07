@@ -1,3 +1,4 @@
+import MessageAlertsPrompt from "./MessageAlertsPrompt";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +48,7 @@ const Sidebar = () => {
         <span>Inbox</span>
         <h1>Messages</h1>
       </div>
+      <MessageAlertsPrompt />
       <div className="sidebar-search">
         <Search size={18} aria-hidden="true" />
         <input

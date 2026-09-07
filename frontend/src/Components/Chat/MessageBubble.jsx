@@ -1,3 +1,4 @@
+import { ReportButton } from '../common/ReportDialog';
 import "./MessageBubble.css";
 import ProfileAvatar from "../common/ProfileAvatar";
 
@@ -38,6 +39,7 @@ const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
               minute: "2-digit",
             })}
           </span>
+          {!isOwn && <ReportButton compact targetKind="message" targetId={message._id} ownerId={message.senderId} />}
           {isOwn && <span> · {message.seen ? "Seen" : "Sent"}</span>}
         </div>
       </div>

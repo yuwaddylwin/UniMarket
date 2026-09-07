@@ -23,6 +23,7 @@ const mockNavigate = jest.fn();
 const mockUpdateProfile = jest.fn();
 
 jest.mock("react-router-dom", () => ({
+  Link: ({ to, children, ...props }) => <a href={to} {...props}>{children}</a>,
   MemoryRouter: ({ children }) => children,
   Routes: ({ children }) => children,
   Route: ({ element }) => element,

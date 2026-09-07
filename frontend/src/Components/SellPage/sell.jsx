@@ -30,7 +30,8 @@ function Sell() {
     <main className="post-page">
       <div className="post-container">
         <header className="post-header">
-          <span className="post-eyebrow">Create a listing</span>
+          <span className="post-header-icon" aria-hidden="true">{isAccommodation ? <Building2 /> : <Package />}</span>
+          <span className="post-eyebrow">{isEditMode ? "Your listing" : "Made for your campus"}</span>
           <h1 className="post-title">{isEditMode ? `Edit your ${isAccommodation ? "accommodation" : "item"}` : "What do you want to post?"}</h1>
           <p>{isEditMode ? "Update your listing details below." : "Choose a listing type and share it with your university community."}</p>
         </header>
@@ -61,6 +62,7 @@ function Sell() {
         )}
 
         <form className="post-form" onSubmit={handleSubmit} noValidate>
+          <div className="post-section-heading"><span>01</span><div><h2>Start with the photos</h2><p>A clear first photo helps your listing stand out.</p></div></div>
           <ImageUploader
             images={currentListing.images}
             listingType={isAccommodation ? "accommodation" : "item"}
@@ -69,6 +71,7 @@ function Sell() {
             onRemove={removeImage}
           />
 
+          <div className="post-section-heading"><span>02</span><div><h2>Add the details</h2><p>Give your campus community the essentials.</p></div></div>
           {isAccommodation ? (
             <AccommodationFields value={accommodation} onChange={handleAccommodationChange} />
           ) : (
@@ -99,7 +102,7 @@ function ImageUploader({ images, listingType, label, onUpload, onRemove }) {
   return (
     <div className="form-group form-group--full">
       <label>{label} <span className="field-note">Required · Up to 6 · Max 5 MB each</span></label>
-      <div className="image-upload-container">
+      <div className={`image-upload-container${images.length === 0 ? " image-upload-container--empty" : ""}`}>
         {images.map((image, index) => (
           <div className="sell-image-preview" key={`${image.url}-${index}`}>
             <img src={image.url} alt={`${label} preview ${index + 1}`} />
@@ -110,6 +113,7 @@ function ImageUploader({ images, listingType, label, onUpload, onRemove }) {
           <label className="upload-box" aria-label={`Add ${label.toLowerCase()}`}>
             <ImagePlus aria-hidden="true" />
             <span>Add photos</span>
+            {images.length === 0 && <small>Choose up to 6 images</small>}
             <input type="file" accept="image/*" multiple onChange={(event) => onUpload(event, listingType)} hidden />
           </label>
         )}
@@ -195,10 +199,6 @@ function AccommodationFields({ value, onChange }) {
       <div className="form-group form-group--full">
         <label htmlFor="accommodation-description">Description</label>
         <textarea id="accommodation-description" name="description" value={value.description} onChange={onChange} placeholder="Furniture, facilities, transport, house rules…" rows="5" required />
-      </div>
-      <div className="form-group form-group--full">
-        <label htmlFor="contact-info">Contact information <span className="field-note">Optional</span></label>
-        <input id="contact-info" type="text" name="contactInfo" value={value.contactInfo} onChange={onChange} placeholder="Phone, email, LINE ID or preferred contact method" />
       </div>
     </div>
   );

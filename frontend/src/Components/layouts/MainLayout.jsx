@@ -1,3 +1,4 @@
+import { AccountStatusBanner } from '../common/AccountStatusBanner';
 import { Outlet, useLocation } from "react-router-dom";
 import BottomNav from "../BottomNavBar/BottomNav";
 import Navbar from "../Navbar/Navbar";
@@ -17,6 +18,7 @@ const MainLayout = ({ cartItems, showBottomNav = true }) => {
           renderBottomNav ? " app-content--with-bottom" : " app-content--without-bottom"
         }`}
       >
+        <AccountStatusBanner />
         <Outlet />
       </div>
       {renderBottomNav && <BottomNav />}

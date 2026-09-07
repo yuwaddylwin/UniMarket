@@ -1,3 +1,4 @@
+import BrandLogo from "../common/BrandLogo";
 import "./Navbar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -22,7 +23,7 @@ export default function Navbar({ cartCount = 0 }) {
   return (
     <header className={`navbar-container${isHome ? " navbar-container--home" : ""}${isMenuOpen ? " navbar-container--menu-open" : ""}`}>
       <nav className="navbar-inner" aria-label="Main navigation">
-        <Logo />
+        <BrandLogo />
 
         {isHome && (
           <div className="navbar-search-center">
@@ -45,14 +46,6 @@ export default function Navbar({ cartCount = 0 }) {
         </div>
       </nav>
     </header>
-  );
-}
-
-function Logo() {
-  return (
-    <Link className="logo" to="/" aria-label="UniMarket home">
-      Uni<span>Market</span>
-    </Link>
   );
 }
 

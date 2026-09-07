@@ -1,3 +1,4 @@
+import BrandLogo from "../common/BrandLogo";
 import { useLocation, useNavigate } from "react-router-dom";
 import { primaryNavigationItems, getNavigationTarget, isNavigationItemActive } from "../../config/navigation";
 import { useAuthStore } from "../store/useAuthStore";
@@ -16,15 +17,13 @@ export default function DesktopChatNav({ cartCount = 0 }) {
 
   return (
     <aside className="desktop-chat-nav">
-      <button className="desktop-chat-brand" type="button" onClick={() => navigate("/")} aria-label="UniMarket home">
-        Uni<span>Market</span>
-      </button>
+      <div className="desktop-chat-brand"><BrandLogo /></div>
 
       <nav className="desktop-chat-nav-links" aria-label="Main navigation">
         {railItems.map((item) => {
           const Icon = item.icon;
           const active = isNavigationItemActive(item, location.pathname);
-          const badge = item.id === "chat" ? totalUnread : item.id === "cart" ? cartCount : 0;
+          const badge = item.id === "chat" ? (location.pathname.startsWith("/chat") ? 0 : totalUnread) : item.id === "cart" ? cartCount : 0;
           return (
             <button
               key={item.id}

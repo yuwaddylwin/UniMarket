@@ -22,6 +22,7 @@ test('authenticated chat safety, persistence, realtime and report persistence', 
   await mongoose.connect(`${uri}/unimarket_chat_tests?replicaSet=chatTest`);
   await mongoose.connection.dropDatabase();
   await Report.init();
+  await Report.createIndexes();
   app.use(express.json()); app.use('/api/messages', messageRoutes); app.use('/api/auth', authRoutes);
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -95,7 +96,8 @@ test('authenticated chat safety, persistence, realtime and report persistence', 
     assert.equal((await request(a, 'POST', `/messages/report/${b}`, { reason: 'duplicate' })).status, 409);
     assert.equal(await Report.countDocuments(), 1);
     const savedReport = await Report.findById(report.data.id);
-    assert.equal(savedReport.reason, 'Abusive messages');
+    assert.equal(savedReport.reason, 'Other');
+    assert.equal(savedReport.description, 'Abusive messages');
     assert.equal(savedReport.status, 'pending');
     assert.equal((await request(a, 'DELETE', `/messages/${b}`)).status, 200);
     assert.equal(await Message.countDocuments(), 0);

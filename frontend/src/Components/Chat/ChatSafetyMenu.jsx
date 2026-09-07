@@ -1,3 +1,4 @@
+import { ReportDialog } from '../common/ReportDialog';
 import { useEffect, useRef, useState } from 'react';
 import { MoreVertical, Flag, ShieldBan, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -52,6 +53,7 @@ export default function ChatSafetyMenu({ user }) {
       <button role="menuitem" onClick={() => choose(blockedByMe ? 'unblock' : 'block')}><ShieldBan size={17} />{blockedByMe ? 'Unblock User' : 'Block User'}</button>
       <button role="menuitem" onClick={() => choose('delete')}><Trash2 size={17} />Delete All Chat</button>
     </div>}
-    {action && <SafetyDialog title={titles[action]} description={action === 'block' ? 'You will no longer receive messages from this user, and they will not be able to send you new messages.' : action === 'delete' ? 'This will permanently delete all messages in this conversation. This action cannot be undone.' : action === 'unblock' ? 'You can message each other again unless this user has also blocked you.' : 'Tell us what happened so the UniMarket team can review your report.'} report={action === 'report'} confirmLabel={{ report: 'Submit report', block: 'Block', unblock: 'Unblock', delete: 'Delete' }[action]} onConfirm={confirm} onClose={() => setAction(null)} />}
+    {action === "report" && <ReportDialog targetKind="user" targetId={user._id} onClose={() => setAction(null)} />}
+    {action && action !== "report" && <SafetyDialog title={titles[action]} description={action === 'block' ? 'You will no longer receive messages from this user, and they will not be able to send you new messages.' : action === 'delete' ? 'This will permanently delete all messages in this conversation. This action cannot be undone.' : action === 'unblock' ? 'You can message each other again unless this user has also blocked you.' : 'Tell us what happened so the UniMarket team can review your report.'} report={action === 'report'} confirmLabel={{ report: 'Submit report', block: 'Block', unblock: 'Unblock', delete: 'Delete' }[action]} onConfirm={confirm} onClose={() => setAction(null)} />}
   </div>;
 }

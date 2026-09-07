@@ -66,3 +66,12 @@
 }
 
 @media (max-width: 768px) { .desktop-chat-nav { display: none; } }
+
+.desktop-chat-brand .logo { max-width: 100%; justify-content: flex-start; }
+.desktop-chat-brand .brand-monogram { flex-shrink: 0; }
+.desktop-chat-brand .brand-wordmark { font-size: clamp(15px, 1.7vw, 22px); }
+@media (max-width: 1020px) {
+  .desktop-chat-brand .brand-wordmark { display: none; }
+  .desktop-chat-brand { width: 100%; margin-inline: 0; }
+  .desktop-chat-brand .logo { justify-content: center; }
+}

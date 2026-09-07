@@ -1,12 +1,21 @@
+import { useRef } from "react";
+import "../common/CarouselArrows.css";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { useAccommodations } from "../Logics/useAccommodations";
-import { useNavigate } from "react-router-dom";
+import ViewAllLink from "../common/ViewAllLink";
 import AccommodationListingCard from "./AccommodationListingCard";
 import "./AccommodationSection.css";
 
 export default function AccommodationSection({ searchQuery = "", listingPage = false }) {
   const { accommodations, isLoading, error } = useAccommodations();
-  const navigate = useNavigate();
+  const scrollerRef = useRef(null);
+  const scrollByCards = (direction) => {
+    const row = scrollerRef.current;
+    if (!row) return;
+    const cardWidth = row.querySelector(".accommodation-card")?.getBoundingClientRect().width || 280;
+    const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+    row.scrollBy({ left: direction * (cardWidth + gap) * 2, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const visibleAccommodations = normalizedQuery
     ? accommodations.filter((listing) =>
@@ -28,10 +37,12 @@ export default function AccommodationSection({ searchQuery = "", listingPage = f
           <span className="accommodation-eyebrow">Live close to campus</span>
           <h2 id="accommodation-title">Accommodation</h2>
         </div>
-        {!listingPage && <button type="button" onClick={() => navigate("/accommodations")}>View All <span aria-hidden="true">&gt;</span></button>}
+        <ViewAllLink to="/accommodations" label="View all accommodation" />
       </div>}
 
-      <div className={`accommodation-row${listingPage ? " listing-page-grid" : ""}${hasState ? " accommodation-row--state" : ""}`}>
+      <div className="accommodation-carousel">
+        {!listingPage && !hasState && <button className="il-arrow il-left" type="button" aria-label="Scroll accommodation left" onClick={() => scrollByCards(-1)}>←</button>}
+      <div ref={scrollerRef} className={`accommodation-row${listingPage ? " listing-page-grid" : ""}${hasState ? " accommodation-row--state" : ""}`}>
         {isLoading ? (
           <LoadingSpinner label="Loading accommodation…" />
         ) : error ? (
@@ -49,6 +60,8 @@ export default function AccommodationSection({ searchQuery = "", listingPage = f
             <AccommodationListingCard listing={listing} key={listing._id} />
           ))
         )}
+      </div>
+        {!listingPage && !hasState && <button className="il-arrow il-right" type="button" aria-label="Scroll accommodation right" onClick={() => scrollByCards(1)}>→</button>}
       </div>
     </section>
   );

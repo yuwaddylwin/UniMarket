@@ -40,7 +40,7 @@ export default function ItemListingCard({ item, showTypeLabel = false, imageOnly
         {!imageOnly && showTypeLabel && <span className="item-type-badge">Item</span>}
       </div>
       {imageOnly ? (
-        <div className="item-grid-price">{formatListingPrice(item.price)}</div>
+        <div className="item-grid-price"><span className="listing-price">{formatListingPrice(item.price)}</span></div>
       ) : (
       <div className="item-body">
         <div className="item-title-price listing-title-price-row">

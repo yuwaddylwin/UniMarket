@@ -1,3 +1,5 @@
+import AdminDashboard from './Components/Admin/AdminDashboard';
+import ChatActivityBridge from './Components/Chat/ChatActivityBridge';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -54,8 +56,10 @@ export default function App() {
   return (
     <Router>
       <Toaster />
+      <ChatActivityBridge />
 
       <Routes>
+        <Route path="/admin/*" element={<AdminDashboard />} />
         {/* ROUTES WITH BottomNav */}
         <Route element={<MainLayout cartItems={cartItems} />}>
           <Route path="/" element={<Home cartItems={cartItems} setCartItems={setCartItems} />} />
@@ -111,8 +115,8 @@ export default function App() {
             <MainLayout cartItems={cartItems} showBottomNav={false} />
           }
         >
-            <Route path="/chat" element={<ChatHomePage cartCount={cartItems.length} />} />
-            <Route path="/chat/:sellerId" element={<ChatHomePage cartCount={cartItems.length} />} />
+            <Route path="/chat" element={<RequireAuth><ChatHomePage cartCount={cartItems.length} /></RequireAuth>} />
+            <Route path="/chat/:sellerId" element={<RequireAuth><ChatHomePage cartCount={cartItems.length} /></RequireAuth>} />
             <Route path="/verify/:token" element={<VerifyEmailPage />} />
             <Route path="/resend-verification" element={<ResendVerificationPage />} />
         </Route>

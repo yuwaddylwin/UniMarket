@@ -1,3 +1,4 @@
+import { ReportButton } from '../common/ReportDialog';
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
@@ -291,6 +292,7 @@ function ListingFeedPost({ listing, listingType, isMine, onAddToCart, onChat }) 
           <strong className="listing-price">{price}</strong>
         </div>
 
+        <ReportButton targetKind={listingType} targetId={listing._id || listing.id} ownerId={getOwnerId(listing)} />
         <FeedDescription description={listing?.description} sellerName={sellerName} />
 
         {isAccommodation && Number.isInteger(listing.bedrooms) && (

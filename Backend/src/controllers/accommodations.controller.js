@@ -1,3 +1,4 @@
+import { visibleListing } from '../services/moderationPolicy.js';
 import Accommodation from "../models/Accommodation.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import mongoose from "mongoose";
@@ -173,7 +174,7 @@ export const createAccommodation = async (req, res) => {
 
 export const getAccommodations = async (_req, res) => {
   try {
-    const accommodations = await Accommodation.find({ status: { $ne: "sold" } })
+    const accommodations = await Accommodation.find({ ...visibleListing, status: { $ne: "sold" } })
       .sort({ createdAt: -1 })
       .populate("user", "fullName username name email profilePic avatar photo")
       .lean();
@@ -204,7 +205,7 @@ export const getAccommodationById = async (req, res) => {
     if (!hasValidId(req.params.id)) {
       return res.status(400).json({ message: "Invalid accommodation id" });
     }
-    const accommodation = await Accommodation.findOne({ _id: req.params.id, status: { $ne: "sold" } })
+    const accommodation = await Accommodation.findOne({ ...visibleListing, _id: req.params.id, status: { $ne: "sold" } })
       .populate("user", "fullName username name email profilePic avatar photo")
       .lean();
 
@@ -229,6 +230,7 @@ export const updateAccommodation = async (req, res) => {
     }
 
     const accommodation = await Accommodation.findById(req.params.id);
+    if (accommodation && ["hidden", "removed", "under_review"].includes(accommodation.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
     if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
     if (String(accommodation.user) !== String(req.user._id)) {
       return res.status(403).json({ message: "Forbidden" });
@@ -323,6 +325,7 @@ export const deleteAccommodation = async (req, res) => {
     }
 
     const accommodation = await Accommodation.findById(req.params.id);
+    if (accommodation && ["hidden", "removed", "under_review"].includes(accommodation.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
     if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
     if (String(accommodation.user) !== String(req.user._id)) {
       return res.status(403).json({ message: "Forbidden" });
@@ -362,6 +365,7 @@ export const updateAccommodationStatus = async (req, res) => {
       return res.status(400).json({ message: "Status must be active or sold" });
     }
     const accommodation = await Accommodation.findById(req.params.id);
+    if (accommodation && ["hidden", "removed", "under_review"].includes(accommodation.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
     if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
     if (String(accommodation.user) !== String(req.user?._id)) {
       return res.status(403).json({ message: "Forbidden" });

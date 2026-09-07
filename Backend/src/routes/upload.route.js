@@ -1,3 +1,5 @@
+import { ProtectRoute } from '../middleware/auth.middleware.js';
+import { requireActive } from '../services/moderationPolicy.js';
 import express from "express";
 import multer from "multer";
 import cloudinary from "../lib/cloudinary.js";
@@ -28,7 +30,7 @@ const uploadBufferToCloudinary = (buffer) => {
   });
 };
 
-router.post("/", upload.array("images", 6), async (req, res) => {
+router.post("/", ProtectRoute, requireActive, upload.array("images", 6), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });

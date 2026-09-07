@@ -1,3 +1,4 @@
+import { disableDevicePush } from "../Chat/push";
 import { create } from "zustand";
 import { axiosInstance, setAuthToken, removeAuthToken, getAuthToken } from "../lib/axios.js";
 import toast from "react-hot-toast";
@@ -5,6 +6,7 @@ import { io } from "socket.io-client";
 import { API_ORIGIN } from "../../config/api";
 
 const SOCKET_URL = API_ORIGIN;
+let unreadRequestVersion = 0;
 
 
 export const useAuthStore = create((set, get) => ({
@@ -78,16 +80,19 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try {
+      await disableDevicePush();
       await axiosInstance.post("/auth/logout");
+    } catch {
+      // The worker is cleared and the local subscription is revoked before
+      // attempting server cleanup, so a failed request cannot keep a session open.
+    } finally {
       removeAuthToken();
-      set({ authUser: null });
-      toast.success("Logged out successfully");
       get().disconnectSocket();
+      set({ authUser: null });
       const { useChatStore } = await import("./useChatStore");
       useChatStore.getState().setSelectedUser(null);
       useChatStore.setState({ users: [] });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Logout Failed!");
+      toast.success("Logged out successfully");
     }
   },
 
@@ -170,12 +175,17 @@ export const useAuthStore = create((set, get) => ({
       set({onlineUsers: userId})
     });
 
+    const alertedMessages = new Set();
     newSocket.on("newMessage", (message) => {
-      if (!message?.senderName) return;
+      if (message?._id && alertedMessages.has(message._id)) return;
+      if (message?._id) { alertedMessages.add(message._id); if (alertedMessages.size > 200) alertedMessages.delete(alertedMessages.values().next().value); }
+      if (!message?.senderName || message.seen || (newSocket.chatPageActive && document.visibilityState === "visible")) return;
       const preferences = get().authUser?.preferences;
-      if (preferences?.messages === false || preferences?.notifications === false) return;
+      if (preferences?.messages === false) return;
       toast.success(`${message.senderName} sent you a message`);
     });
+
+    newSocket.on("connect", () => get().getUnreadCount());
 
     // Initialize unread count and subscribe to updates
     get().getUnreadCount();
@@ -188,13 +198,17 @@ export const useAuthStore = create((set, get) => ({
       socket.disconnect();
     }
     get().unsubscribeFromUnreadUpdates();
+    unreadRequestVersion += 1;
     set({ socket: null, onlineUsers: [], unreadCount: {}, totalUnread: 0 });
   },
 
   getUnreadCount: async () => {
+    const requestVersion = ++unreadRequestVersion;
+    const userId = get().authUser?._id;
     try {
       const { axiosInstance } = await import("../lib/axios.js");
       const res = await axiosInstance.get("/messages/unread/count");
+      if (requestVersion !== unreadRequestVersion || get().authUser?._id !== userId) return;
       const unreadMap = {};
       res.data.byUser.forEach(item => {
         unreadMap[item.userId] = item.count;
@@ -209,18 +223,7 @@ export const useAuthStore = create((set, get) => ({
     const socket = get().socket;
     if (!socket) return;
 
-    socket.on("unreadCountUpdate", ({ senderId, unreadCount }) => {
-      set((state) => {
-        const newUnreadCount = { ...state.unreadCount };
-        newUnreadCount[senderId] = (newUnreadCount[senderId] || 0) + unreadCount;
-        const totalUnread = Object.values(newUnreadCount).reduce((sum, count) => sum + count, 0);
-        
-        return {
-          unreadCount: newUnreadCount,
-          totalUnread,
-        };
-      });
-    });
+    socket.on("unreadCountUpdate", () => get().getUnreadCount());
 
     socket.on("unreadChanged", () => get().getUnreadCount());
     socket.on("chatDeleted", () => get().getUnreadCount());

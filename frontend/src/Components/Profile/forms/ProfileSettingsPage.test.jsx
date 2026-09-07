@@ -53,13 +53,11 @@ test("validates the display name before saving", () => {
   expect(mockUpdateAccount).not.toHaveBeenCalled();
 });
 
-test("hides language and saves independent notification preferences", async () => {
+test("does not expose general notification settings", () => {
   render(<ProfileSettingsPage />);
-  expect(screen.queryByText("Language")).not.toBeInTheDocument();
-  expect(screen.queryByRole("radiogroup", { name: "Language" })).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("switch", { name: "Messages" }));
-  await waitFor(() => expect(mockUpdatePreferences).toHaveBeenLastCalledWith({ language: "en", messages: false, notifications: true }));
-  expect(screen.getByRole("switch", { name: "Notifications" })).toHaveAttribute("aria-checked", "true");
+  expect(screen.queryByRole("switch")).not.toBeInTheDocument();
+  expect(screen.queryByText("Notifications")).not.toBeInTheDocument();
+  expect(screen.queryByText("Browser notifications")).not.toBeInTheDocument();
 });
 
 test("opens the sold archive and restores a listing", async () => {

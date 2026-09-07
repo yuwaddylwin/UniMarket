@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema(
   {
+    moderationStatus: { type: String, enum: ["active", "hidden", "removed", "under_review"], default: "active", index: true },
+    moderationReason: { type: String, default: "" },
+    moderatedAt: Date,
+    moderatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
     title: { type: String, required: true, trim: true },
     category: { type: String, required: true },
     description: { type: String, required: true, trim: true },

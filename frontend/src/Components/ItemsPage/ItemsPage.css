@@ -20,15 +20,11 @@
 .ip-page .item-card--image-only:hover { transform: none; }
 .ip-page .item-card--image-only .item-img { aspect-ratio: 1; }
 .ip-page .item-card--image-only .item-img::after { display: none; }
-.ip-page .item-grid-price {
-  padding: 8px 10px;
-  color: var(--color-text);
-  font-size: clamp(.72rem, 1.8vw, 1rem);
-  font-weight: 750;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
+.ip-page .item-grid-price { padding: 8px; }
+.ip-page .item-grid-price .listing-price { box-shadow: 0 2px 10px rgba(16, 185, 129, .14); }
 @media (max-width: 600px) {
   .ip-page .item-card--image-only { border-radius: 7px; }
   .ip-page .item-grid-price { padding: 6px; }
 }
+
+@media (max-width: 600px) { .ip-page .item-grid-price .listing-price { min-height: 23px; padding: 4px 6px; font-size: .68rem; white-space: normal; overflow-wrap: anywhere; } }

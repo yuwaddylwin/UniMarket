@@ -1,6 +1,6 @@
 import SafetyDialog from "../../common/SafetyDialog";
 import { useEffect, useState } from "react";
-import { Archive, Bell, ChevronDown, Mail, Pencil, ShieldBan, SlidersHorizontal, UserRound } from "lucide-react";
+import { Archive, ChevronDown, Pencil, ShieldBan, UserRound } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { axiosInstance } from "../../lib/axios";
 import LoadingSpinner from "../../common/LoadingSpinner";
@@ -8,24 +8,15 @@ import ProfileAvatar from "../../common/ProfileAvatar";
 import ItemCarousel from "../../Items/ItemStyle/ItemCarousel";
 import "./ProfileSettingsPage.css";
 
-const defaultPreferences = (preferences) => ({
-  language: preferences?.language === "th" ? "th" : "en",
-  messages: preferences?.messages !== false,
-  notifications: preferences?.notifications !== false,
-});
-
 export default function ProfileSettingsPage() {
   const {
     authUser,
     updateAccount,
-    updatePreferences,
     isUpdatingAccount,
-    isUpdatingPreferences,
   } = useAuthStore();
   const [fullName, setFullName] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [formError, setFormError] = useState("");
-  const [preferences, setPreferences] = useState(() => defaultPreferences(authUser?.preferences));
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [archivedListings, setArchivedListings] = useState([]);
   const [archiveLoading, setArchiveLoading] = useState(false);
@@ -41,11 +32,6 @@ export default function ProfileSettingsPage() {
     setFullName(authUser?.fullName || "");
     setFormError("");
   }, [authUser?._id, authUser?.fullName]);
-
-  useEffect(() => {
-    const next = defaultPreferences(authUser?.preferences);
-    setPreferences(next);
-  }, [authUser?.preferences]);
 
   useEffect(() => {
     if (!archiveOpen) return undefined;
@@ -115,17 +101,6 @@ export default function ProfileSettingsPage() {
     }
   };
 
-  const changePreference = async (key, value) => {
-    const previous = preferences;
-    const next = { ...preferences, [key]: value };
-    setPreferences(next);
-    try {
-      await updatePreferences(next);
-    } catch {
-      setPreferences(previous);
-    }
-  };
-
   const unblockUser = async (userId) => {
     try {
       setUnblockingId(userId);
@@ -170,12 +145,6 @@ export default function ProfileSettingsPage() {
         </div>
       </section>
 
-      <section className="settings-section" aria-labelledby="preferences-title">
-        <div className="settings-section-title"><SlidersHorizontal aria-hidden="true" /><div><h2 id="preferences-title">Preferences</h2><p>Communication controls</p></div></div>
-        <PreferenceSwitch icon={<Mail aria-hidden="true" />} label="Messages" description="Allow message alerts from other UniMarket users." checked={preferences.messages} disabled={isUpdatingPreferences} onChange={(value) => changePreference("messages", value)} />
-        <PreferenceSwitch icon={<Bell aria-hidden="true" />} label="Notifications" description="Allow general UniMarket notifications." checked={preferences.notifications} disabled={isUpdatingPreferences} onChange={(value) => changePreference("notifications", value)} />
-      </section>
-
       <section className="settings-section settings-archive settings-blocked" aria-labelledby="blocked-title">
         <button className="archive-toggle" type="button" aria-expanded={blockedOpen} aria-controls="blocked-users" onClick={() => setBlockedOpen((open) => !open)}>
           <ShieldBan aria-hidden="true" /><span><strong id="blocked-title">Blocked</strong><small>Manage blocked accounts</small></span><ChevronDown className={blockedOpen ? "is-open" : ""} aria-hidden="true" />
@@ -204,8 +173,4 @@ export default function ProfileSettingsPage() {
       </section>
     </main>
   );
-}
-
-function PreferenceSwitch({ icon, label, description, checked, disabled, onChange }) {
-  return <div className="settings-row"><span className="settings-row-icon">{icon}</span><div className="settings-row-copy"><strong>{label}</strong><span>{description}</span></div><button className="settings-switch" type="button" role="switch" aria-checked={checked} aria-label={label} disabled={disabled} onClick={() => onChange(!checked)}><span /></button></div>;
 }

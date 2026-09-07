@@ -12,12 +12,8 @@
   font-family: var(--font-ui);
 }
 
-/* CHAT ICON */
-.chat-icon {
-  color: var(--color-primary);
-  margin-bottom: 14px;
-}
-
+.no-chat-content .logo{justify-content:center;max-width:100%;margin-bottom:20px}
+.no-chat-content{padding:24px;max-width:100%;box-sizing:border-box}
 /* TITLE */
 .no-chat-content h2 {
   margin: 0 0 7px;
@@ -26,21 +22,6 @@
   font-size: 22px;
   font-weight: 600;
   line-height: 1.25;
-}
-
-.no-chat-welcome {
-  color: var(--color-text-secondary);
-}
-
-.no-chat-brand {
-  color: var(--color-primary);
-  font-family: var(--font-brand);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-}
-
-.no-chat-brand span {
-  color: var(--color-text);
 }
 
 /* SUBTEXT */

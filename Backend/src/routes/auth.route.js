@@ -37,20 +37,7 @@ router.delete("/profile-photo", ProtectRoute, removeProfilePhoto);
 
 router.get("/check", ProtectRoute, checkAuth);
 
-router.get("/me", ProtectRoute, (req, res) => {
-  res.json({
-    _id: req.user._id,
-    fullName: req.user.fullName,
-    username: req.user.username || "",
-    profilePic: req.user.profilePic || "",
-    email: req.user.email,
-    preferences: {
-      language: req.user.preferences?.language || "en",
-      messages: req.user.preferences?.messages !== false,
-      notifications: req.user.preferences?.notifications !== false,
-    },
-  });
-});
+router.get("/me", ProtectRoute, checkAuth);
 
 
 export default router;

@@ -1,3 +1,4 @@
+import { requireActive } from '../services/moderationPolicy.js';
 import express from "express";
 import { ProtectRoute } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/upload.middleware.js";
@@ -30,10 +31,10 @@ router.get("/mine", ProtectRoute, getMyItems);
 router.get("/mine/archive", ProtectRoute, getMyArchivedItems);
 router.get("/:id", getItemById);
 
-router.post("/", ProtectRoute, uploadItemImages, createItem);
-router.put("/:id", ProtectRoute, uploadItemImages, updateItem);
-router.patch("/:id/status", ProtectRoute, updateItemStatus);
+router.post("/", ProtectRoute, requireActive, uploadItemImages, createItem);
+router.put("/:id", ProtectRoute, requireActive, uploadItemImages, updateItem);
+router.patch("/:id/status", ProtectRoute, requireActive, updateItemStatus);
 
-router.delete("/:id", ProtectRoute, deleteItem);
+router.delete("/:id", ProtectRoute, requireActive, deleteItem);
 
 export default router;
