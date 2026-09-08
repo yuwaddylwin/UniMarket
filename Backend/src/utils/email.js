@@ -156,3 +156,11 @@ export const sendVerificationEmail = async (email, token) => {
     `,
   });
 };
+
+export const sendAuthCode = async (email, code, purpose) => {
+  const config = getEmailConfig();
+  return sendMail(config, {
+    from: config.from, to: email, subject: `Your UniMarket ${purpose === 'reset' ? 'password reset' : 'verification'} code`,
+    text: `Your UniMarket code is ${code}. It expires in 10 minutes and can only be used once. If you did not request this, ignore this email.`,
+  });
+};

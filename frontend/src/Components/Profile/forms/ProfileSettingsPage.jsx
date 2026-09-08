@@ -126,6 +126,7 @@ export default function ProfileSettingsPage() {
       <section className="settings-section" aria-labelledby="account-settings-title">
         <div className="settings-section-title"><UserRound aria-hidden="true" /><div><h2 id="account-settings-title">Profile</h2><p>Your public account information</p></div></div>
 
+        <div className="settings-row"><ProfileAvatar profilePic={authUser?.profilePic} alt="Profile picture" className="blocked-user-avatar" /><div className="settings-row-copy"><strong>Email</strong><span>{authUser?.email}</span><small>{authUser?.verified ? "Verified email" : "Verification required"}</small></div></div>
         <div className="settings-row settings-name-row">
           <div className="settings-row-copy"><strong>Name</strong><span>{authUser?.fullName}</span></div>
           {!isEditingName && <button className="settings-text-button" type="button" aria-label="Edit display name" onClick={() => setIsEditingName(true)}><Pencil aria-hidden="true" /> Edit</button>}

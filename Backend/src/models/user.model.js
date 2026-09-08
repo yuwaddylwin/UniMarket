@@ -14,13 +14,18 @@ const userSchema = new mongoose.Schema(
     },
     username: {
         type: String,
+        required: true,
         trim: true,
         lowercase: true,
         minlength: 3,
         maxlength: 30,
         unique: true,
         sparse: true,
+        immutable: true,
+        match: /^[a-z0-9_]{3,30}$/,
     },
+    googleSub: { type: String, unique: true, sparse: true, select: false },
+    sessionVersion: { type: Number, default: 0, select: false },
     email:{
         type: String,
         required: true,
@@ -28,7 +33,8 @@ const userSchema = new mongoose.Schema(
     },
     password:{
         type: String,
-        required: true,
+        required: function () { return !this.googleSub; },
+        select: false,
         minlength: 6,
     },
     profilePic:{

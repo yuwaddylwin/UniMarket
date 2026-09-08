@@ -1,3 +1,6 @@
+import { migrateUsernames } from './src/services/usernameMigration.js';
+import { originGuard } from './src/services/authSecurity.js';
+import User from './src/models/user.model.js';
 import savedRoutes from "./src/routes/saved.route.js";
 import SavedListing from "./src/models/savedListing.model.js";
 import adminRoutes from './src/routes/admin.route.js';
@@ -20,6 +23,8 @@ import accommodationRoutes from "./src/routes/accommodations.route.js";
 import { app, server } from "./src/lib/socket.js";
 
 
+// Set only the exact number of trusted proxy hops for your deployment.
+if (process.env.TRUST_PROXY_HOPS) app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS));
 //Middleware
 app.use(cors({
   origin: [
@@ -33,6 +38,7 @@ app.use(cors({
 
 app.use(express.json({ limit: "20mb" }));
 app.use(cookieParser());
+app.use(originGuard);
 
 
 
@@ -69,6 +75,8 @@ app.use((error, req, res, next) => {
 mongoose
 .connect(MONGOURL)
 .then(async ()=>{
+    await User.init();
+    await migrateUsernames();
     await SavedListing.init();
     await migrateReports();
     startChatAlertWorker();

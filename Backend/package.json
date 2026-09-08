@@ -5,7 +5,9 @@
     "main": "index.js",
     "scripts": {
         "start": "node index.js",
-        "dev": "nodemon --ignore node_modules index.js"
+        "dev": "nodemon --ignore node_modules index.js",
+        "test": "node --test test/*.test.js",
+        "migrate:usernames": "node scripts/migrate-usernames.js"
     },
     "author": "Yu Waddy Lwin",
     "license": "ISC",
@@ -17,6 +19,7 @@
         "cors": "^2.8.5",
         "dotenv": "^17.2.3",
         "express": "^5.1.0",
+        "google-auth-library": "^11.0.2",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.19.0",
         "multer": "^2.0.2",

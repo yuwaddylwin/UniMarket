@@ -19,6 +19,7 @@ function buildSellerSnapshot(user) {
   if (!user) return undefined;
   return {
     id: user._id,
+    username: user.username || "",
     fullName: user.fullName || user.name || user.username || user.email || "Host",
     profilePic: user.profilePic || user.avatar || user.photo || "",
   };
@@ -176,7 +177,7 @@ export const getAccommodations = async (_req, res) => {
   try {
     const accommodations = await Accommodation.find({ ...visibleListing, status: { $ne: "sold" } })
       .sort({ createdAt: -1 })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
     return res.status(200).json(accommodations.map(normalizeAccommodation));
@@ -191,7 +192,7 @@ export const getMyAccommodations = async (req, res) => {
     if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
     const accommodations = await Accommodation.find({ user: req.user._id, status: { $ne: "sold" } })
       .sort({ createdAt: -1 })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
     return res.status(200).json(accommodations.map(normalizeAccommodation));
   } catch (error) {
@@ -206,7 +207,7 @@ export const getAccommodationById = async (req, res) => {
       return res.status(400).json({ message: "Invalid accommodation id" });
     }
     const accommodation = await Accommodation.findOne({ ...visibleListing, _id: req.params.id, status: { $ne: "sold" } })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
     if (!accommodation) {
@@ -346,7 +347,7 @@ export const getMyArchivedAccommodations = async (req, res) => {
     if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
     const accommodations = await Accommodation.find({ user: req.user._id, status: "sold" })
       .sort({ soldAt: -1, updatedAt: -1 })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
     return res.status(200).json(accommodations.map(normalizeAccommodation));
   } catch (error) {

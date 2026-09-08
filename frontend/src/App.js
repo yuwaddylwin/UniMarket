@@ -1,3 +1,5 @@
+import AuthCodePage from './pages/AuthCodePage';
+import GoogleCompletePage from './pages/GoogleCompletePage';
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import ChatActivityBridge from './Components/Chat/ChatActivityBridge';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -18,7 +20,7 @@ import AccommodationsPage from "./Components/Accommodation/AccommodationsPage";
 import AccommodationDetails from "./Components/Accommodation/AccommodationDetails";
 import SearchPage from "./Components/Search/SearchPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-import ResendVerificationPage from "./pages/ResendVerificationPage";
+
 import HowItWorksPage from "./pages/HowItWorksPage";
 import { PrivacyPage, TermsPage } from "./pages/LegalPage";
 
@@ -64,8 +66,6 @@ export default function App() {
         {/* ROUTES WITH BottomNav */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginForm/>} /> 
-          <Route path="/signup" element={<SignUpForm/>} />
           <Route
             path="/post"
             element={
@@ -110,8 +110,13 @@ export default function App() {
         >
             <Route path="/chat" element={<RequireAuth><ChatHomePage /></RequireAuth>} />
             <Route path="/chat/:sellerId" element={<RequireAuth><ChatHomePage /></RequireAuth>} />
+            <Route path="/login" element={<LoginForm/>} />
+            <Route path="/signup" element={<SignUpForm/>} />
+            <Route path="/verify-code" element={<AuthCodePage />} />
+            <Route path="/forgot-password" element={<AuthCodePage reset />} />
+            <Route path="/auth/google/complete" element={<GoogleCompletePage />} />
             <Route path="/verify/:token" element={<VerifyEmailPage />} />
-            <Route path="/resend-verification" element={<ResendVerificationPage />} />
+            <Route path="/resend-verification" element={<AuthCodePage />} />
         </Route>
 
       </Routes>
@@ -128,5 +133,5 @@ export default function App() {
 //       </div>
 //     );
 //   }
-  
+
 //   export default App;

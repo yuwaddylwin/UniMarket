@@ -36,7 +36,7 @@ test('admin authorization, moderation, reports, notifications and push delivery'
   app.use(express.json());
   for (const [path, routes] of [['admin', adminRoutes], ['reports', reportRoutes], ['messages', messageRoutes], ['auth', authRoutes], ['items', itemRoutes], ['accommodations', accommodationRoutes]]) app.use(`/api/${path}`, routes);
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve)); const base = `http://127.0.0.1:${server.address().port}`;
-  const users = await User.create(['Admin', 'Alice', 'Bob', 'Carol'].map((name, i) => ({ fullName: name, email: `${name}@example.test`, password: 'test-password', verified: true, role: i ? 'user' : 'admin', preferences: { browserPush: true } })));
+  const users = await User.create(['Admin', 'Alice', 'Bob', 'Carol'].map((name, i) => ({ fullName: name, username: `test_${name.toLowerCase()}`, email: `${name}@example.test`, password: 'test-password', verified: true, role: i ? 'user' : 'admin', preferences: { browserPush: true } })));
   const [admin, a, b, c] = users.map(u => String(u._id));
   const tokens = Object.fromEntries(users.map(u => [String(u._id), jwt.sign({ userId: u._id }, process.env.JWT_SECRET)]));
   const request = async (who, method, path, body) => {
@@ -73,7 +73,7 @@ test('admin authorization, moderation, reports, notifications and push delivery'
       assert.equal((await act('review_report', reportId)).status, 200);
       assert.equal((await act('resolve_report', reportId)).status, 200);
       assert.equal((await act('dismiss_report', reportId)).status, 409);
-      for (let i = 0; i < 4; i++) { const target = await User.create({ fullName: `Target ${i}`, email: `target${i}@example.test`, password: 'test-password', verified: true }); const result = await request(a, 'POST', '/reports', { targetKind: 'user', targetId: String(target._id), reason: 'Spam' }); assert.equal(result.status, i === 3 ? 429 : 201); }
+      for (let i = 0; i < 4; i++) { const target = await User.create({ fullName: `Target ${i}`, username: `target_${i}`, email: `target${i}@example.test`, password: 'test-password', verified: true }); const result = await request(a, 'POST', '/reports', { targetKind: 'user', targetId: String(target._id), reason: 'Spam' }); assert.equal(result.status, i === 3 ? 429 : 201); }
     });
     await t.test('warn, freeze, restore, suspension and automatic expiry', async () => {
       assert.equal((await act('warn', b)).status, 200); assert.equal(await Warning.countDocuments({ userId: b }), 1);

@@ -19,12 +19,14 @@ export const ProtectRoute = async (req,res,next) =>{
         }
 
         const user = await User.findById(decoded.userId).select(
-            "-password -verificationToken -verificationTokenExpires"
+            "-password -verificationToken -verificationTokenExpires +sessionVersion"
         );
 
         if(!user){
             return res.status(404).json({message: "User not found"});
         }
+
+        if ((decoded.version || 0) !== (user.sessionVersion || 0)) return res.status(401).json({ message: 'Please sign in again.' });
 
         if (!user.verified) {
             return res.status(401).json({

@@ -30,8 +30,8 @@ test('saved listings persist, isolate accounts, and prevent duplicates for both 
     await mongoose.connection.dropDatabase();
     await SavedListing.init();
     const [a, b] = await User.create([
-      { fullName: 'Saved A', email: 'saved-a@example.test', password: 'password', verified: true },
-      { fullName: 'Saved B', email: 'saved-b@example.test', password: 'password', verified: true },
+      { fullName: 'Saved A', username: 'saved_a', email: 'saved-a@example.test', password: 'password', verified: true },
+      { fullName: 'Saved B', username: 'saved_b', email: 'saved-b@example.test', password: 'password', verified: true },
     ]);
     const item = await Item.create({ title: 'Desk', category: 'Furniture', description: 'Desk', price: 500, user: b._id });
     const stay = await Accommodation.create({ title: 'Studio', location: 'Campus', description: 'Room', price: 5000, accommodationType: 'Studio', user: b._id });

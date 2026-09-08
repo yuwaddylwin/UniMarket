@@ -25,9 +25,9 @@ await mongoose.connection.dropDatabase();
 await Promise.all([User.init(), Item.init(), Accommodation.init(), Report.init(), Message.init()]);
 await migrateReports();
 const [admin, seller, reporter] = await User.create([
-  { fullName: 'UniMarket Moderator', email: 'moderator@example.test', role: 'admin' },
-  { fullName: 'Alex Chen', email: 'alex@example.test', username: 'alex.chen' },
-  { fullName: 'Maya Lin', email: 'maya@example.test', username: 'maya.lin' },
+  { fullName: 'UniMarket Moderator', username: 'unimarket_moderator', email: 'moderator@example.test', role: 'admin' },
+  { fullName: 'Alex Chen', email: 'alex@example.test', username: 'alex_chen' },
+  { fullName: 'Maya Lin', email: 'maya@example.test', username: 'maya_lin' },
 ].map(user => ({ ...user, verified: true, password: 'preview-only-password' })));
 const listing = await Item.create({ title: 'Adjustable study desk', description: 'A compact wooden desk for student rooms. Includes a drawer and adjustable legs.', category: 'Furniture', price: 850, user: seller._id, images: [{ url: 'http://localhost:3001/Images/placeholder.png', publicId: 'preview/desk' }] });
 const accommodation = await Accommodation.create({ title: 'Campus Studio', description: 'A studio close to the university.', location: 'Near campus', accommodationType: 'Studio', price: 6500, user: seller._id, images: [{ url: 'http://localhost:3001/Images/unimarket/accommodation.jpg', publicId: 'preview/room' }] });

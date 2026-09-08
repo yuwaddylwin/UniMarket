@@ -22,10 +22,12 @@ export function getReceiverSocketId(userId) { return `user:${userId}`; }
 const online = new Map();
 io.use(async (socket, next) => {
   try {
+    const origin = socket.handshake.headers.origin;
+    if (origin && ![process.env.CLIENT_URL, ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : [])].includes(origin)) return next(new Error('Unauthorized'));
     const cookie = socket.handshake.headers.cookie?.split('; ').find(c => c.startsWith('jwt='))?.slice(4);
     const decoded = jwt.verify(socket.handshake.auth?.token || cookie, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('verified');
-    if (!user?.verified) return next(new Error('Unauthorized'));
+    const user = await User.findById(decoded.userId).select('verified +sessionVersion');
+    if (!user?.verified || (decoded.version || 0) !== (user.sessionVersion || 0)) return next(new Error('Unauthorized'));
     socket.data.userId = String(user._id);
     next();
   } catch { next(new Error('Unauthorized')); }

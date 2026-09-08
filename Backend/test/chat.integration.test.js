@@ -26,7 +26,7 @@ test('authenticated chat safety, persistence, realtime and report persistence', 
   app.use(express.json()); app.use('/api/messages', messageRoutes); app.use('/api/auth', authRoutes);
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
-  const users = await User.create(['A', 'B', 'C'].map(name => ({ fullName: name, email: `${name}@example.test`, password: 'test-password', verified: true })));
+  const users = await User.create(['A', 'B', 'C'].map(name => ({ fullName: name, username: `test_${name.toLowerCase()}`, email: `${name}@example.test`, password: 'test-password', verified: true })));
   const [a,b,c] = users.map(u => String(u._id));
   const tokens = Object.fromEntries(users.map(u => [String(u._id), jwt.sign({ userId: u._id }, process.env.JWT_SECRET)]));
   const request = async (who, method, path, body) => {

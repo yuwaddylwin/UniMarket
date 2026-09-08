@@ -26,6 +26,7 @@ function buildSellerSnapshot(user) {
 
   return {
     id: user._id,
+    username: user.username || "",
     fullName,
     profilePic,
   };
@@ -177,7 +178,7 @@ export const getItems = async (req, res) => {
   try {
     const items = await Item.find({ ...visibleListing, status: { $ne: "sold" } })
       .sort({ createdAt: -1 })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
     const normalized = items.map((it) => {
@@ -186,6 +187,7 @@ export const getItems = async (req, res) => {
       const seller = u
           ? {
               id: u._id,
+              username: u.username || "",
               fullName: u.fullName || u.name || u.username || u.email || "Seller",
               profilePic: u.profilePic || u.avatar || u.photo || "",
             }
@@ -211,7 +213,7 @@ export const getMyItems = async (req, res) => {
 
     const items = await Item.find({ user: req.user._id, status: { $ne: "sold" } })
       .sort({ createdAt: -1 })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
     const normalized = items.map((it) => {
@@ -220,6 +222,7 @@ export const getMyItems = async (req, res) => {
       const seller = u
           ? {
               id: u._id,
+              username: u.username || "",
               fullName: u.fullName || u.name || u.username || u.email || "Seller",
               profilePic: u.profilePic || u.avatar || u.photo || "",
             }
@@ -243,7 +246,7 @@ export const getItemById = async (req, res) => {
       return res.status(400).json({ message: "Invalid item id" });
     }
     const item = await Item.findOne({ ...visibleListing, _id: req.params.id, status: { $ne: "sold" } })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
     if (!item) return res.status(404).json({ message: "Item not found" });
@@ -253,7 +256,8 @@ export const getItemById = async (req, res) => {
     const seller = u
         ? {
             id: u._id,
-            fullName: u.fullName || u.name || u.username || u.email || "Seller",
+            username: u.username || "",
+              fullName: u.fullName || u.name || u.username || u.email || "Seller",
             profilePic: u.profilePic || u.avatar || u.photo || "",
           }
         : item.seller?.fullName || item.seller?.profilePic || item.seller?.id
@@ -271,7 +275,7 @@ export const getMyArchivedItems = async (req, res) => {
     if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
     const items = await Item.find({ user: req.user._id, status: "sold" })
       .sort({ soldAt: -1, updatedAt: -1 })
-      .populate("user", "fullName username name email profilePic avatar photo")
+      .populate("user", "fullName username name profilePic avatar photo")
       .lean();
     return res.status(200).json(items.map((item) => {
       const user = item.user && typeof item.user === "object" ? item.user : null;

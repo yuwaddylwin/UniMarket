@@ -47,6 +47,7 @@ const ChatHeader = () => {
 
         <div className="chat-header-info">
           <h4>{selectedUser.fullName}</h4>
+          {selectedUser.username && <small>@{selectedUser.username}</small>}
           <span className={`status ${isOnline ? "online" : "offline"}`}>
             {isOnline ? "Online" : "Offline"}
           </span>

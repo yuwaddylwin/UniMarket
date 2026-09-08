@@ -108,3 +108,24 @@
 
 @keyframes auth-page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 640px) { .profile { min-height: calc(100dvh - var(--header-compact-mobile-height) - var(--bottom-nav-height)); padding: 24px 12px; } }
+
+.auth-page { min-height: calc(100dvh - var(--header-height)); padding: 40px 16px 90px; display: grid; place-items: center; background: radial-gradient(ellipse at top left, #e6eefb, transparent 65%), var(--color-page); }
+.auth-card { width: min(100%, 470px); max-width: 470px; padding: clamp(22px, 5vw, 38px); gap: 14px; border-top: 4px solid var(--color-primary); }
+.auth-card > .logo { align-self: center; margin: 0 0 12px; }
+.auth-card h1 { margin: 0; font-size: clamp(1.6rem, 6vw, 2rem); }
+.auth-fields { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.auth-fields label { margin-top: 8px; font-weight: 700; font-size: .875rem; }
+.auth-card input { font-size: 16px; min-width: 0; }
+.auth-intro, .auth-hint { color: var(--color-text-muted); line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+.auth-intro { text-align: center; font-size: .9rem; }
+.auth-hint, .auth-fields small { font-size: .78rem; }
+.auth-error { color: #a32424; line-height: 1.5; margin: 4px 0; }
+.auth-link { text-align: center; font-size: .85rem; color: var(--color-primary); }
+.auth-divider { display: flex; align-items: center; gap: 12px; color: var(--color-text-muted); font-size: .8rem; }
+.auth-divider::before, .auth-divider::after { content: ''; height: 1px; flex: 1; background: var(--color-border); }
+.google-button { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 0; }
+.google-button span { font: 700 22px Arial, sans-serif; color: #4285f4; }
+.auth-card button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.otp-input { letter-spacing: .45em; text-align: center; font-size: 24px !important; }
+@media (max-width: 480px) { .auth-page { padding: 22px 12px 88px; } .auth-card { padding: 24px 20px; } }
+@media (prefers-reduced-motion: reduce) { .auth-page *, .profile { animation: none; transition: none; } }

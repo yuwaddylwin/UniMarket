@@ -1,7 +1,7 @@
 import { useSavedStore } from "./useSavedStore";
 import { disableDevicePush } from "../Chat/push";
 import { create } from "zustand";
-import { axiosInstance, setAuthToken, removeAuthToken, getAuthToken } from "../lib/axios.js";
+import { axiosInstance, removeAuthToken, getAuthToken } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { API_ORIGIN } from "../../config/api";
@@ -26,17 +26,12 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        set({ authUser: null });
-        return;
-      }
-
-      const res = await axiosInstance.get("/auth/check"); // http://localhost:3000/api
+      const res = await axiosInstance.get("/auth/check", { timeout: 10000 }); // http://localhost:3000/api
+      if (get().authUser?._id !== res.data._id) get().disconnectSocket();
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
-      console.log("Error in checkAuth:", error);
+      get().disconnectSocket();
       removeAuthToken();
       set({ authUser: null });
     } finally {
@@ -63,9 +58,9 @@ export const useAuthStore = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      const { token, ...user } = res.data;
-      setAuthToken(token);
-      set({ authUser: user });
+      removeAuthToken();
+      get().disconnectSocket();
+      set({ authUser: res.data });
       toast.success("Logged in successfully");
 
       // Socket
@@ -81,20 +76,21 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try {
-      await disableDevicePush();
+      await disableDevicePush().catch(() => {});
       await axiosInstance.post("/auth/logout");
-    } catch {
-      // The worker is cleared and the local subscription is revoked before
-      // attempting server cleanup, so a failed request cannot keep a session open.
-    } finally {
-      removeAuthToken();
-      get().disconnectSocket();
-      set({ authUser: null });
-      const { useChatStore } = await import("./useChatStore");
-      useChatStore.getState().setSelectedUser(null);
-      useChatStore.setState({ users: [] });
-      toast.success("Logged out successfully");
+    } catch (error) {
+      if (error.response?.status !== 401) {
+        toast.error("Unable to sign out. Check your connection and try again.");
+        return;
+      }
     }
+    removeAuthToken();
+    get().disconnectSocket();
+    set({ authUser: null });
+    const { useChatStore } = await import("./useChatStore");
+    useChatStore.getState().setSelectedUser(null);
+    useChatStore.setState({ users: [] });
+    toast.success("Logged out successfully");
   },
 
   updateProfile: async (data) => {

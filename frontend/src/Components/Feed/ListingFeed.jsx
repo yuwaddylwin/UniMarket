@@ -202,6 +202,7 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
         />
         <div>
           <strong>{sellerName}</strong>
+          {seller?.username && <small>@{seller.username}</small>}
           {meta && <span>{isAccommodation && <MapPin size={12} aria-hidden="true" />}{meta}</span>}
         </div>
         {isMine && <span className="listing-feed-owner-badge">My Listing</span>}
