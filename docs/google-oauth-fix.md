@@ -1,118 +1,145 @@
-# Google OAuth redirect fix
+# Google authentication: same-origin production proxy
 
-## Confirmed cause
+## Confirmed findings
 
-The local ignored `Backend/.env` had `NODE_ENV=development` and `GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/google/callback`, but `CLIENT_URL=https://unimarket-web.onrender.com`. Google returned to the correct local backend; the backend then redirected to the wrong frontend environment. The localhost session/pending cookie cannot authenticate requests to the hosted API.
+Public checks during this audit returned HTTP 200 **text/html (React index.html)** for all three frontend URLs:
 
-Public deployment checks on 2026-09-08 confirmed:
+- https://unimarket-web.onrender.com/api/auth/google/config
+- https://unimarket-web.onrender.com/api/auth/check
+- https://unimarket-web.onrender.com/healthz
 
-- `https://unimarket-web.onrender.com/auth/google/complete` returns HTTP 200 with the SPA HTML, so a missing rewrite is not the current cause.
-- Its deployed bundle `main.eb3ac6a8.js` contains no `/auth/google/complete`, `/auth/google`, or `/verify-code` routes. This older frontend renders no matching route, explaining the blank page.
-- `https://unimarket-08di.onrender.com/` returns HTTP 200 / `API is running!`. This API hostname is also configured in `frontend/src/config/api.js` and embedded in the deployed frontend bundle; it was not guessed.
-- The deployed API's `/api/auth/google/config` returns HTTP 404. Both deployed app tiers need the existing authentication changes plus this fix.
+The backend https://unimarket-08di.onrender.com/healthz returned HTTP 200 JSON (`{"ok":true}`). These observations describe the currently deployed version, not the local changes.
 
-The project uses Express/Mongoose, google-auth-library, and its existing HTTP-only JWT cookie flow. There is no Django application, `urls.py`, allauth or Django OAuth Toolkit to modify.
+The checkout had no `frontend/server.cjs` and no `start:production` script. React defaulted to the backend's production origin. The previous deployment instructions used a Static Site and cross-site `SameSite=None` cookies. This does not implement the required frontend proxy, and creates reliance on third-party cookie availability. A 200 HTML response was not rejected by Axios. Session checks cleared users on all errors and could overwrite newer authentication state. These are confirmed code defects; actual Render environment and Google Cloud settings were not accessible.
 
-## Changes in this fix
+## Required Render frontend settings
 
-- Corrected **only** `CLIENT_URL` in ignored `Backend/.env` to `http://localhost:3000`. The existing Google client ID and secret were preserved byte-for-byte.
-- Added Google URL validation: reject mixed localhost/hosted environments, invalid callback paths, mismatched loopback hostnames, and non-HTTPS production URLs. The frontend reports a safe configuration error before sending the user to Google.
-- Kept the same backend callback, authorization-code exchange, verified identity, state/nonce/PKCE, secure linking, usernames and cookies.
-- Added visible completion loading/error states and bounded frontend requests. Completion clears obsolete bearer storage before restoring the new Google cookie session, distinguishes network failure from missing pending signup, and no longer navigates to the profile when session restoration failed.
-- Added clear cancellation/state/exchange/identity/account failure messages without returning authorization codes, tokens or secrets.
-- Added configuration and frontend completion regression tests, and extended the isolated browser test to cover new/existing Google sign-in and refresh. Provider transport is mocked in tests.
+Use a **Web Service**, not a Static Site. A static-site rewrite cannot run the Node proxy. Preserve the requested frontend hostname when migrating the service; coordinate the service name/domain in Render rather than deploying under a different origin unnoticed.
 
-No additional database/model changes or migrations are required **for this fix**. If deploying the original username/auth changes for the first time, follow the existing migration/deployment steps in `docs/authentication.md`.
+| Setting | Exact value |
+| --- | --- |
+| Root directory | `frontend` |
+| Build command | `npm ci && npm run build` |
+| Start command | `npm run start:production` |
+| Health check path | `/healthz` |
+| `NODE_ENV` | `production` |
+| `API_PROXY_TARGET` | `https://unimarket-08di.onrender.com` |
+| `REACT_APP_API_URL` | `/api` |
+| `API_PROXY_SECRET` | A new random server-only value of at least 32 characters, identical on both services |
 
-## Google Cloud Console — edit the EXISTING Web application client
+`PORT` is supplied by Render. Production React uses `/api` even if an obsolete absolute API URL remains in the build environment. No production hostname or Google credentials are embedded in React source. `REACT_APP_APP_ORIGIN` was not present and is unnecessary.
 
-Authorized JavaScript origins (one entry per line):
+The Node server streams `/api/*`, `/uploads/*`, and `/socket.io/*` to the backend without stripping `/api`. It forwards bodies, cookies and redirects, and tunnels WebSocket upgrades. API requests never use the SPA fallback. Frontend `/healthz` measures frontend process availability; `/api/auth/google/config` separately checks frontend-to-backend reachability.
+
+## Required Render backend settings
+
+| Setting | Exact value |
+| --- | --- |
+| Root directory | `Backend` |
+| Build command | `npm ci` |
+| Start command | `npm start` |
+| Health check path | `/healthz` |
+| `NODE_ENV` | `production` |
+| `CLIENT_URL` | `https://unimarket-web.onrender.com` |
+| `GOOGLE_REDIRECT_URI` | `https://unimarket-web.onrender.com/api/auth/google/callback` |
+| `API_PROXY_SECRET` | Same server-only value as the frontend Web Service |
+
+Preserve existing `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`, `MONGO_URL`, SMTP/email, Cloudinary, push and all other application settings. Do not replace credentials. Remove the obsolete `COOKIE_SAME_SITE=none` override; cookies now consistently use `Lax`. Cookies remain host-only, HttpOnly, and Secure in production. No `.onrender.com` cookie domain is used.
+
+The additional `API_PROXY_SECRET` protects the forwarded client IP used by existing rate limits. Create one random value in your secret manager and set it identically on both Render services; it does not replace any existing credential. Never name it `REACT_APP_*` or expose it in React. The frontend signs the IP, method, path and timestamp; the backend rejects forged or stale assertions. This avoids a shared rate-limit bucket for all frontend users without trusting arbitrary headers on the public backend.
+
+Proxy trust defaults to one hop in production and zero locally; `TRUST_PROXY_HOPS` accepts an explicit nonnegative integer. Before deployment sign-off, verify the actual forwarding chain and per-client rate-limit identities on Render. Do not blindly increase the hop count or use `trust proxy=true`: the public backend has a shorter access path than the frontend-proxied path. The frontend selects the client address using its bounded proxy trust setting, strips supplied internal assertion/forwarding headers, and creates a fresh signed assertion. Keep backend proxy trust conservative; the signed assertion handles the additional frontend hop for authentication rate limiting. Production Secure cookies depend on `NODE_ENV`, not an unreliable incoming HTTP socket after TLS termination. See [Express proxy trust guidance](https://expressjs.com/en/guide/behind-proxies/) and [Render Web Services](https://render.com/docs/web-services).
+
+## Google Cloud: existing Web application OAuth client
+
+Authorized JavaScript origin:
 
 ```text
-http://localhost:3000
 https://unimarket-web.onrender.com
 ```
 
-Authorized redirect URIs (one entry per line):
+Authorized redirect URI:
 
 ```text
-http://localhost:8000/api/auth/google/callback
-https://unimarket-08di.onrender.com/api/auth/google/callback
+https://unimarket-web.onrender.com/api/auth/google/callback
 ```
 
-Remove `http://localhost:3000` from redirect URIs if it was added only for UniMarket. The frontend root is an origin/homepage, not this implementation's Google callback. The server authorization flow does not depend on JavaScript-origin registration, but the origins above correctly describe the app.
+Replace the obsolete production backend callback entry. Do not add `/api` to the JavaScript origin. Keep the existing client ID and secret on the backend only. If consent is in testing, include the test accounts in the allowed audience.
 
-Application/Home Page (Google Auth Platform → Branding):
+For local development, retain separate entries:
 
-```text
-https://unimarket-web.onrender.com
-```
+- Origin: `http://localhost:3000`
+- Callback: `http://localhost:8000/api/auth/google/callback`
 
-Local app home is `http://localhost:3000/`. The completion path `/auth/google/complete` is a React route after the backend callback; do not register it as Google's callback. Keep the existing client ID and secret. Ensure your Google account is listed as a test user if the consent screen is in testing mode.
+Local backend uses `NODE_ENV=development`, `CLIENT_URL=http://localhost:3000`, `GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/google/callback`; frontend `npm start` defaults to `http://localhost:8000/api`. Use `localhost` consistently. To test the production proxy locally, build React and run `API_PROXY_TARGET=http://localhost:8000 npm run start:production`, with the backend callback set to the frontend `/api/auth/google/callback` address.
 
-Google's [server-flow documentation](https://developers.google.com/identity/openid-connect/openid-connect) requires the redirect URI to exactly match the backend endpoint registered on the existing client.
+## Behavior and performance
 
-## Local environment
+- Existing state, nonce, PKCE, signed Google identity verification, email ownership proof, username uniqueness and session revocation remain intact.
+- Production config rejects a callback on a different origin, with a safe server diagnostic.
+- Existing Google users land on home. New users complete their username and land on profile. An existing linked session clears a stale pending cookie.
+- Concurrent session checks share a request. Login, logout and Google completion invalidate old checks. Temporary network/server failures retry once and preserve the current user; visible retry controls are available.
+- Google/OTP completion uses the authenticated user returned by the backend, avoiding a redundant session request and race.
+- Axios rejects HTML responses, including HTTP 200 SPA fallback pages.
+- Removed a redundant unread request at socket creation; retained reconnect/event reconciliation. App subscribes only to relevant auth state, so unread/presence updates do not rerender the entire route tree.
+- Existing lazy listing images, parallel profile listing requests, saved-state request coalescing and database indexes remain. No pagination, API response redesign or feature removal was introduced.
 
-In `Backend/.env`:
+## Verification and remaining deployment work
 
-```dotenv
-NODE_ENV=development
-PORT=8000
-CLIENT_URL=http://localhost:3000
-GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/google/callback
-COOKIE_SAME_SITE=lax
-```
+Local automated verification and production verification are separate. The production service currently still returns HTML for the frontend API paths: these local edits have not been deployed.
 
-Keep `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`, `MONGO_URL`, SMTP and other existing values. `COOKIE_SAME_SITE=lax` is already the default when unset; the only required local value changed here was `CLIENT_URL`.
+After deploying **both** services with the settings above:
 
-Frontend `REACT_APP_API_URL=http://localhost:8000` is optional locally because it is already the development default. If overriding it, place it in ignored `frontend/.env.local`. Never put the Google secret in any `REACT_APP_*` variable.
+1. Request frontend `/api/auth/google/config`: expect JSON `{ "enabled": true }`.
+2. Request frontend `/api/auth/check` signed out: expect 401 JSON, not 200 HTML. Signed in: expect 200 with the public user.
+3. Check both `/healthz` endpoints return JSON with HTTP 200, and verify API reachability through the frontend.
+4. In a browser, sign up with a new Google identity, complete username/email proof if requested, reach profile, refresh, visit a protected route, logout, then sign in with the same Google identity and reach home.
+5. Test an existing password account with matching email: linking must require the emailed code and must preserve the username and user ID.
+6. Confirm browser cookies `jwt`, `google_state`, `google_pending` have the frontend host, HttpOnly, Secure and SameSite=Lax while relevant to the flow.
+7. Check real uploads/Cloudinary, chat socket reconnection, notifications and per-client rate limiting in the deployed topology.
+8. Repeat with real Google in Chrome, Safari, Firefox, Edge, iPhone/iPad and Android. Local headless Chrome with a mocked provider does not certify those devices, Google consent settings or real SMTP delivery.
 
-Restart the backend so it reloads `.env`:
+Final local results:
 
-```sh
-cd Backend
-npm run dev
-```
+- `npm install --no-audit --no-fund` (frontend): passed; the initial `npm ci` attempt hit an existing cache-directory cleanup error, then installation completed without lockfile changes.
+- `npm ci --no-audit --no-fund` (backend): passed.
+- `npm run build` (frontend): passed; main JavaScript is 156.86 kB gzip. Existing browser-data age warnings remain.
+- `CI=true npm test -- --watchAll=false --runInBand`: **85 tests passed across 15 suites**.
+- `npm run test:proxy`: passed; exercises GET/POST/PUT/PATCH/DELETE, query strings, JSON, multipart uploads, cookies, separate Set-Cookie headers, redirects, WebSockets, assets, SPA routes, signed forwarding and unavailable-backend JSON errors.
+- Backend `npm test` with `AUTH_TEST_MONGO_URL=mongodb://127.0.0.1:27028/auth_test?replicaSet=authTest`, `SAVED_TEST_MONGO_URL=mongodb://127.0.0.1:27028/saved_test?replicaSet=authTest`, `CHAT_TEST_MONGO_URL=mongodb://127.0.0.1:27029`: **20 tests passed, zero skipped**, including auth/Google, OTP, session revocation, usernames, chat, saved items, moderation/admin, reports, push and signed proxy identities.
+- `AUTH_BROWSER_PORT=18739 UNIMARKET_GOOGLE_PREVIEW=mock node test/auth.browser.test.cjs`, against the isolated `auth-browser-server.js` and production React build: passed password signup → OTP → profile/settings → logout → username login, plus Google initiation → frontend callback proxy → username → profile → refresh → logout → existing Google sign-in → home. Auth page layouts checked at 1440, 768, 390 and 320 px. Google and email transports are mocked.
+- Actual backend `npm start` using a disposable local database and development settings: passed; `/healthz` returned HTTP 200 JSON.
+- JavaScript syntax and `git diff --check`: passed.
 
-Run/restart the frontend in a separate terminal:
+The first sandboxed network tests could not open local ports/reach MongoDB; the reported successful integration runs used permitted local networking. Existing occupied preview ports were avoided using isolated ports. No test was skipped to claim a pass.
 
-```sh
-cd frontend
-npm start
-```
+ Backend integration tests use explicitly isolated local databases; Google and email transports are mocked. No production account or database was modified during verification.
 
-Use `localhost` consistently rather than mixing it with `127.0.0.1`. Start a fresh Google attempt after restarting; previous state/pending cookies may have expired.
+## Complete file change list
 
-Expected flow: localhost:3000 → localhost:8000/api/auth/google → Google → localhost:8000/api/auth/google/callback → localhost:3000/auth/google/complete → username/email-proof step if needed → profile.
-
-## Render environment and deployment
-
-Backend service (`unimarket-08di.onrender.com`):
-
-```dotenv
-NODE_ENV=production
-CLIENT_URL=https://unimarket-web.onrender.com
-GOOGLE_REDIRECT_URI=https://unimarket-08di.onrender.com/api/auth/google/callback
-COOKIE_SAME_SITE=none
-```
-
-Retain existing Google client credentials, JWT secret, DB and SMTP settings in the backend Render environment. Configure `TRUST_PROXY_HOPS` for the actual trusted proxy arrangement so rate limits identify clients correctly. No new `BACKEND_URL`/`FRONTEND_URL` variables are needed: this architecture already uses `GOOGLE_REDIRECT_URI`, `CLIENT_URL` and `REACT_APP_API_URL` for those roles.
-
-Frontend static-site service (`unimarket-web.onrender.com`):
-
-```dotenv
-REACT_APP_API_URL=https://unimarket-08di.onrender.com
-```
-
-Deploy the current code for **both** services. Frontend build: `npm ci && npm run build` from `frontend`, publish `build`. Backend install/start: `npm ci`, `npm start` from `Backend`. Environment-only updates do not add the missing deployed routes; the latest code must be deployed. Preserve the existing SPA rewrite (`/*` → `/index.html`, action Rewrite), which currently serves the completion URL correctly. See [Render rewrite documentation](https://render.com/docs/redirects-rewrites).
-
-Axios already uses `withCredentials: true`; existing CORS/Origin guards allow the configured frontend, and production JWT cookies use Secure/HttpOnly. The separate Render hostnames need `SameSite=None`. Browsers that block third-party cookies may still block this hosting arrangement; use frontend/API custom domains under one site or a same-origin proxy for those browsers. The completion screen now reports session failure instead of silently showing a profile without authentication.
-
-## Verification and remaining manual checks
-
-Automated checks cover local/production URL validation, callback redirects, invalid state, cancellation, failed identity verification, new Google usernames, existing linked users, safe email linking, cookies/session restoration, refresh, logout, and existing signup/login/reset/username behavior. Real Google identity/token transport is mocked; no real Google account was signed into by the test runner. The existing Google credentials were not exchanged/replaced or committed.
-
-After restarting locally, manually select your Google account, complete username/email proof when requested, refresh the profile and log out. After both Render deployments, repeat this test on production and confirm `/api/auth/google/config` returns `enabled: true`. Live Render environment values and Google Cloud Console settings cannot be changed or inspected from this workspace; update them as listed above.
-
-Recorded results for this fix: 77 frontend tests passed (14 suites); 11 backend auth/configuration/saved/worker tests passed; production build and configured frontend lint passed; backend syntax and `git diff --check` passed. Chrome passed Google initiation → backend callback → username completion → profile refresh → logout → existing Google login with the provider mocked, plus the email signup/OTP/login flow and four responsive widths. Credential fingerprints matched before/after, and `Backend/.env` is ignored by Git.
+- `Backend/index.js`
+- `Backend/src/controllers/googleAuth.controller.js`
+- `Backend/src/lib/socket.js`
+- `Backend/src/services/authSecurity.js`
+- `Backend/src/services/googleConfig.js`
+- `Backend/src/services/proxyIdentity.js`
+- `Backend/test/auth-browser-server.js`
+- `Backend/test/auth.browser.test.cjs`
+- `Backend/test/google-config.test.js`
+- `Backend/test/proxy-identity.test.js`
+- `docs/authentication.md`
+- `docs/google-oauth-fix.md`
+- `frontend/package.json`
+- `frontend/server.cjs`
+- `frontend/src/App.js`
+- `frontend/src/Components/Profile/forms/AuthShared.jsx`
+- `frontend/src/Components/common/RequireAuth.jsx`
+- `frontend/src/Components/lib/axios.js`
+- `frontend/src/Components/lib/axios.test.js`
+- `frontend/src/Components/store/useAuthStore.js`
+- `frontend/src/Components/store/useAuthStore.test.js`
+- `frontend/src/config/api.js`
+- `frontend/src/pages/AuthCodePage.jsx`
+- `frontend/src/pages/GoogleCompletePage.jsx`
+- `frontend/src/pages/GoogleCompletePage.test.jsx`
+- `frontend/test/proxy.test.cjs`

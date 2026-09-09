@@ -1,11 +1,11 @@
 const DEFAULT_API_ORIGIN =
   process.env.NODE_ENV === "production"
-    ? "https://unimarket-08di.onrender.com"
+    ? "/api"
     : "http://localhost:8000";
 
-const configuredOrigin = (process.env.REACT_APP_API_URL || DEFAULT_API_ORIGIN).replace(/\/$/, "");
+const configuredOrigin = (process.env.NODE_ENV === "production" ? "/api" : (process.env.REACT_APP_API_URL || DEFAULT_API_ORIGIN)).replace(/\/$/, "");
 
-// REACT_APP_API_URL may be supplied as either https://host or https://host/api.
+// Production always uses the frontend proxy; development accepts a backend origin or /api URL.
 export const API_BASE_URL = configuredOrigin.endsWith("/api")
   ? configuredOrigin
   : `${configuredOrigin}/api`;

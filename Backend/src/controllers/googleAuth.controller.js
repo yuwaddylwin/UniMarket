@@ -7,7 +7,7 @@ import { serializePublicUser } from './auth.controller.js';
 const configured = () => googleConfiguration().enabled;
 const client = () => new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, googleSettings().redirectUri);
 const flowCookie = () => ({ ...cookieOptions(), sameSite: 'lax', maxAge: 600000 });
-export const googleConfig = (req, res) => res.json(googleConfiguration());
+export const googleConfig = (req, res) => { const config = googleConfiguration(); if (!config.enabled) console.error('Google OAuth configuration:', config.message); res.json(config); };
 export const googleStart = safeAuth(async (req, res) => {
   if (!configured()) return res.status(503).json({ message: googleConfiguration().message });
   const state = random(), nonce = random(), verifier = random();
@@ -42,7 +42,7 @@ export const googleCallback = async (req, res) => {
     if (!identity?.sub || !identity.email || !identity.email_verified || identity.nonce !== flow.data.nonce) throw new Error('Invalid identity');
     failure = 'account';
     const user = await User.findOne({ googleSub: identity.sub }).select('+sessionVersion');
-    if (user?.verified) { establishSession(res, user); return redirect('/auth/google/complete'); }
+    if (user?.verified) { res.clearCookie('google_pending', cookieOptions()); establishSession(res, user); return redirect('/auth/google/complete'); }
     const email = normalize(identity.email);
     const existing = await User.findOne({ email });
     // Explicit fresh email proof for ALL matching accounts: never silently link by email.

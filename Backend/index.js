@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { migrateUsernames } from './src/services/usernameMigration.js';
 import { originGuard } from './src/services/authSecurity.js';
 import User from './src/models/user.model.js';
@@ -7,11 +8,9 @@ import adminRoutes from './src/routes/admin.route.js';
 import reportRoutes from './src/routes/reports.route.js';
 import { startChatAlertWorker } from './src/services/chatAlerts.js';
 import { migrateReports, startModerationMaintenance } from './src/services/moderationMaintenance.js';
-import express, { Router } from "express";
+import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import path from "path";
-dotenv.config();
 
 import cors from 'cors'; 
 import cookieParser from "cookie-parser";
@@ -23,13 +22,16 @@ import accommodationRoutes from "./src/routes/accommodations.route.js";
 import { app, server } from "./src/lib/socket.js";
 
 
+if (process.env.NODE_ENV === 'production' && (!process.env.API_PROXY_SECRET || process.env.API_PROXY_SECRET.length < 32)) throw new Error('API_PROXY_SECRET must be at least 32 characters and match the frontend server.');
+
 // Set only the exact number of trusted proxy hops for your deployment.
-if (process.env.TRUST_PROXY_HOPS) app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS));
+const proxyHops = Number(process.env.TRUST_PROXY_HOPS || (process.env.NODE_ENV === 'production' ? 1 : 0));
+if (!Number.isInteger(proxyHops) || proxyHops < 0) throw new Error('TRUST_PROXY_HOPS must be a nonnegative integer.');
+app.set('trust proxy', proxyHops);
 //Middleware
 app.use(cors({
   origin: [
-    'http://localhost:3000',
-    'https://unimarket-web.onrender.com',
+    ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : []),
     process.env.CLIENT_URL,
   ].filter(Boolean),
   credentials: true,
@@ -57,6 +59,9 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+
+app.get('/healthz', (req, res) => res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({ status: mongoose.connection.readyState === 1 ? 'ok' : 'unavailable' }));
+app.use('/api', (req, res) => res.status(404).json({ message: 'API route not found' }));
 
 // Test route
 app.get("/", (req, res) => {

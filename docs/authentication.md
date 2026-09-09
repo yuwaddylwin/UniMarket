@@ -39,7 +39,7 @@ In Google Cloud Console / Google Auth Platform:
 
 1. Select/create your project. Configure Branding, Audience and contact details for UniMarket; add test users while the app is in testing.
 2. Create an OAuth client of type **Web application**.
-3. Add the exact backend callback URI as an authorized redirect URI. For the current backend hostname this is `https://unimarket-08di.onrender.com/api/auth/google/callback`. Local development: `http://localhost:8000/api/auth/google/callback`. Match your actual backend host if it differs.
+3. Add `https://unimarket-web.onrender.com/api/auth/google/callback` as the production authorized redirect URI; the frontend Web Service proxies it to Express. Local development: `http://localhost:8000/api/auth/google/callback`. See [deployment settings](google-oauth-fix.md).
 4. Copy the client ID and secret into backend environment variables below. Never add the secret to React environment variables.
 5. Publish/configure the consent screen for your intended audience, then test a real new Google user and an existing account through the deployed site.
 
@@ -49,18 +49,19 @@ Backend environment variables (local `Backend/.env`, or the backend hosting serv
 | --- | --- |
 | `GOOGLE_CLIENT_ID` | Web OAuth client ID from Google Cloud |
 | `GOOGLE_CLIENT_SECRET` | Corresponding secret from Google Cloud |
-| `GOOGLE_REDIRECT_URI` | Exact authorized backend callback URI above |
+| `GOOGLE_REDIRECT_URI` | Exact authorized callback URI above |
 | `CLIENT_URL` | Exact frontend origin, e.g. `https://unimarket-web.onrender.com`; no trailing slash/path |
 | `JWT_SECRET` | Existing strong secret; also keys code digests. Keep stable across instances |
 | `MONGO_URL` | Existing MongoDB connection string |
 | `NODE_ENV` | `production` on the hosted backend, enabling Secure cookies |
-| `COOKIE_SAME_SITE` | `none` for cross-site frontend/API hosts; otherwise `lax` (default) |
+| `COOKIE_SAME_SITE` | Obsolete override; cookies always use `lax` for the same-origin proxy |
+| `API_PROXY_SECRET` | New server-only random value, at least 32 characters, identical on frontend and backend; authenticates client IP forwarding for rate limits |
 | `TRUST_PROXY_HOPS` | Exact trusted reverse-proxy hop count, only when behind a trusted proxy; local development leaves it unset |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | Existing SMTP configuration; same values/service as verification email |
 
-Frontend environment: `REACT_APP_API_URL` is the backend origin (or `/api` URL), set before building. No Google secrets belong in frontend configuration.
+Frontend production environment: `REACT_APP_API_URL=/api`, `API_PROXY_TARGET=https://unimarket-08di.onrender.com`, `NODE_ENV=production`. Run as a Web Service using `npm run start:production`. No Google credentials belong in frontend configuration.
 
-The two existing `onrender.com` hostnames require cross-site cookie configuration (`COOKIE_SAME_SITE=none`, HTTPS). Browsers that block third-party cookies can still block cross-site sessions: serving frontend and API under the same site (e.g. `www.example.com` / `api.example.com`) or through a same-origin reverse proxy is the reliable deployment arrangement. This applies to HTTP and Socket.IO authentication.
+The browser uses only the frontend origin for API and Socket.IO requests. The frontend Node proxy forwards them to the separate backend service, keeping authentication cookies first-party, host-only, HttpOnly, Secure and SameSite=Lax. See [the complete Render/Google deployment guide](google-oauth-fix.md).
 
 Implementation uses Google's authorization-code flow with state, nonce, PKCE, a fixed callback and google-auth-library verification of the signed ID token/audience/issuer/expiry. Stable Google `sub` identifies linked accounts. A matching email NEVER silently links an account: fresh email-code proof is required. Third-party non-Gmail/non-Workspace email identities also require email proof. For an unverified matching account, any pre-existing password is removed when linking to prevent an attacker retaining a pre-registration password. Google passwords/access tokens are not stored. New users explicitly confirm a unique username. Cancellation, invalid state and failed identity verification return to login with a safe error.
 

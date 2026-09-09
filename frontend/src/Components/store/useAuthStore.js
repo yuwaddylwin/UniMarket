@@ -6,8 +6,12 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { API_ORIGIN } from "../../config/api";
 
-const SOCKET_URL = API_ORIGIN;
+const SOCKET_URL = API_ORIGIN || undefined;
 let unreadRequestVersion = 0;
+let authVersion = 0;
+let authRequest = null;
+function invalidateAuthChecks() { authVersion += 1; authRequest = null; }
+
 
 
 export const useAuthStore = create((set, get) => ({
@@ -24,19 +28,54 @@ export const useAuthStore = create((set, get) => ({
   unreadCount: {}, // { userId: count }
   totalUnread: 0,
 
-  checkAuth: async () => {
-    try {
-      const res = await axiosInstance.get("/auth/check", { timeout: 10000 }); // http://localhost:3000/api
-      if (get().authUser?._id !== res.data._id) get().disconnectSocket();
-      set({ authUser: res.data });
-      get().connectSocket();
-    } catch (error) {
-      get().disconnectSocket();
-      removeAuthToken();
-      set({ authUser: null });
-    } finally {
-      set({ isCheckingAuth: false });
-    }
+  authError: null,
+  invalidateAuthChecks,
+  acceptSession: (user) => {
+    if (!user?._id) throw new Error('Invalid session response');
+    invalidateAuthChecks();
+    removeAuthToken();
+    if (get().authUser?._id !== user._id) get().disconnectSocket();
+    set({ authUser: user, authError: null, isCheckingAuth: false });
+    get().connectSocket();
+  },
+  checkAuth: (options = {}) => {
+    if (options?.fresh) invalidateAuthChecks();
+    if (authRequest) return authRequest;
+    const version = authVersion;
+    const request = (async () => {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          const res = await axiosInstance.get("/auth/check", { timeout: 20000 });
+          if (!res.data?._id) throw Object.assign(new Error('Invalid session response from the API.'), { code: 'INVALID_SESSION' });
+          if (version !== authVersion) return get().authUser;
+          if (get().authUser?._id !== res.data._id) get().disconnectSocket();
+          set({ authUser: res.data, authError: null });
+          get().connectSocket();
+          return res.data;
+        } catch (error) {
+          if (version !== authVersion) return get().authUser;
+          if (error.response?.status === 401 || (error.response?.status === 404 && error.response?.data?.message === 'User not found')) {
+            get().disconnectSocket(); removeAuthToken();
+            set({ authUser: null, authError: null });
+            return null;
+          }
+          const retryable = !error.response || error.response.status >= 500;
+          if (attempt === 0 && retryable && !['API_HTML_RESPONSE', 'INVALID_SESSION'].includes(error.code)) {
+            await new Promise(resolve => setTimeout(resolve, 400));
+            if (version !== authVersion) return get().authUser;
+            continue;
+          }
+          set({ authError: error.code === 'API_HTML_RESPONSE' ? error.message : 'Unable to check your session. Check your connection and retry.' });
+          return null;
+        }
+      }
+    })();
+    authRequest = request;
+    request.finally(() => {
+      if (version === authVersion) set({ isCheckingAuth: false });
+      if (authRequest === request) authRequest = null;
+    });
+    return request;
   },
 
   signup: async (data) => {
@@ -55,16 +94,13 @@ export const useAuthStore = create((set, get) => ({
   },
 
   login: async (data) => {
+    invalidateAuthChecks();
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      removeAuthToken();
-      get().disconnectSocket();
-      set({ authUser: res.data });
+      get().acceptSession(res.data);
       toast.success("Logged in successfully");
 
-      // Socket
-      get().connectSocket();
       return res.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Login Failed!");
@@ -75,6 +111,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   logout: async () => {
+    invalidateAuthChecks();
     try {
       await disableDevicePush().catch(() => {});
       await axiosInstance.post("/auth/logout");
@@ -86,7 +123,8 @@ export const useAuthStore = create((set, get) => ({
     }
     removeAuthToken();
     get().disconnectSocket();
-    set({ authUser: null });
+    invalidateAuthChecks();
+    set({ authUser: null, authError: null, isCheckingAuth: false });
     const { useChatStore } = await import("./useChatStore");
     useChatStore.getState().setSelectedUser(null);
     useChatStore.setState({ users: [] });
@@ -185,7 +223,6 @@ export const useAuthStore = create((set, get) => ({
     newSocket.on("connect", () => get().getUnreadCount());
 
     // Initialize unread count and subscribe to updates
-    get().getUnreadCount();
     get().subscribeToUnreadUpdates();
   },
 

@@ -15,9 +15,12 @@ test('Google configuration separates local and production without changing crede
     assert.match(googleConfiguration().message, /mixes local and hosted/);
     process.env.GOOGLE_REDIRECT_URI = 'https://unimarket-08di.onrender.com/api/auth/google/callback';
     process.env.NODE_ENV = 'production'; process.env.COOKIE_SAME_SITE = 'none';
+    assert.equal(googleConfiguration().enabled, false);
+    assert.match(googleConfiguration().message, /CLIENT_URL origin/);
+    process.env.GOOGLE_REDIRECT_URI = 'https://unimarket-web.onrender.com/api/auth/google/callback';
     assert.equal(googleConfiguration().enabled, true);
     assert.equal(googleSettings().frontendOrigin, 'https://unimarket-web.onrender.com');
-    assert.deepEqual(cookieOptions(), { httpOnly: true, secure: true, sameSite: 'none', path: '/' });
+    assert.deepEqual(cookieOptions(), { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
     process.env.GOOGLE_REDIRECT_URI = 'http://localhost:3000';
     assert.equal(googleConfiguration().enabled, false);
     process.env.GOOGLE_REDIRECT_URI = 'invalid';

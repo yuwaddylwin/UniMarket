@@ -19,9 +19,9 @@ export default function AuthCodePage({ reset = false }) {
     if (reset && password !== confirm) return setMessage('Passwords do not match.');
     setBusy(true); setMessage('');
     try {
-      await axiosInstance.post(reset ? '/auth/reset-password' : '/auth/verify-code', { email, code, ...(reset ? { password } : {}) });
+      const { data } = await axiosInstance.post(reset ? '/auth/reset-password' : '/auth/verify-code', { email, code, ...(reset ? { password } : {}) });
       removeAuthToken();
-      if (!reset) await useAuthStore.getState().checkAuth();
+      if (!reset) useAuthStore.getState().acceptSession(data);
       navigate(reset ? '/login' : '/profile', { replace: true });
     } catch (err) { setMessage(errorMessage(err)); } finally { setBusy(false); }
   }

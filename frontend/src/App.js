@@ -1,3 +1,4 @@
+import { removeAuthToken } from './Components/lib/axios';
 import AuthCodePage from './pages/AuthCodePage';
 import GoogleCompletePage from './pages/GoogleCompletePage';
 import AdminDashboard from './Components/Admin/AdminDashboard';
@@ -34,12 +35,16 @@ import "./App.css";
 import "./theme.css";
 
 export default function App() {
-  const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
+  const checkAuth = useAuthStore(state => state.checkAuth);
+  const isCheckingAuth = useAuthStore(state => state.isCheckingAuth);
+  const authUser = useAuthStore(state => state.authUser);
+  const authError = useAuthStore(state => state.authError);
   useEffect(() => {
     useSavedStore.getState().setUser(authUser?._id || null);
   }, [authUser?._id]);
 
   useEffect(() => {
+    if (window.location.pathname === '/auth/google/complete') removeAuthToken();
     checkAuth();
   }, [checkAuth]);
 
@@ -60,6 +65,7 @@ export default function App() {
     <Router>
       <Toaster />
       <ChatActivityBridge />
+      {authError && <div role="alert">{authError} <button onClick={() => checkAuth()}>Retry session check</button></div>}
 
       <Routes>
         <Route path="/admin/*" element={<AdminDashboard />} />
