@@ -7,8 +7,8 @@ jest.mock('react-router-dom', () => ({ Link: ({ children, to }) => <a href={to}>
 jest.mock('../Components/lib/axios', () => ({ axiosInstance: { get: jest.fn(), post: jest.fn() }, removeAuthToken: jest.fn() }));
 jest.mock('../Components/store/useAuthStore', () => ({ useAuthStore: { getState: jest.fn() } }));
 const checkAuth = jest.fn(), invalidateAuthChecks = jest.fn(), acceptSession = jest.fn();
-let authUser;
-beforeEach(() => { jest.clearAllMocks(); authUser = null; useAuthStore.getState.mockImplementation(() => ({ checkAuth, authUser, invalidateAuthChecks, acceptSession })); checkAuth.mockResolvedValue(undefined); });
+let authUser, authError;
+beforeEach(() => { jest.clearAllMocks(); authUser = null; authError = null; useAuthStore.getState.mockImplementation(() => ({ checkAuth, authUser, authError, invalidateAuthChecks, acceptSession })); checkAuth.mockResolvedValue(undefined); });
 test('existing Google session restores and leaves the completion route', async () => {
   axiosInstance.get.mockRejectedValue({ response: { status: 401 } }); checkAuth.mockImplementation(async () => { authUser = { _id: 'google-user' }; return authUser; });
   render(<GoogleCompletePage />); expect(screen.getByRole('status')).toHaveTextContent('Finishing Google sign-in');
@@ -44,5 +44,17 @@ test('a retained old user does not count as a successful fresh session check', a
   authUser = { _id: 'old-user' }; checkAuth.mockResolvedValue(null);
   axiosInstance.get.mockRejectedValue({ response: { status: 401 } }); render(<GoogleCompletePage />);
   expect(await screen.findByRole('alert')).toHaveTextContent('could not restore your session');
+  expect(mockNavigate).not.toHaveBeenCalled();
+});
+
+test('a failed session request after pending 401 preserves the connection error', async () => {
+  axiosInstance.get.mockRejectedValue({ response: { status: 401 } });
+  checkAuth.mockImplementation(async () => {
+    authError = 'Unable to check your session. Check your connection and retry.';
+    return null;
+  });
+  render(<GoogleCompletePage />);
+  expect(await screen.findByRole('alert')).toHaveTextContent('Unable to check your session');
+  expect(screen.getByRole('alert')).not.toHaveTextContent('Make sure cookies are allowed');
   expect(mockNavigate).not.toHaveBeenCalled();
 });

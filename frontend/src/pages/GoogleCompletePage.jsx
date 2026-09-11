@@ -30,7 +30,7 @@ export default function GoogleCompletePage() {
         const user = await useAuthStore.getState().checkAuth();
         if (!live) return;
         if (user?._id) navigate('/', { replace: true });
-        else setError(sessionError);
+        else setError(useAuthStore.getState().authError || sessionError);
       } finally { if (live) setLoading(false); }
     }
     restore();
