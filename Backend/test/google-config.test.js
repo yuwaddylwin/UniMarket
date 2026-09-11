@@ -15,8 +15,10 @@ test('Google configuration separates local and production without changing crede
     assert.match(googleConfiguration().message, /mixes local and hosted/);
     process.env.GOOGLE_REDIRECT_URI = 'https://unimarket-08di.onrender.com/api/auth/google/callback';
     process.env.NODE_ENV = 'production'; process.env.COOKIE_SAME_SITE = 'none';
-    assert.equal(googleConfiguration().enabled, false);
-    assert.match(googleConfiguration().message, /CLIENT_URL origin/);
+    assert.equal(googleConfiguration().enabled, true);
+    assert.equal(cookieOptions().sameSite, 'none');
+    assert.equal(cookieOptions().secure, true);
+    delete process.env.COOKIE_SAME_SITE;
     process.env.GOOGLE_REDIRECT_URI = 'https://unimarket-web.onrender.com/api/auth/google/callback';
     assert.equal(googleConfiguration().enabled, true);
     assert.equal(googleSettings().frontendOrigin, 'https://unimarket-web.onrender.com');
@@ -25,6 +27,10 @@ test('Google configuration separates local and production without changing crede
     assert.equal(googleConfiguration().enabled, false);
     process.env.GOOGLE_REDIRECT_URI = 'invalid';
     assert.equal(googleConfiguration().enabled, false);
+    process.env.COOKIE_SAME_SITE = 'invalid';
+    assert.throws(() => cookieOptions(), /lax or none/);
+    process.env.COOKIE_SAME_SITE = 'none'; process.env.NODE_ENV = 'development';
+    assert.throws(() => cookieOptions(), /production HTTPS/);
     assert.equal(process.env.GOOGLE_CLIENT_ID, 'test-client'); assert.equal(process.env.GOOGLE_CLIENT_SECRET, 'test-secret');
   } finally { for (const key of keys) { if (original[key] === undefined) delete process.env[key]; else process.env[key] = original[key]; } }
 });

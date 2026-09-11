@@ -22,7 +22,7 @@ import accommodationRoutes from "./src/routes/accommodations.route.js";
 import { app, server } from "./src/lib/socket.js";
 
 
-if (process.env.NODE_ENV === 'production' && (!process.env.API_PROXY_SECRET || process.env.API_PROXY_SECRET.length < 32)) throw new Error('API_PROXY_SECRET must be at least 32 characters and match the frontend server.');
+if (process.env.NODE_ENV === 'production' && process.env.API_PROXY_SECRET && process.env.API_PROXY_SECRET.length < 32) throw new Error('API_PROXY_SECRET, when set, must be at least 32 characters and match the legacy frontend server.');
 
 // Set only the exact number of trusted proxy hops for your deployment.
 const proxyHops = Number(process.env.TRUST_PROXY_HOPS || (process.env.NODE_ENV === 'production' ? 1 : 0));

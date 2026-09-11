@@ -29,7 +29,7 @@ axiosInstance.interceptors.request.use((config) => {
 export function validateApiResponse(response) {
   if (/text\/html/i.test(response.headers?.['content-type'] || '') ||
       (typeof response.data === 'string' && /^\s*(?:<!doctype\s+html|<html)/i.test(response.data))) {
-    throw Object.assign(new Error('UniMarket received a web page instead of API data. The frontend API proxy needs to be configured.'), { code: 'API_HTML_RESPONSE' });
+    throw Object.assign(new Error('UniMarket received a web page instead of API data. Check the backend API URL or legacy proxy configuration.'), { code: 'API_HTML_RESPONSE' });
   }
   return response;
 }

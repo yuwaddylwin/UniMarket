@@ -16,7 +16,6 @@ export function googleSettings() {
   if (process.env.NODE_ENV === 'production' && [frontend, callback].some(url => url.protocol !== 'https:' || loopback(url))) {
     throw new Error('Production Google sign-in requires hosted HTTPS URLs.');
   }
-  if (process.env.NODE_ENV === 'production' && frontend.origin !== callback.origin) throw new Error('Production GOOGLE_REDIRECT_URI must use the CLIENT_URL origin followed by /api/auth/google/callback through the frontend proxy.');
   return { frontendOrigin: frontend.origin, redirectUri: callback.href };
 }
 export function googleConfiguration() {

@@ -22,9 +22,11 @@
     "start": "react-scripts start",
     "start:production": "node server.cjs",
     "test:proxy": "node --test test/*.test.cjs",
-    "build": "react-scripts build",
+    "build": "node scripts/build-static.cjs",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:static": "node scripts/build-static.cjs",
+    "build:proxy": "react-scripts build"
   },
   "eslintConfig": {
     "extends": [

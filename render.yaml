@@ -1,0 +1,25 @@
+# Optional Blueprint for a NEW static preview only. No existing backend is managed.
+services:
+  - type: web
+    name: unimarket-static-preview
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build:static
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /static/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /chat-sw.js
+        name: Cache-Control
+        value: no-cache

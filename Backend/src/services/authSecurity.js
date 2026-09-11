@@ -8,7 +8,12 @@ export const validUsername = value => /^[a-z0-9_]{3,30}$/.test(value);
 export const validPassword = value => typeof value === 'string' && value.length >= 8 && Buffer.byteLength(value) <= 72;
 export const digest = value => crypto.createHmac('sha256', process.env.JWT_SECRET).update(value).digest('hex');
 export const random = () => crypto.randomBytes(32).toString('hex');
-export const cookieOptions = () => ({ httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+export function cookieOptions() {
+  const sameSite = process.env.COOKIE_SAME_SITE || 'lax';
+  if (!['lax', 'none'].includes(sameSite)) throw new Error('COOKIE_SAME_SITE must be lax or none.');
+  if (sameSite === 'none' && process.env.NODE_ENV !== 'production') throw new Error('COOKIE_SAME_SITE=none requires production HTTPS.');
+  return { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite, path: '/' };
+}
 export function establishSession(res, user) {
   res.cookie('jwt', jwt.sign({ userId: user._id, version: user.sessionVersion || 0 }, process.env.JWT_SECRET, { expiresIn: '7d' }), { ...cookieOptions(), maxAge: 604800000 });
 }
