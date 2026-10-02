@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useAccommodations } from "../Logics/useAccommodations";
+import { useAccommodations } from "../../hooks/useAccommodations";
 import ListingFeed from "../Feed/ListingFeed";
 
 export default function AccommodationDetails() {

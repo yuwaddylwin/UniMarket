@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-import { useItemsList } from "../Logics/useItemsList";
-import { useAccommodations } from "../Logics/useAccommodations";
-import ItemListingCard from "../ItemsList/ItemListingCard";
+import { useItemsList } from "../../hooks/useItemsList";
+import { useAccommodations } from "../../hooks/useAccommodations";
+import ItemListingCard from "../Items/ItemListingCard";
 import AccommodationListingCard from "../Accommodation/AccommodationListingCard";
 import LoadingSpinner from "../common/LoadingSpinner";
 import "../common/ListingPage.css";
@@ -19,7 +19,11 @@ function matchesQuery(listing, query) {
     listing.location,
     listing.accommodationType,
     listing.seller?.fullName,
-  ].some((value) => String(value || "").toLowerCase().includes(query));
+  ].some((value) =>
+    String(value || "")
+      .toLowerCase()
+      .includes(query)
+  );
 }
 
 export default function SearchPage() {
@@ -40,16 +44,21 @@ export default function SearchPage() {
     setActiveSearch(incomingSearch);
   }, [incomingSearch]);
 
-  const results = useMemo(() => [
-    ...items.map((listing) => ({ ...listing, searchResultType: "item" })),
-    ...accommodations.map((listing) => ({
-      ...listing,
-      searchResultType: "accommodation",
-    })),
-  ]
-    .filter((listing) => matchesQuery(listing, query))
-    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)),
-  [items, accommodations, query]);
+  const results = useMemo(
+    () =>
+      [
+        ...items.map((listing) => ({ ...listing, searchResultType: "item" })),
+        ...accommodations.map((listing) => ({
+          ...listing,
+          searchResultType: "accommodation",
+        })),
+      ]
+        .filter((listing) => matchesQuery(listing, query))
+        .sort(
+          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        ),
+    [items, accommodations, query]
+  );
 
   const isLoading = itemsLoading || accommodationsLoading;
   const hasPartialError = Boolean(itemsError || accommodationsError);
@@ -78,29 +87,51 @@ export default function SearchPage() {
             <span>{query ? "Search results" : "Explore UniMarket"}</span>
             <h2>Items &amp; Accommodation</h2>
           </div>
-          {!isLoading && <span>{results.length} {results.length === 1 ? "listing" : "listings"}</span>}
+          {!isLoading && (
+            <span>
+              {results.length} {results.length === 1 ? "listing" : "listings"}
+            </span>
+          )}
         </header>
 
         {hasPartialError && (
           <div className="search-results-warning" role="status">
-            Some listings could not be loaded. Available results are shown below.
+            Some listings could not be loaded. Available results are shown
+            below.
           </div>
         )}
 
         {isLoading ? (
-          <LoadingSpinner className="search-results-loading" label="Loading listings…" />
+          <LoadingSpinner
+            className="search-results-loading"
+            label="Loading listings…"
+          />
         ) : results.length === 0 ? (
           <div className="search-results-empty">
-            <strong>{query ? "No matching listings found." : "No listings available yet."}</strong>
-            <span>{query ? "Try another name, category, or location." : "New posts will appear here."}</span>
+            <strong>
+              {query
+                ? "No matching listings found."
+                : "No listings available yet."}
+            </strong>
+            <span>
+              {query
+                ? "Try another name, category, or location."
+                : "New posts will appear here."}
+            </span>
           </div>
         ) : (
           <div className="search-results-grid">
-            {results.map((listing) => listing.searchResultType === "item" ? (
-              <ItemListingCard item={listing} key={`item-${listing._id}`} />
-            ) : (
-              <AccommodationListingCard listing={listing} hideTypeLabel key={`accommodation-${listing._id}`} />
-            ))}
+            {results.map((listing) =>
+              listing.searchResultType === "item" ? (
+                <ItemListingCard item={listing} key={`item-${listing._id}`} />
+              ) : (
+                <AccommodationListingCard
+                  listing={listing}
+                  hideTypeLabel
+                  key={`accommodation-${listing._id}`}
+                />
+              )
+            )}
           </div>
         )}
       </section>

@@ -1,4 +1,4 @@
-import { useSavedStore } from "../store/useSavedStore";
+import { useSavedStore } from "../../store/useSavedStore";
 import BrandLogo from "../common/BrandLogo";
 import "./Navbar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ import { Search as SearchIcon, Bookmark } from "lucide-react";
 import NavbarMenu from "./NavbarMenu";
 
 export default function Navbar() {
-  const savedCount = useSavedStore(state => state.entries.length);
+  const savedCount = useSavedStore((state) => state.entries.length);
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -23,13 +23,19 @@ export default function Navbar() {
   };
 
   return (
-    <header className={`navbar-container${isHome ? " navbar-container--home" : ""}${isMenuOpen ? " navbar-container--menu-open" : ""}`}>
+    <header
+      className={`navbar-container${isHome ? " navbar-container--home" : ""}${isMenuOpen ? " navbar-container--menu-open" : ""}`}
+    >
       <nav className="navbar-inner" aria-label="Main navigation">
         <BrandLogo />
 
         {isHome && (
           <div className="navbar-search-center">
-            <Search value={q} onChange={(event) => setQ(event.target.value)} onSubmit={handleSearch} />
+            <Search
+              value={q}
+              onChange={(event) => setQ(event.target.value)}
+              onSubmit={handleSearch}
+            />
           </div>
         )}
 
@@ -41,7 +47,11 @@ export default function Navbar() {
               aria-label={`Saved listings with ${savedCount} listing${savedCount === 1 ? "" : "s"}`}
             >
               <Bookmark aria-hidden="true" />
-              {savedCount > 0 && <span className="navbar-saved-badge">{savedCount > 99 ? "99+" : savedCount}</span>}
+              {savedCount > 0 && (
+                <span className="navbar-saved-badge">
+                  {savedCount > 99 ? "99+" : savedCount}
+                </span>
+              )}
             </Link>
           )}
           <NavbarMenu menuId="navbar-menu" onOpenChange={setIsMenuOpen} />
@@ -55,8 +65,20 @@ function Search({ value, onChange, onSubmit }) {
   return (
     <form className="search-form" role="search" onSubmit={onSubmit}>
       <SearchIcon className="search-icon" size={18} aria-hidden="true" />
-      <input type="search" aria-label="Search UniMarket" placeholder="What are you looking for?" value={value} onChange={onChange} />
-      <button type="submit" className="search-button" aria-label="Search UniMarket">Search</button>
+      <input
+        type="search"
+        aria-label="Search UniMarket"
+        placeholder="What are you looking for?"
+        value={value}
+        onChange={onChange}
+      />
+      <button
+        type="submit"
+        className="search-button"
+        aria-label="Search UniMarket"
+      >
+        Search
+      </button>
     </form>
   );
 }

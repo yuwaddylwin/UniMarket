@@ -8,17 +8,36 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <section className="footer-brand" aria-label="UniMarket">
-          <h3>Uni<span>Market</span></h3>
-          <p className="footer-tagline">A student marketplace for useful finds, nearby living, and real campus connections.</p>
-          <span className="footer-trust"><ShieldCheck aria-hidden="true" /> Built for safer student exchanges</span>
+          <h3>
+            Uni<span>Market</span>
+          </h3>
+          <p className="footer-tagline">
+            A student marketplace for useful finds, nearby living, and real
+            campus connections.
+          </p>
+          <span className="footer-trust">
+            <ShieldCheck aria-hidden="true" /> Built for safer student exchanges
+          </span>
         </section>
 
         <section className="footer-section">
           <h4>Help</h4>
           <ul>
-            <li><Link to="/how-it-works">How it works <ArrowUpRight aria-hidden="true" /></Link></li>
-            <li><Link to="/privacy">Privacy <ArrowUpRight aria-hidden="true" /></Link></li>
-            <li><Link to="/terms">Terms <ArrowUpRight aria-hidden="true" /></Link></li>
+            <li>
+              <Link to="/how-it-works">
+                How it works <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </li>
+            <li>
+              <Link to="/privacy">
+                Privacy <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms">
+                Terms <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </li>
           </ul>
         </section>
 

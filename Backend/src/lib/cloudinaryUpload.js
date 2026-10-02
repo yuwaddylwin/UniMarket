@@ -1,9 +1,13 @@
-import cloudinary from "../lib/cloudinary.js";
+import cloudinary from "./cloudinary.js";
 
-export function uploadBufferToCloudinary(buffer, folder = "items") {
+export function uploadBufferToCloudinary(
+  buffer,
+  folder = "items",
+  options = {}
+) {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder },
+      { folder, ...options },
       (error, result) => {
         if (error) return reject(error);
         resolve(result);

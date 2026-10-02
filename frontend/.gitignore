@@ -22,3 +22,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Keep local credentials out of source control; retain the setup template.
+.env.*
+!.env.example

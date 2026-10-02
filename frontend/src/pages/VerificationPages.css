@@ -67,7 +67,10 @@
   font: inherit;
   font-weight: 800;
   cursor: pointer;
-  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
 }
 
 .verification-card button:hover:not(:disabled) {
@@ -76,7 +79,9 @@
   transform: translateY(-1px);
 }
 
-.verification-card button:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+.verification-card button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
 
 .verification-card button:disabled {
   opacity: 0.6;
@@ -88,7 +93,10 @@
   background: transparent;
   color: var(--color-primary);
 }
-.verification-card .verification-link-button:hover { background: var(--color-primary-soft); box-shadow: none; }
+.verification-card .verification-link-button:hover {
+  background: var(--color-primary-soft);
+  box-shadow: none;
+}
 
 .verification-icon {
   width: 58px;

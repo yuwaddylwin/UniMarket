@@ -1,11 +1,59 @@
-.safety-dialog { border: 0; border-radius: 16px; padding: 24px; width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); box-sizing: border-box; color: #1f2937; box-shadow: 0 20px 80px #0003; overflow: auto; }
-.safety-dialog::backdrop { background: #11182780; }
-.safety-dialog h2 { font-size: 20px; margin: 0 0 12px; }
-.safety-dialog p { line-height: 1.6; overflow-wrap: anywhere; }
-.safety-dialog label { display: block; margin-bottom: 8px; }
-.safety-dialog textarea { box-sizing: border-box; width: 100%; resize: vertical; padding: 12px; font: inherit; border: 1px solid #9ca3af; border-radius: 8px; }
-.safety-dialog-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
-.safety-dialog button { min-height: 44px; border: 0; border-radius: 8px; padding: 10px 18px; cursor: pointer; }
-.safety-dialog .safety-danger { background: #b42318; color: white; }
-.safety-dialog button:disabled { opacity: .55; cursor: wait; }
-.safety-dialog [role=alert] { color: #b42318; }
+.safety-dialog {
+  border: 0;
+  border-radius: 16px;
+  padding: 24px;
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  box-sizing: border-box;
+  color: #1f2937;
+  box-shadow: 0 20px 80px #0003;
+  overflow: auto;
+}
+.safety-dialog::backdrop {
+  background: #11182780;
+}
+.safety-dialog h2 {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+.safety-dialog p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.safety-dialog label {
+  display: block;
+  margin-bottom: 8px;
+}
+.safety-dialog textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  padding: 12px;
+  font: inherit;
+  border: 1px solid #9ca3af;
+  border-radius: 8px;
+}
+.safety-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+.safety-dialog button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+.safety-dialog .safety-danger {
+  background: #b42318;
+  color: white;
+}
+.safety-dialog button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.safety-dialog [role="alert"] {
+  color: #b42318;
+}

@@ -1,52 +1,13 @@
-import { visibleListing } from '../services/moderationPolicy.js';
+import { visibleListing } from "../services/moderationPolicy.js";
 import Accommodation from "../models/Accommodation.model.js";
 import cloudinary from "../lib/cloudinary.js";
-import mongoose from "mongoose";
-
-function hasValidId(id) {
-  return mongoose.isObjectIdOrHexString(id);
-}
-
-function sendControllerError(res, error, fallback) {
-  if (error?.name === "ValidationError" || error?.name === "CastError") {
-    return res.status(400).json({ message: error.message || fallback });
-  }
-  console.error(fallback, error);
-  return res.status(500).json({ message: fallback });
-}
-
-function buildSellerSnapshot(user) {
-  if (!user) return undefined;
-  return {
-    id: user._id,
-    username: user.username || "",
-    fullName: user.fullName || user.name || user.username || user.email || "Host",
-    profilePic: user.profilePic || user.avatar || user.photo || "",
-  };
-}
-
-function uploadBufferToCloudinary(buffer) {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: "accommodations" },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      }
-    );
-    stream.end(buffer);
-  });
-}
-
-function parseMaybeJson(value, fallback) {
-  if (value === undefined || value === null) return fallback;
-  if (typeof value !== "string") return value;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
-}
+import {
+  buildSellerSnapshot,
+  hasValidId,
+  sendControllerError,
+  parseMaybeJson,
+} from "../services/listingHelpers.js";
+import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 
 function normalizeImages(images) {
   if (!Array.isArray(images)) return [];
@@ -67,12 +28,12 @@ function normalizeAccommodation(accommodation) {
       ? accommodation.user
       : null;
   const seller = user
-    ? buildSellerSnapshot(user)
+    ? buildSellerSnapshot(user, "Host")
     : accommodation.seller?.fullName ||
-      accommodation.seller?.profilePic ||
-      accommodation.seller?.id
-    ? accommodation.seller
-    : null;
+        accommodation.seller?.profilePic ||
+        accommodation.seller?.id
+      ? accommodation.seller
+      : null;
 
   return { ...accommodation, seller };
 }
@@ -112,7 +73,9 @@ export const createAccommodation = async (req, res) => {
 
     const allowedPeriods = ["day", "week", "month", "semester"];
     if (!allowedPeriods.includes(pricePeriod)) {
-      return res.status(400).json({ success: false, message: "Invalid price period" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid price period" });
     }
 
     const numericPrice = Number(price);
@@ -142,8 +105,14 @@ export const createAccommodation = async (req, res) => {
     }
 
     for (const file of req.files) {
-      const result = await uploadBufferToCloudinary(file.buffer);
-      uploadedImages.push({ url: result.secure_url, publicId: result.public_id });
+      const result = await uploadBufferToCloudinary(
+        file.buffer,
+        "accommodations"
+      );
+      uploadedImages.push({
+        url: result.secure_url,
+        publicId: result.public_id,
+      });
     }
 
     const accommodation = await Accommodation.create({
@@ -157,25 +126,31 @@ export const createAccommodation = async (req, res) => {
       contactInfo,
       images: uploadedImages.slice(0, 6),
       user: req.user._id,
-      seller: buildSellerSnapshot(req.user),
+      seller: buildSellerSnapshot(req.user, "Host"),
     });
 
     return res.status(201).json(accommodation);
   } catch (error) {
     for (const image of uploadedImages) {
-      if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+      if (image.publicId)
+        await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
     if (error?.name === "ValidationError") {
       return res.status(400).json({ success: false, message: error.message });
     }
     console.error("Error creating accommodation:", error);
-    return res.status(500).json({ success: false, message: "Error creating accommodation" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Error creating accommodation" });
   }
 };
 
 export const getAccommodations = async (_req, res) => {
   try {
-    const accommodations = await Accommodation.find({ ...visibleListing, status: { $ne: "sold" } })
+    const accommodations = await Accommodation.find({
+      ...visibleListing,
+      status: { $ne: "sold" },
+    })
       .sort({ createdAt: -1 })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
@@ -189,8 +164,12 @@ export const getAccommodations = async (_req, res) => {
 
 export const getMyAccommodations = async (req, res) => {
   try {
-    if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
-    const accommodations = await Accommodation.find({ user: req.user._id, status: { $ne: "sold" } })
+    if (!req.user?._id)
+      return res.status(401).json({ message: "Unauthorized" });
+    const accommodations = await Accommodation.find({
+      user: req.user._id,
+      status: { $ne: "sold" },
+    })
       .sort({ createdAt: -1 })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
@@ -206,7 +185,11 @@ export const getAccommodationById = async (req, res) => {
     if (!hasValidId(req.params.id)) {
       return res.status(400).json({ message: "Invalid accommodation id" });
     }
-    const accommodation = await Accommodation.findOne({ ...visibleListing, _id: req.params.id, status: { $ne: "sold" } })
+    const accommodation = await Accommodation.findOne({
+      ...visibleListing,
+      _id: req.params.id,
+      status: { $ne: "sold" },
+    })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
@@ -224,15 +207,26 @@ export const updateAccommodation = async (req, res) => {
   const uploadedImages = [];
 
   try {
-    if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
+    if (!req.user?._id)
+      return res.status(401).json({ message: "Unauthorized" });
 
     if (!hasValidId(req.params.id)) {
       return res.status(400).json({ message: "Invalid accommodation id" });
     }
 
     const accommodation = await Accommodation.findById(req.params.id);
-    if (accommodation && ["hidden", "removed", "under_review"].includes(accommodation.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
-    if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
+    if (
+      accommodation &&
+      ["hidden", "removed", "under_review"].includes(
+        accommodation.moderationStatus
+      )
+    )
+      return res.status(403).json({
+        message:
+          "This listing is moderated. Contact support to request a review.",
+      });
+    if (!accommodation)
+      return res.status(404).json({ message: "Accommodation not found" });
     if (String(accommodation.user) !== String(req.user._id)) {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -255,25 +249,39 @@ export const updateAccommodation = async (req, res) => {
 
     const numericPrice = Number(price);
     if (!Number.isFinite(numericPrice) || numericPrice < 0) {
-      return res.status(400).json({ message: "Price must be a valid number greater than or equal to 0" });
+      return res.status(400).json({
+        message: "Price must be a valid number greater than or equal to 0",
+      });
     }
 
     let numericBedrooms = null;
     if (bedrooms !== "") {
       numericBedrooms = Number(bedrooms);
       if (!Number.isInteger(numericBedrooms) || numericBedrooms < 0) {
-        return res.status(400).json({ message: "Bedrooms must be a whole number greater than or equal to 0" });
+        return res.status(400).json({
+          message: "Bedrooms must be a whole number greater than or equal to 0",
+        });
       }
     }
 
-    const requestedExisting = normalizeImages(parseMaybeJson(req.body.existingImages, []));
-    const requestedPublicIds = new Set(requestedExisting.map((image) => image.publicId));
+    const requestedExisting = normalizeImages(
+      parseMaybeJson(req.body.existingImages, [])
+    );
+    const requestedPublicIds = new Set(
+      requestedExisting.map((image) => image.publicId)
+    );
     const existingImages = (accommodation.images || [])
       .filter((image) => requestedPublicIds.has(image.publicId))
       .map((image) => ({ url: image.url, publicId: image.publicId }));
     for (const file of req.files || []) {
-      const result = await uploadBufferToCloudinary(file.buffer);
-      uploadedImages.push({ url: result.secure_url, publicId: result.public_id });
+      const result = await uploadBufferToCloudinary(
+        file.buffer,
+        "accommodations"
+      );
+      uploadedImages.push({
+        url: result.secure_url,
+        publicId: result.public_id,
+      });
     }
 
     const nextImages = [...existingImages, ...uploadedImages].slice(0, 6);
@@ -295,23 +303,28 @@ export const updateAccommodation = async (req, res) => {
     accommodation.bedrooms = numericBedrooms;
     accommodation.contactInfo = contactInfo;
     accommodation.images = nextImages;
-    accommodation.seller = buildSellerSnapshot(req.user);
+    accommodation.seller = buildSellerSnapshot(req.user, "Host");
 
     const saved = await accommodation.save();
     for (const publicId of removedPublicIds) {
       await cloudinary.uploader.destroy(publicId).catch(() => {});
     }
-    const retainedPublicIds = new Set(nextImages.map((image) => image.publicId));
+    const retainedPublicIds = new Set(
+      nextImages.map((image) => image.publicId)
+    );
     for (const image of uploadedImages) {
       if (!retainedPublicIds.has(image.publicId)) {
         await cloudinary.uploader.destroy(image.publicId).catch(() => {});
       }
     }
 
-    return res.status(200).json({ message: "Accommodation updated", accommodation: saved });
+    return res
+      .status(200)
+      .json({ message: "Accommodation updated", accommodation: saved });
   } catch (error) {
     for (const image of uploadedImages) {
-      if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+      if (image.publicId)
+        await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
     return sendControllerError(res, error, "Error updating accommodation");
   }
@@ -319,24 +332,38 @@ export const updateAccommodation = async (req, res) => {
 
 export const deleteAccommodation = async (req, res) => {
   try {
-    if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
+    if (!req.user?._id)
+      return res.status(401).json({ message: "Unauthorized" });
 
     if (!hasValidId(req.params.id)) {
       return res.status(400).json({ message: "Invalid accommodation id" });
     }
 
     const accommodation = await Accommodation.findById(req.params.id);
-    if (accommodation && ["hidden", "removed", "under_review"].includes(accommodation.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
-    if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
+    if (
+      accommodation &&
+      ["hidden", "removed", "under_review"].includes(
+        accommodation.moderationStatus
+      )
+    )
+      return res.status(403).json({
+        message:
+          "This listing is moderated. Contact support to request a review.",
+      });
+    if (!accommodation)
+      return res.status(404).json({ message: "Accommodation not found" });
     if (String(accommodation.user) !== String(req.user._id)) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
     await Accommodation.deleteOne({ _id: req.params.id });
     for (const image of accommodation.images || []) {
-      if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+      if (image.publicId)
+        await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
-    return res.status(200).json({ message: "Accommodation deleted", id: req.params.id });
+    return res
+      .status(200)
+      .json({ message: "Accommodation deleted", id: req.params.id });
   } catch (error) {
     return sendControllerError(res, error, "Error deleting accommodation");
   }
@@ -344,15 +371,21 @@ export const deleteAccommodation = async (req, res) => {
 
 export const getMyArchivedAccommodations = async (req, res) => {
   try {
-    if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
-    const accommodations = await Accommodation.find({ user: req.user._id, status: "sold" })
+    if (!req.user?._id)
+      return res.status(401).json({ message: "Unauthorized" });
+    const accommodations = await Accommodation.find({
+      user: req.user._id,
+      status: "sold",
+    })
       .sort({ soldAt: -1, updatedAt: -1 })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
     return res.status(200).json(accommodations.map(normalizeAccommodation));
   } catch (error) {
     console.error("Error fetching archived accommodations", error);
-    return res.status(500).json({ message: "Error fetching archived accommodations" });
+    return res
+      .status(500)
+      .json({ message: "Error fetching archived accommodations" });
   }
 };
 
@@ -366,8 +399,18 @@ export const updateAccommodationStatus = async (req, res) => {
       return res.status(400).json({ message: "Status must be active or sold" });
     }
     const accommodation = await Accommodation.findById(req.params.id);
-    if (accommodation && ["hidden", "removed", "under_review"].includes(accommodation.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
-    if (!accommodation) return res.status(404).json({ message: "Accommodation not found" });
+    if (
+      accommodation &&
+      ["hidden", "removed", "under_review"].includes(
+        accommodation.moderationStatus
+      )
+    )
+      return res.status(403).json({
+        message:
+          "This listing is moderated. Contact support to request a review.",
+      });
+    if (!accommodation)
+      return res.status(404).json({ message: "Accommodation not found" });
     if (String(accommodation.user) !== String(req.user?._id)) {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -375,10 +418,15 @@ export const updateAccommodationStatus = async (req, res) => {
     accommodation.soldAt = status === "sold" ? new Date() : null;
     await accommodation.save();
     return res.status(200).json({
-      message: status === "sold" ? "Accommodation archived" : "Accommodation restored",
+      message:
+        status === "sold" ? "Accommodation archived" : "Accommodation restored",
       accommodation,
     });
   } catch (error) {
-    return sendControllerError(res, error, "Unable to update accommodation status");
+    return sendControllerError(
+      res,
+      error,
+      "Unable to update accommodation status"
+    );
   }
 };

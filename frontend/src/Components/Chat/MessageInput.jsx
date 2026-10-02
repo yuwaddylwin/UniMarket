@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Image, X, Send } from "lucide-react";
-import { useChatStore } from "../store/useChatStore";
+import { useChatStore } from "../../store/useChatStore";
 import "./MessageInput.css";
 
 const MessageInput = () => {
@@ -39,7 +39,10 @@ const MessageInput = () => {
     });
 
     setSending(false);
-    if (sent) { setText(""); removeImage(); }
+    if (sent) {
+      setText("");
+      removeImage();
+    }
   };
 
   return (

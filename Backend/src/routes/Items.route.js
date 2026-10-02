@@ -1,4 +1,4 @@
-import { requireActive } from '../services/moderationPolicy.js';
+import { requireActive } from "../services/moderationPolicy.js";
 import express from "express";
 import { ProtectRoute } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/upload.middleware.js";

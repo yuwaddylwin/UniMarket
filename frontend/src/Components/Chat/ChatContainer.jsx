@@ -1,13 +1,25 @@
-import { useChatStore } from "../store/useChatStore";
+import { useChatStore } from "../../store/useChatStore";
 import { Fragment, useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageBubble from "./MessageBubble";
 import "./ChatContainer.css";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const ChatContainer = () => {
-  const { messages, getMessages, isMessagesLoading, selectedUser, getSafety, markMessagesAsSeen, messagingBlocked, safetyLoading, safetyError, subscribeToMessages, unsubscribeFromMessages } =useChatStore();
+  const {
+    messages,
+    getMessages,
+    isMessagesLoading,
+    selectedUser,
+    getSafety,
+    markMessagesAsSeen,
+    messagingBlocked,
+    safetyLoading,
+    safetyError,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
   const { authUser, socket } = useAuthStore();
   const messageEndRef = useRef(null);
 
@@ -20,34 +32,58 @@ const ChatContainer = () => {
 
       return () => unsubscribeFromMessages();
     }
-  }, [authUser?._id, selectedUser?._id, getMessages, getSafety, socket, subscribeToMessages, unsubscribeFromMessages]);
+  }, [
+    authUser?._id,
+    selectedUser?._id,
+    getMessages,
+    getSafety,
+    socket,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   useEffect(() => {
-    if(messageEndRef.current && messages){
-      messageEndRef.current.scrollIntoView({behavior: "smooth"});}
+    if (messageEndRef.current && messages) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   useEffect(() => {
     if (!selectedUser || isMessagesLoading) return;
     let pending = false;
     const markVisible = async () => {
-      if (pending || document.visibilityState !== 'visible' || !document.hasFocus()) return;
-      const ids = [...document.querySelectorAll('[data-unread-message]')].filter(el => {
-        const r = el.getBoundingClientRect();
-        const container = el.closest('.chat-messages').getBoundingClientRect();
-        return r.bottom > container.top && r.top < container.bottom;
-      }).map(el => el.dataset.unreadMessage).slice(0, 500);
+      if (
+        pending ||
+        document.visibilityState !== "visible" ||
+        !document.hasFocus()
+      )
+        return;
+      const ids = [...document.querySelectorAll("[data-unread-message]")]
+        .filter((el) => {
+          const r = el.getBoundingClientRect();
+          const container = el
+            .closest(".chat-messages")
+            .getBoundingClientRect();
+          return r.bottom > container.top && r.top < container.bottom;
+        })
+        .map((el) => el.dataset.unreadMessage)
+        .slice(0, 500);
       if (!ids.length) return;
       pending = true;
       await markMessagesAsSeen(selectedUser._id, ids);
       pending = false;
     };
-    const container = document.querySelector('.chat-messages');
-    container?.addEventListener('scroll', markVisible);
-    document.addEventListener('visibilitychange', markVisible);
-    window.addEventListener('focus', markVisible);
+    const container = document.querySelector(".chat-messages");
+    container?.addEventListener("scroll", markVisible);
+    document.addEventListener("visibilitychange", markVisible);
+    window.addEventListener("focus", markVisible);
     const timer = setTimeout(markVisible, 400);
-    return () => { clearTimeout(timer); container?.removeEventListener('scroll', markVisible); document.removeEventListener('visibilitychange', markVisible); window.removeEventListener('focus', markVisible); };
+    return () => {
+      clearTimeout(timer);
+      container?.removeEventListener("scroll", markVisible);
+      document.removeEventListener("visibilitychange", markVisible);
+      window.removeEventListener("focus", markVisible);
+    };
   }, [messages, selectedUser, isMessagesLoading, markMessagesAsSeen]);
 
   if (isMessagesLoading) return <div className="loading">Loading...</div>;
@@ -58,48 +94,76 @@ const ChatContainer = () => {
 
       <div className="chat-messages" aria-live="polite">
         {messages.length === 0 && (
-          <div className="conversation-empty">Send a message to start the conversation.</div>
+          <div className="conversation-empty">
+            Send a message to start the conversation.
+          </div>
         )}
         {messages.map((message, index) => {
           const date = new Date(message.createdAt);
-          const previousDate = index > 0 ? new Date(messages[index - 1].createdAt) : null;
-          const showDate = !Number.isNaN(date.getTime()) && (
-            !previousDate || date.toDateString() !== previousDate.toDateString()
-          );
+          const previousDate =
+            index > 0 ? new Date(messages[index - 1].createdAt) : null;
+          const showDate =
+            !Number.isNaN(date.getTime()) &&
+            (!previousDate ||
+              date.toDateString() !== previousDate.toDateString());
 
           return (
-          <Fragment key={message._id}>
-            {showDate && (
-              <div className="chat-date-divider">
-                <time dateTime={date.toISOString()}>
-                  {date.toLocaleDateString([], {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    ...(date.getFullYear() !== new Date().getFullYear() ? { year: "numeric" } : {}),
-                  })}
-                  {" · "}
-                  {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </time>
-              </div>
-            )}
-          <MessageBubble
-            message={message}
-            isOwn={message.senderId === authUser._id}
-            authUser={authUser}
-            selectedUser={selectedUser}
-          />
-          </Fragment>
+            <Fragment key={message._id}>
+              {showDate && (
+                <div className="chat-date-divider">
+                  <time dateTime={date.toISOString()}>
+                    {date.toLocaleDateString([], {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                      ...(date.getFullYear() !== new Date().getFullYear()
+                        ? { year: "numeric" }
+                        : {}),
+                    })}
+                    {" · "}
+                    {date.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </time>
+                </div>
+              )}
+              <MessageBubble
+                message={message}
+                isOwn={message.senderId === authUser._id}
+                authUser={authUser}
+                selectedUser={selectedUser}
+              />
+            </Fragment>
           );
         })}
-      <div ref={messageEndRef} style={{ height: 0 }} />
+        <div ref={messageEndRef} style={{ height: 0 }} />
       </div>
 
-      {safetyLoading && <div className="chat-blocked-notice" role="status">Checking messaging availability…</div>}
-      {safetyError && !messagingBlocked && <div className="chat-blocked-notice" role="status">
-        {safetyError} <button type="button" disabled={safetyLoading} onClick={() => getSafety(selectedUser._id)}>{safetyLoading ? 'Checking…' : 'Retry check'}</button>
-      </div>}
-      {messagingBlocked ? <div className="chat-blocked-notice" role="status">Messaging is unavailable because one of you has blocked the other.</div> : <MessageInput key={selectedUser?._id} />}
+      {safetyLoading && (
+        <div className="chat-blocked-notice" role="status">
+          Checking messaging availability…
+        </div>
+      )}
+      {safetyError && !messagingBlocked && (
+        <div className="chat-blocked-notice" role="status">
+          {safetyError}{" "}
+          <button
+            type="button"
+            disabled={safetyLoading}
+            onClick={() => getSafety(selectedUser._id)}
+          >
+            {safetyLoading ? "Checking…" : "Retry check"}
+          </button>
+        </div>
+      )}
+      {messagingBlocked ? (
+        <div className="chat-blocked-notice" role="status">
+          Messaging is unavailable because one of you has blocked the other.
+        </div>
+      ) : (
+        <MessageInput key={selectedUser?._id} />
+      )}
     </div>
   );
 };

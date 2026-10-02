@@ -1,8 +1,8 @@
-import { ProtectRoute } from '../middleware/auth.middleware.js';
-import { requireActive } from '../services/moderationPolicy.js';
+import { ProtectRoute } from "../middleware/auth.middleware.js";
+import { requireActive } from "../services/moderationPolicy.js";
 import express from "express";
 import multer from "multer";
-import cloudinary from "../lib/cloudinary.js";
+import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 
 const router = express.Router();
 
@@ -12,43 +12,35 @@ const upload = multer({
   limits: { fileSize: 8 * 1024 * 1024 }, // 8MB
 });
 
-// helper: upload a buffer to cloudinary using upload_stream
-const uploadBufferToCloudinary = (buffer) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "items",
-        resource_type: "image",
-      },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
+router.post(
+  "/",
+  ProtectRoute,
+  requireActive,
+  upload.array("images", 6),
+  async (req, res) => {
+    try {
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: "No files uploaded" });
       }
-    );
 
-    stream.end(buffer);
-  });
-};
+      // upload all images
+      const results = await Promise.all(
+        req.files.map((file) =>
+          uploadBufferToCloudinary(file.buffer, "items", {
+            resource_type: "image",
+          })
+        )
+      );
 
-router.post("/", ProtectRoute, requireActive, upload.array("images", 6), async (req, res) => {
-  try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "No files uploaded" });
+      const urls = results.map((r) => r.secure_url);
+      const publicIds = results.map((r) => r.public_id);
+
+      return res.status(200).json({ urls, publicIds });
+    } catch (err) {
+      console.error("Upload error:", err);
+      return res.status(500).json({ message: "Upload failed" });
     }
-
-    // upload all images
-    const results = await Promise.all(
-      req.files.map((file) => uploadBufferToCloudinary(file.buffer))
-    );
-
-    const urls = results.map((r) => r.secure_url);
-    const publicIds = results.map((r) => r.public_id);
-
-    return res.status(200).json({ urls, publicIds });
-  } catch (err) {
-    console.error("Upload error:", err);
-    return res.status(500).json({ message: "Upload failed" });
   }
-});
+);
 
 export default router;

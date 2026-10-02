@@ -1,4 +1,4 @@
-import { requireActive } from '../services/moderationPolicy.js';
+import { requireActive } from "../services/moderationPolicy.js";
 import express from "express";
 import {
   createAccommodation,
@@ -29,9 +29,26 @@ router.get("/", getAccommodations);
 router.get("/mine", ProtectRoute, getMyAccommodations);
 router.get("/mine/archive", ProtectRoute, getMyArchivedAccommodations);
 router.get("/:id", getAccommodationById);
-router.post("/", ProtectRoute, requireActive, uploadAccommodationImages, createAccommodation);
-router.put("/:id", ProtectRoute, requireActive, uploadAccommodationImages, updateAccommodation);
-router.patch("/:id/status", ProtectRoute, requireActive, updateAccommodationStatus);
+router.post(
+  "/",
+  ProtectRoute,
+  requireActive,
+  uploadAccommodationImages,
+  createAccommodation
+);
+router.put(
+  "/:id",
+  ProtectRoute,
+  requireActive,
+  uploadAccommodationImages,
+  updateAccommodation
+);
+router.patch(
+  "/:id/status",
+  ProtectRoute,
+  requireActive,
+  updateAccommodationStatus
+);
 router.delete("/:id", ProtectRoute, requireActive, deleteAccommodation);
 
 export default router;

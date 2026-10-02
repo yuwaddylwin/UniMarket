@@ -1,21 +1,16 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useChatStore } from "../store/useChatStore";
-import { useAuthStore } from "../store/useAuthStore";
+import { useChatStore } from "../../store/useChatStore";
+import { useAuthStore } from "../../store/useAuthStore";
 import SidebarSkeleton from "./SidebarSkeleton/SidebarSkeleton";
 import "./Sidebar.css";
 import ProfileAvatar from "../common/ProfileAvatar";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const {
-    getUsers,
-    users,
-    selectedUser,
-    setSelectedUser,
-    isUsersLoading,
-  } = useChatStore();
+  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } =
+    useChatStore();
 
   const { authUser, onlineUsers, unreadCount, socket } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,8 +55,14 @@ const Sidebar = () => {
       <div className="user-list">
         {filteredUsers.length === 0 ? (
           <div className="no-users">
-            <strong>{users.length ? "No conversations found" : "No conversations yet"}</strong>
-            <span>{users.length ? "Try a different search." : "Start a chat from an item to see it here."}</span>
+            <strong>
+              {users.length ? "No conversations found" : "No conversations yet"}
+            </strong>
+            <span>
+              {users.length
+                ? "Try a different search."
+                : "Start a chat from an item to see it here."}
+            </span>
           </div>
         ) : (
           filteredUsers.map((user) => {

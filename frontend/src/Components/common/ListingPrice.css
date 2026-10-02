@@ -5,14 +5,14 @@
   display: inline-flex;
   align-items: center;
   padding: 5px 9px;
-  border: 1px solid rgba(16, 129, 81, .2);
+  border: 1px solid rgba(16, 129, 81, 0.2);
   border-radius: var(--radius-pill, 999px);
-  background: rgba(16, 185, 129, .1);
+  background: rgba(16, 185, 129, 0.1);
   color: #087443;
-  font-size: .78rem;
+  font-size: 0.78rem;
   font-weight: 850;
   line-height: 1.2;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
@@ -34,10 +34,12 @@
 }
 
 @media (max-width: 420px) {
-  .listing-title-price-row { gap: 6px; }
+  .listing-title-price-row {
+    gap: 6px;
+  }
   .listing-title-price-row > .listing-price {
     min-height: 25px;
     padding: 4px 7px;
-    font-size: .7rem;
+    font-size: 0.7rem;
   }
 }

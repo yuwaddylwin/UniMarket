@@ -7,7 +7,11 @@ export function getProfileImageSrc(profilePic) {
   return resolveApiAssetUrl(profilePic, DEFAULT_AVATAR);
 }
 
-export default function ProfileAvatar({ profilePic, alt = "Profile", ...props }) {
+export default function ProfileAvatar({
+  profilePic,
+  alt = "Profile",
+  ...props
+}) {
   return (
     <img
       {...props}

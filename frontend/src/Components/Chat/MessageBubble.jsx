@@ -3,7 +3,10 @@ import ProfileAvatar from "../common/ProfileAvatar";
 
 const MessageBubble = ({ message, isOwn, authUser, selectedUser }) => {
   return (
-    <div data-unread-message={!isOwn && !message.seen ? message._id : undefined} className={`message-row ${isOwn ? "own" : "other"}`}>
+    <div
+      data-unread-message={!isOwn && !message.seen ? message._id : undefined}
+      className={`message-row ${isOwn ? "own" : "other"}`}
+    >
       {!isOwn && (
         <ProfileAvatar
           className="message-avatar"

@@ -1,1 +1,8 @@
-.account-status-banner{background:#fff1d8;color:#775321;padding:12px 20px;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.account-status-banner {
+  background: #fff1d8;
+  color: #775321;
+  padding: 12px 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}

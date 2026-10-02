@@ -22,16 +22,20 @@ const getEmailConfig = () => {
   );
 
   if (missing.length > 0) {
-    throw new Error(
-      `Email service is not configured. Missing: ${missing.join(", ")}`
-    );
+    throw Object.assign(new Error("Email service configuration is incomplete."), { code: "EMAIL_CONFIG" });
   }
 
   const port = Number(process.env.SMTP_PORT);
   if (!Number.isInteger(port) || port <= 0 || port > 65535) {
-    throw new Error("SMTP_PORT must be a valid port number");
+    throw Object.assign(new Error("SMTP_PORT must be a valid port number"), { code: "EMAIL_CONFIG" });
   }
 
+  try {
+    const url = new URL(process.env.CLIENT_URL);
+    if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || url.search || url.hash || url.pathname !== "/") throw new Error();
+  } catch {
+    throw Object.assign(new Error("CLIENT_URL must be a frontend origin."), { code: "EMAIL_CONFIG" });
+  }
   return {
     host: process.env.SMTP_HOST.trim(),
     port,
@@ -58,7 +62,12 @@ const createTransporter = ({ host, port, user, pass }) =>
   });
 
 const getTransporter = async (config) => {
-  const configKey = JSON.stringify([config.host, config.port, config.user, config.pass]);
+  const configKey = JSON.stringify([
+    config.host,
+    config.port,
+    config.user,
+    config.pass,
+  ]);
 
   if (!transporter || transporterConfigKey !== configKey) {
     transporter?.close();
@@ -94,25 +103,23 @@ const sendMail = async (config, message) => {
       );
 
       if (!recipientAccepted || delivery.rejected?.length > 0) {
-        throw new Error("SMTP server did not accept the verification recipient");
+        throw new Error(
+          "SMTP server did not accept the verification recipient"
+        );
       }
 
       return delivery;
     } catch (error) {
       lastError = error;
       resetTransporter();
-      const response = `${error.response || ""} ${error.message || ""}`;
-      if (/unauthorized ip|ip not authorized/i.test(response)) {
-        throw new Error(
-          "SMTP access blocked: authorize this backend's outbound IP in Brevo Settings > Security > Authorized IPs, then retry.",
-          { cause: error }
-        );
-      }
       if (
         error.code === "EAUTH" ||
         Number(error.responseCode) >= 500 ||
-        !["ETIMEDOUT", "ECONNECTION", "ESOCKET"].includes(error.code) &&
-          !(Number(error.responseCode) >= 400 && Number(error.responseCode) < 500)
+        (!["ETIMEDOUT", "ECONNECTION", "ESOCKET"].includes(error.code) &&
+          !(
+            Number(error.responseCode) >= 400 &&
+            Number(error.responseCode) < 500
+          ))
       ) {
         throw error;
       }
@@ -122,45 +129,24 @@ const sendMail = async (config, message) => {
   throw lastError;
 };
 
-export const sendVerificationEmail = async (email, token) => {
+export const sendAuthCode = async (email, code, purpose, linkToken = "") => {
   const config = getEmailConfig();
-  const verificationUrl = `${config.clientUrl}/verify/${encodeURIComponent(token)}`;
-
+  const verificationUrl = linkToken
+    ? `${config.clientUrl}/verify/${encodeURIComponent(linkToken)}`
+    : "";
+  const title = purpose === "reset" ? "Reset your password" : "Verify your email";
   return sendMail(config, {
     from: config.from,
     to: email,
-    subject: "Verify your UniMarket account",
-    text: `Welcome to UniMarket!\n\nVerify your email by visiting this link:\n${verificationUrl}\n\nThis link expires in 24 hours.`,
-    html: `
-      <!doctype html>
-      <html lang="en">
-        <body style="margin:0;background:#f3f6fb;font-family:Arial,sans-serif;color:#1f2937;">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:32px 16px;background:#f3f6fb;">
-            <tr>
-              <td align="center">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border-radius:16px;padding:36px;box-shadow:0 8px 24px rgba(0,0,0,.08);">
-                  <tr>
-                    <td>
-                      <h1 style="margin:0 0 18px;color:#1b4a91;font-size:28px;">Welcome to UniMarket!</h1>
-                      <p style="margin:0 0 24px;line-height:1.6;">Click the button below to verify your email.</p>
-                      <a href="${verificationUrl}" style="display:inline-block;padding:13px 24px;border-radius:10px;background:#1b4a91;color:#ffffff;text-decoration:none;font-weight:700;">Verify email</a>
-                      <p style="margin:24px 0 0;color:#6b7280;font-size:13px;line-height:1.5;">This verification link expires in 24 hours. If you did not create this account, you can ignore this email.</p>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-      </html>
-    `,
+    subject: `Your UniMarket ${purpose === "reset" ? "password reset" : "verification"} code`,
+    text: `Your UniMarket code is ${code}. It expires in 10 minutes and can only be used once.${verificationUrl ? `\nOr verify your email: ${verificationUrl}` : ""} If you did not request this, ignore this email.`,
+    html: `<div style="background:#f3f6fb;padding:32px;font-family:Arial,sans-serif;color:#1f2937"><div style="max-width:520px;margin:auto;background:white;padding:32px;border-radius:16px"><h1 style="color:#1b4a91">UniMarket</h1><h2>${title}</h2><p>Enter this code in UniMarket to ${purpose === "reset" ? "reset your password" : "activate your account"}:</p><p style="font-size:32px;letter-spacing:8px;font-weight:bold">${code}</p>${verificationUrl ? `<p><a href="${verificationUrl}" style="color:#1b4a91">Verify email</a></p>` : ""}<p>This code${verificationUrl ? " and link expire" : " expires"} in 10 minutes. Verification can only be completed once.</p><p>If you did not request this, you can ignore this email.</p></div></div>`,
   });
 };
 
-export const sendAuthCode = async (email, code, purpose) => {
+// A connection/authentication probe; does not send email or print credentials.
+export async function verifyEmailTransport() {
   const config = getEmailConfig();
-  return sendMail(config, {
-    from: config.from, to: email, subject: `Your UniMarket ${purpose === 'reset' ? 'password reset' : 'verification'} code`,
-    text: `Your UniMarket code is ${code}. It expires in 10 minutes and can only be used once. If you did not request this, ignore this email.`,
-  });
-};
+  const probe = createTransporter(config);
+  try { await probe.verify(); } finally { probe.close(); }
+}

@@ -8,11 +8,16 @@ export function getDescriptionPreview(value) {
 
   let sentences;
   if (typeof Intl !== "undefined" && typeof Intl.Segmenter === "function") {
-    const segmenter = new Intl.Segmenter(undefined, { granularity: "sentence" });
-    sentences = Array.from(segmenter.segment(description), ({ segment }) => segment)
-      .filter((sentence) => sentence.trim());
+    const segmenter = new Intl.Segmenter(undefined, {
+      granularity: "sentence",
+    });
+    sentences = Array.from(
+      segmenter.segment(description),
+      ({ segment }) => segment
+    ).filter((sentence) => sentence.trim());
   } else {
-    sentences = description.match(/.*?(?:[.!?]+["')\]]*(?=\s+|$)|$)/gs)
+    sentences = description
+      .match(/.*?(?:[.!?]+["')\]]*(?=\s+|$)|$)/gs)
       ?.filter((sentence) => sentence.trim()) || [description];
   }
 
@@ -37,7 +42,10 @@ export default function FeedDescription({ description: value, sellerName }) {
         <strong>{sellerName}</strong>{" "}
         {shouldTruncate && !expanded ? preview : description}
         {shouldTruncate && (
-          <button type="button" onClick={() => setExpanded((current) => !current)}>
+          <button
+            type="button"
+            onClick={() => setExpanded((current) => !current)}
+          >
             {expanded ? "...less" : "...more"}
           </button>
         )}

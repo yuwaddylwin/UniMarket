@@ -12,8 +12,16 @@
   font-family: var(--font-ui);
 }
 
-.no-chat-content .logo{justify-content:center;max-width:100%;margin-bottom:20px}
-.no-chat-content{padding:24px;max-width:100%;box-sizing:border-box}
+.no-chat-content .logo {
+  justify-content: center;
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+.no-chat-content {
+  padding: 24px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 /* TITLE */
 .no-chat-content h2 {
   margin: 0 0 7px;

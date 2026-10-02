@@ -10,37 +10,67 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : []),
+      ...(process.env.NODE_ENV !== "production"
+        ? ["http://localhost:3000"]
+        : []),
       process.env.CLIENT_URL,
     ].filter(Boolean),
     credentials: true,
   },
 });
 
-export function getReceiverSocketId(userId) { return `user:${userId}`; }
+export function getReceiverSocketId(userId) {
+  return `user:${userId}`;
+}
 const online = new Map();
 io.use(async (socket, next) => {
   try {
     const origin = socket.handshake.headers.origin;
-    if (origin && ![process.env.CLIENT_URL, ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000'] : [])].includes(origin)) return next(new Error('Unauthorized'));
-    const cookie = socket.handshake.headers.cookie?.split('; ').find(c => c.startsWith('jwt='))?.slice(4);
-    const decoded = jwt.verify(socket.handshake.auth?.token || cookie, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('verified +sessionVersion');
-    if (!user?.verified || (decoded.version || 0) !== (user.sessionVersion || 0)) return next(new Error('Unauthorized'));
+    if (
+      origin &&
+      ![
+        process.env.CLIENT_URL,
+        ...(process.env.NODE_ENV !== "production"
+          ? ["http://localhost:3000"]
+          : []),
+      ].includes(origin)
+    )
+      return next(new Error("Unauthorized"));
+    const cookie = socket.handshake.headers.cookie
+      ?.split("; ")
+      .find((c) => c.startsWith("jwt="))
+      ?.slice(4);
+    const decoded = jwt.verify(
+      socket.handshake.auth?.token || cookie,
+      process.env.JWT_SECRET
+    );
+    const user = await User.findById(decoded.userId).select(
+      "verified +sessionVersion"
+    );
+    if (
+      !user?.verified ||
+      (decoded.version || 0) !== (user.sessionVersion || 0)
+    )
+      return next(new Error("Unauthorized"));
     socket.data.userId = String(user._id);
     next();
-  } catch { next(new Error('Unauthorized')); }
+  } catch {
+    next(new Error("Unauthorized"));
+  }
 });
-io.on('connection', socket => {
+io.on("connection", (socket) => {
   const id = socket.data.userId;
   socket.join(getReceiverSocketId(id));
   online.set(id, (online.get(id) || 0) + 1);
-  io.emit('getOnlineUsers', [...online.keys()]);
-  socket.on('chat:activity', active => { socket.data.chatActiveUntil = active === true ? Date.now() + 45000 : 0; });
-  socket.on('disconnect', () => {
+  io.emit("getOnlineUsers", [...online.keys()]);
+  socket.on("chat:activity", (active) => {
+    socket.data.chatActiveUntil = active === true ? Date.now() + 45000 : 0;
+  });
+  socket.on("disconnect", () => {
     const count = online.get(id) - 1;
-    if (count) online.set(id, count); else online.delete(id);
-    io.emit('getOnlineUsers', [...online.keys()]);
+    if (count) online.set(id, count);
+    else online.delete(id);
+    io.emit("getOnlineUsers", [...online.keys()]);
   });
 });
 export { io, app, server };

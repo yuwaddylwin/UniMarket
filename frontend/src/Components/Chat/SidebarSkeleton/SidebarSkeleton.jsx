@@ -1,4 +1,4 @@
-import "./SidebarSkeleton.css"
+import "./SidebarSkeleton.css";
 const SidebarSkeleton = () => {
   return (
     <aside className="sidebar">

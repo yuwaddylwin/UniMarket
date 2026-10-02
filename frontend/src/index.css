@@ -13,14 +13,16 @@
   --color-page: #fafafa;
   --color-border: #e5e7eb;
   --font-brand: Georgia, "Times New Roman", serif;
-  --font-ui: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-ui:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-pill: 999px;
   --shadow-xs: 0 3px 12px rgba(17, 24, 39, 0.05);
   --shadow-sm: 0 8px 24px rgba(17, 24, 39, 0.07);
-  --shadow-md: 0 14px 36px rgba(17, 24, 39, 0.10);
+  --shadow-md: 0 14px 36px rgba(17, 24, 39, 0.1);
   --shadow-lg: 0 22px 54px rgba(17, 24, 39, 0.14);
   --transition: 180ms ease;
   --content: 1200px;
@@ -31,9 +33,20 @@
   --bottom-nav-height: 68px;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
-html { max-width: 100%; scroll-behavior: smooth; }
-body, #root { min-height: 100%; max-width: 100%; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  max-width: 100%;
+  scroll-behavior: smooth;
+}
+body,
+#root {
+  min-height: 100%;
+  max-width: 100%;
+}
 body {
   margin: 0;
   overflow-x: hidden;
@@ -50,44 +63,102 @@ body {
   min-height: 100dvh;
   padding-top: var(--header-height);
 }
-.app-content--with-bottom { padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); }
-img, svg { max-width: 100%; }
-img { display: block; }
-button, input, textarea, select { font: inherit; }
-button { -webkit-tap-highlight-color: transparent; }
-button:disabled { cursor: not-allowed; opacity: 0.58; transform: none !important; box-shadow: none !important; }
-a, button, input, textarea, select { outline: none; }
+.app-content--with-bottom {
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+}
+img,
+svg {
+  max-width: 100%;
+}
+img {
+  display: block;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none !important;
+  box-shadow: none !important;
+}
+a,
+button,
+input,
+textarea,
+select {
+  outline: none;
+}
 :where(a, button, input, textarea, select):focus-visible {
   outline: 3px solid rgba(27, 74, 145, 0.28);
   outline-offset: 2px;
 }
-::selection { background: rgba(27, 74, 145, 0.18); }
+::selection {
+  background: rgba(27, 74, 145, 0.18);
+}
 
-code { font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace; }
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
 
-h1, h2, h3, h4, h5, h6 { font-family: var(--font-ui); }
-::placeholder { font-family: var(--font-ui); }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-ui);
+}
+::placeholder {
+  font-family: var(--font-ui);
+}
 
 @media (max-width: 640px) {
-  .app-content { padding-top: var(--header-compact-mobile-height); }
-  .app-content--home { padding-top: var(--header-mobile-height); }
+  .app-content {
+    padding-top: var(--header-compact-mobile-height);
+  }
+  .app-content--home {
+    padding-top: var(--header-mobile-height);
+  }
 }
 
 @media (min-width: 769px) and (min-height: 501px), (min-width: 933px) {
   .app-shell--chat > .navbar-container,
-  .app-shell--chat > .bottom-nav { display: none; }
-  .app-shell--chat > .app-content { min-height: 100dvh; padding: 0; }
+  .app-shell--chat > .bottom-nav {
+    display: none;
+  }
+  .app-shell--chat > .app-content {
+    min-height: 100dvh;
+    padding: 0;
+  }
 }
 
-@media (max-width: 768px), (max-width: 932px) and (max-height: 500px) and (pointer: coarse) {
+@media (max-width: 768px),
+  (max-width: 932px) and (max-height: 500px) and (pointer: coarse) {
   .app-shell--active-chat > .navbar-container,
-  .app-shell--active-chat > .bottom-nav { display: none; }
-  .app-shell--active-chat > .app-content { min-height: 100dvh; padding: 0; }
+  .app-shell--active-chat > .bottom-nav {
+    display: none;
+  }
+  .app-shell--active-chat > .app-content {
+    min-height: 100dvh;
+    padding: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

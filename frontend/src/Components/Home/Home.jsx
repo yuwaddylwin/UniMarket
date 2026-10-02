@@ -9,8 +9,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import AccommodationSection from "../Accommodation/AccommodationSection";
 import Footer from "../Footer/footer";
-import ItemsList from "../ItemsList/ItemsList";
-import { useAuthStore } from "../store/useAuthStore";
+import ItemsList from "../Items/ItemsList";
+import { useAuthStore } from "../../store/useAuthStore";
 import "./Home.css";
 
 const SLIDES = [
@@ -20,7 +20,8 @@ const SLIDES = [
     tabletImage: "/Images/unimarket/hero-marketplace-tablet.jpg",
     eyebrow: "A marketplace made for students",
     title: "Buy and sell within your campus community.",
-    description: "Pass useful items on, discover affordable finds, and keep good things in student hands.",
+    description:
+      "Pass useful items on, discover affordable finds, and keep good things in student hands.",
     alt: "Books, a keyboard and headphones on a study table in a bright campus lounge",
     position: "center",
   },
@@ -30,7 +31,8 @@ const SLIDES = [
     tabletImage: "/Images/unimarket/hero-room-tablet.jpg",
     eyebrow: "Student-friendly accommodation",
     title: "Find a place that feels like home.",
-    description: "Explore practical places near university that fit student life and student budgets.",
+    description:
+      "Explore practical places near university that fit student life and student budgets.",
     alt: "A bright student studio with a study desk and blue-and-white bedding",
     position: "center",
   },
@@ -40,7 +42,8 @@ const SLIDES = [
     tabletImage: "/Images/unimarket/hero-connect-tablet.jpg",
     eyebrow: "Direct student connections",
     title: "Chat, connect, and make it happen.",
-    description: "Speak directly with other students to ask questions, arrange details, and build trust.",
+    description:
+      "Speak directly with other students to ask questions, arrange details, and build trust.",
     alt: "Students connecting through marketplace chat in a university courtyard",
     position: "center",
   },
@@ -96,8 +99,14 @@ export default function Home() {
               key={slide.title}
             >
               <picture>
-                <source media="(max-width: 600px) and (orientation: portrait)" srcSet={slide.phoneImage} />
-                <source media="(orientation: portrait)" srcSet={slide.tabletImage} />
+                <source
+                  media="(max-width: 600px) and (orientation: portrait)"
+                  srcSet={slide.phoneImage}
+                />
+                <source
+                  media="(orientation: portrait)"
+                  srcSet={slide.tabletImage}
+                />
                 <img
                   src={slide.image}
                   alt={index === activeSlide ? slide.alt : ""}
@@ -130,7 +139,10 @@ export default function Home() {
             <ChevronRight aria-hidden="true" />
           </button>
 
-          <div className="home-carousel-dots" aria-label="Choose carousel image">
+          <div
+            className="home-carousel-dots"
+            aria-label="Choose carousel image"
+          >
             {SLIDES.map((slide, index) => (
               <button
                 className={index === activeSlide ? "is-active" : ""}
@@ -150,23 +162,32 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="home-value-strip" aria-label="Why students use UniMarket">
+        <section
+          className="home-value-strip"
+          aria-label="Why students use UniMarket"
+        >
           <article>
-            <span className="home-value-icon"><GraduationCap aria-hidden="true" /></span>
+            <span className="home-value-icon">
+              <GraduationCap aria-hidden="true" />
+            </span>
             <div>
               <h2>Student-exclusive</h2>
               <p>A marketplace made for student life.</p>
             </div>
           </article>
           <article>
-            <span className="home-value-icon"><BadgeCheck aria-hidden="true" /></span>
+            <span className="home-value-icon">
+              <BadgeCheck aria-hidden="true" />
+            </span>
             <div>
               <h2>Email verified</h2>
               <p>Verify your email to post and chat.</p>
             </div>
           </article>
           <article>
-            <span className="home-value-icon"><Heart aria-hidden="true" /></span>
+            <span className="home-value-icon">
+              <Heart aria-hidden="true" />
+            </span>
             <div>
               <h2>Built by a student</h2>
               <p>Created for our university community.</p>
@@ -177,7 +198,11 @@ export default function Home() {
         <div id="home-discovery" className="home-discovery">
           <header className="home-discovery-intro">
             <span>Explore UniMarket</span>
-            <h2>Everything students need,<br />right around campus.</h2>
+            <h2>
+              Everything students need,
+              <br />
+              right around campus.
+            </h2>
           </header>
           <AccommodationSection />
           <ItemsList />
@@ -187,21 +212,38 @@ export default function Home() {
           <div className="home-signup-card">
             {authUser ? (
               <>
-                <span className="home-signup-eyebrow">Welcome back to UniMarket</span>
+                <span className="home-signup-eyebrow">
+                  Welcome back to UniMarket
+                </span>
                 <h2 id="home-signup-title">
-                  Have something to share?<br /><em>Create your next listing.</em>
+                  Have something to share?
+                  <br />
+                  <em>Create your next listing.</em>
                 </h2>
-                <p>Post an item or accommodation for students in your campus community.</p>
-                <button type="button" onClick={() => navigate("/post")}>Post a Listing</button>
+                <p>
+                  Post an item or accommodation for students in your campus
+                  community.
+                </p>
+                <button type="button" onClick={() => navigate("/post")}>
+                  Post a Listing
+                </button>
               </>
             ) : (
               <>
-                <span className="home-signup-eyebrow">Join your campus community</span>
+                <span className="home-signup-eyebrow">
+                  Join your campus community
+                </span>
                 <h2 id="home-signup-title">
-                  Ready to find your need &<br /><em>Sell what you don't?</em>
+                  Ready to find your need &<br />
+                  <em>Sell what you don't?</em>
                 </h2>
-                <p>Discover items, find accommodation, and connect with students around your campus.</p>
-                <button type="button" onClick={() => navigate("/signup")}>Sign Up</button>
+                <p>
+                  Discover items, find accommodation, and connect with students
+                  around your campus.
+                </p>
+                <button type="button" onClick={() => navigate("/signup")}>
+                  Sign Up
+                </button>
               </>
             )}
           </div>

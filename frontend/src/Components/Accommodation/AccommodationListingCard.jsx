@@ -12,10 +12,16 @@ function buildDetails(listing) {
       ? `${listing.bedrooms} ${listing.bedrooms === 1 ? "bedroom" : "bedrooms"}`
       : "",
     listing.description,
-  ].filter(Boolean).join(" · ");
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
-export default function AccommodationListingCard({ listing, showTypeLabel = false, hideTypeLabel = false }) {
+export default function AccommodationListingCard({
+  listing,
+  showTypeLabel = false,
+  hideTypeLabel = false,
+}) {
   const navigate = useNavigate();
   const openListing = () => navigate(`/accommodations/${listing._id}`);
   const details = buildDetails(listing);
@@ -41,9 +47,16 @@ export default function AccommodationListingCard({ listing, showTypeLabel = fals
           src={listing.images[0] || "/Images/unimarket/accommodation.jpg"}
           alt={listing.title}
           loading="lazy"
-          onError={(event) => { event.currentTarget.src = "/Images/unimarket/accommodation.jpg"; }}
+          onError={(event) => {
+            event.currentTarget.src = "/Images/unimarket/accommodation.jpg";
+          }}
         />
-        <SaveButton listing={listing} listingType="accommodation" listingId={listing._id} compact />
+        <SaveButton
+          listing={listing}
+          listingType="accommodation"
+          listingId={listing._id}
+          compact
+        />
         {!hideTypeLabel && badge && <span>{badge}</span>}
       </div>
       <div className="accommodation-body">
@@ -53,7 +66,10 @@ export default function AccommodationListingCard({ listing, showTypeLabel = fals
             {formatListingPrice(listing.price, listing.pricePeriod || "month")}
           </div>
         </div>
-        <p className="accommodation-location"><MapPin size={15} aria-hidden="true" />{listing.location}</p>
+        <p className="accommodation-location">
+          <MapPin size={15} aria-hidden="true" />
+          {listing.location}
+        </p>
         {listing?.seller?.fullName && (
           <div className="accommodation-seller seller-row">
             <ProfileAvatar

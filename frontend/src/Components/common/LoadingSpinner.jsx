@@ -1,10 +1,7 @@
 import React from "react";
 import "./LoadingSpinner.css";
 
-export default function LoadingSpinner({
-  label = "Loading…",
-  className = "",
-}) {
+export default function LoadingSpinner({ label = "Loading…", className = "" }) {
   const classes = ["loading-spinner", className].filter(Boolean).join(" ");
 
   return (

@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance } from "../../lib/axios";
 import ProfileAvatar from "../common/ProfileAvatar";
-import { normalizeSeller } from "../Logics/useItemsList";
+import { normalizeSeller } from "../../hooks/useItemsList";
 import { formatListingPrice } from "../common/listingPrice";
 import "../common/ListingPrice.css";
-import { normalizeAccommodationSeller } from "../Logics/useAccommodations";
+import { normalizeAccommodationSeller } from "../../hooks/useAccommodations";
 import { resolveApiAssetUrl } from "../../config/api";
 import "./ItemCardfromProfile.css";
 
@@ -17,7 +17,12 @@ function getCoverSrc(item) {
   return resolveApiAssetUrl(url, "/Images/placeholder.png");
 }
 
-export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveMode = false }) {
+export default function ItemCard({
+  item,
+  onDeleteItem,
+  onArchiveChange,
+  archiveMode = false,
+}) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -107,13 +112,19 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
     try {
       statusLockRef.current = true;
       setIsUpdatingStatus(true);
-      await axiosInstance.patch(`/${resource}/${itemId}/status`, { status: nextStatus });
-      toast.success(archiveMode ? "Listing restored" : "Listing moved to Archive");
+      await axiosInstance.patch(`/${resource}/${itemId}/status`, {
+        status: nextStatus,
+      });
+      toast.success(
+        archiveMode ? "Listing restored" : "Listing moved to Archive"
+      );
       setMenuOpen(false);
       setStatusConfirmOpen(false);
       onArchiveChange?.(itemId);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Unable to update listing status");
+      toast.error(
+        error?.response?.data?.message || "Unable to update listing status"
+      );
     } finally {
       statusLockRef.current = false;
       setIsUpdatingStatus(false);
@@ -149,29 +160,37 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
         </button>
 
         {menuOpen && (
-          <div className="profile-kebab-menu" role="menu" aria-label={`Actions for ${title}`}>
-            {!archiveMode && <button
-              type="button"
-              className="profile-kebab-item"
-              onClick={(event) => {
-                event.stopPropagation();
-                handleEdit();
-              }}
-              disabled={isDeleting || isUpdatingStatus}
-            >
-              Edit
-            </button>}
-            {!archiveMode && <button
-              type="button"
-              className="profile-kebab-item danger"
-              onClick={(event) => {
-                event.stopPropagation();
-                handleDeleteClick();
-              }}
-              disabled={isDeleting || isUpdatingStatus}
-            >
-              Delete
-            </button>}
+          <div
+            className="profile-kebab-menu"
+            role="menu"
+            aria-label={`Actions for ${title}`}
+          >
+            {!archiveMode && (
+              <button
+                type="button"
+                className="profile-kebab-item"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleEdit();
+                }}
+                disabled={isDeleting || isUpdatingStatus}
+              >
+                Edit
+              </button>
+            )}
+            {!archiveMode && (
+              <button
+                type="button"
+                className="profile-kebab-item danger"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleDeleteClick();
+                }}
+                disabled={isDeleting || isUpdatingStatus}
+              >
+                Delete
+              </button>
+            )}
             <button
               type="button"
               className="profile-kebab-item"
@@ -185,7 +204,11 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
               }}
               disabled={isDeleting || isUpdatingStatus}
             >
-              {isUpdatingStatus ? "Saving…" : archiveMode ? "Restore listing" : "Mark as done"}
+              {isUpdatingStatus
+                ? "Saving…"
+                : archiveMode
+                  ? "Restore listing"
+                  : "Mark as done"}
             </button>
           </div>
         )}
@@ -197,28 +220,37 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
           alt={title}
           onError={(e) => (e.currentTarget.src = "/Images/placeholder.png")}
         />
-        {archiveMode && <span className="profile-item-sold-badge">Sold · Archived</span>}
+        {archiveMode && (
+          <span className="profile-item-sold-badge">Sold · Archived</span>
+        )}
       </div>
 
       <div className="profile-item-body">
         <div className="profile-item-title-row listing-title-price-row">
           <h3 className="profile-item-title">{title}</h3>
           <p className="profile-item-price listing-price">
-            {formatListingPrice(item?.price, isAccommodation ? item?.pricePeriod || "month" : undefined)}
+            {formatListingPrice(
+              item?.price,
+              isAccommodation ? item?.pricePeriod || "month" : undefined
+            )}
           </p>
         </div>
         <p className="profile-item-kind">
           {isAccommodation ? "Accommodation" : "Item"}
-          {isAccommodation && item?.pricePeriod ? ` · per ${item.pricePeriod}` : ""}
+          {isAccommodation && item?.pricePeriod
+            ? ` · per ${item.pricePeriod}`
+            : ""}
         </p>
-        {seller?.fullName && <div className="profile-item-seller">
-          <ProfileAvatar
-            className="profile-item-seller-photo"
-            profilePic={seller.profilePic}
-            alt={seller.fullName}
-          />
-          <span>{seller.fullName}</span>
-        </div>}
+        {seller?.fullName && (
+          <div className="profile-item-seller">
+            <ProfileAvatar
+              className="profile-item-seller-photo"
+              profilePic={seller.profilePic}
+              alt={seller.fullName}
+            />
+            <span>{seller.fullName}</span>
+          </div>
+        )}
       </div>
 
       {/* Confirm Modal */}
@@ -239,7 +271,8 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
           >
             <h3 className="confirm-title">Delete listing?</h3>
             <p className="confirm-text">
-              Are you sure you want to delete this listing? <b>{title}</b> will be permanently removed.
+              Are you sure you want to delete this listing? <b>{title}</b> will
+              be permanently removed.
             </p>
 
             <div className="confirm-actions">
@@ -275,14 +308,32 @@ export default function ItemCard({ item, onDeleteItem, onArchiveChange, archiveM
           aria-modal="true"
           aria-labelledby={`sold-confirm-${itemId}`}
         >
-          <div className="confirm-modal" onMouseDown={(event) => event.stopPropagation()}>
-            <h3 className="confirm-title" id={`sold-confirm-${itemId}`}>Mark as sold?</h3>
+          <div
+            className="confirm-modal"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <h3 className="confirm-title" id={`sold-confirm-${itemId}`}>
+              Mark as sold?
+            </h3>
             <p className="confirm-text">
-              This will remove <b>{title}</b> from the marketplace and move it to your Archive.
+              This will remove <b>{title}</b> from the marketplace and move it
+              to your Archive.
             </p>
             <div className="confirm-actions">
-              <button type="button" className="confirm-btn" onClick={() => setStatusConfirmOpen(false)} disabled={isUpdatingStatus}>Cancel</button>
-              <button type="button" className="confirm-btn" onClick={handleStatusChange} disabled={isUpdatingStatus}>
+              <button
+                type="button"
+                className="confirm-btn"
+                onClick={() => setStatusConfirmOpen(false)}
+                disabled={isUpdatingStatus}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="confirm-btn"
+                onClick={handleStatusChange}
+                disabled={isUpdatingStatus}
+              >
                 {isUpdatingStatus ? "Saving…" : "Yes, mark as sold"}
               </button>
             </div>

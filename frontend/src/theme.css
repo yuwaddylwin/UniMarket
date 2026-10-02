@@ -14,17 +14,37 @@ select {
   font-family: var(--font-ui);
 }
 
-h1, h2, h3, h4, h5, h6,
-p, label, input, textarea, select, button, a, small, strong {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label,
+input,
+textarea,
+select,
+button,
+a,
+small,
+strong {
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--color-text);
   font-family: var(--font-ui);
 }
 
-a { color: var(--color-primary); }
+a {
+  color: var(--color-primary);
+}
 
 /* Wordmark */
 .logo,
@@ -33,7 +53,7 @@ a { color: var(--color-primary); }
   color: var(--color-primary);
   font-family: var(--font-brand);
   font-weight: 800;
-  letter-spacing: -.045em;
+  letter-spacing: -0.045em;
   line-height: 1;
   white-space: nowrap;
 }
@@ -49,7 +69,7 @@ a { color: var(--color-primary); }
 .bottom-nav,
 .desktop-chat-nav {
   border-color: var(--color-border);
-  background: rgba(255, 255, 255, .97);
+  background: rgba(255, 255, 255, 0.97);
   color: var(--color-text);
   box-shadow: var(--shadow-xs);
 }
@@ -106,7 +126,7 @@ a { color: var(--color-primary); }
 }
 
 .footer-trust {
-  border-color: rgba(27, 74, 145, .16);
+  border-color: rgba(27, 74, 145, 0.16);
   background: var(--color-primary-soft);
   color: var(--color-primary);
 }
@@ -121,9 +141,15 @@ a { color: var(--color-primary); }
   border-color: var(--color-border);
 }
 
-.navbar-menu-item { color: var(--color-text); }
-.navbar-menu-number { color: var(--color-text-subtle); }
-.navbar-submenu a { color: var(--color-text-secondary); }
+.navbar-menu-item {
+  color: var(--color-text);
+}
+.navbar-menu-number {
+  color: var(--color-text-subtle);
+}
+.navbar-submenu a {
+  color: var(--color-text-secondary);
+}
 
 /* Search and form controls */
 .search-form,
@@ -168,9 +194,9 @@ input[type="search"] {
 .post-form select:focus,
 .settings-name-form input:focus,
 .verification-card input:focus {
-  border-color: rgba(27, 74, 145, .58);
+  border-color: rgba(27, 74, 145, 0.58);
   background: var(--color-surface);
-  box-shadow: 0 0 0 3px rgba(27, 74, 145, .10);
+  box-shadow: 0 0 0 3px rgba(27, 74, 145, 0.1);
 }
 
 input::placeholder,
@@ -223,7 +249,7 @@ textarea::placeholder {
 .ip-card:hover,
 .profile-item-card:hover,
 .saved-page li:hover {
-  border-color: rgba(27, 74, 145, .22);
+  border-color: rgba(27, 74, 145, 0.22);
   box-shadow: var(--shadow-sm);
 }
 
@@ -258,11 +284,17 @@ textarea::placeholder {
   color: var(--color-text-muted);
 }
 
-.listing-feed-page { background: var(--color-page); }
+.listing-feed-page {
+  background: var(--color-page);
+}
 .listing-feed,
 .listing-feed-post,
-.listing-feed-carousel-dots { background: var(--color-surface); }
-.listing-feed-post { border-color: var(--color-border); }
+.listing-feed-carousel-dots {
+  background: var(--color-surface);
+}
+.listing-feed-post {
+  border-color: var(--color-border);
+}
 
 /* Buttons */
 .search-button,
@@ -298,7 +330,7 @@ textarea::placeholder {
 .legal-home-link:hover,
 .listing-feed-actions button.is-primary:hover {
   background: var(--color-primary-hover);
-  box-shadow: 0 8px 18px rgba(27, 74, 145, .18);
+  box-shadow: 0 8px 18px rgba(27, 74, 145, 0.18);
 }
 
 .secondary_button,
@@ -326,7 +358,7 @@ textarea::placeholder {
 .item-back-button:hover,
 .carousel-btn:hover,
 .il-arrow:hover {
-  border-color: rgba(27, 74, 145, .22);
+  border-color: rgba(27, 74, 145, 0.22);
   background: var(--color-primary-soft);
   color: var(--color-primary);
 }
@@ -336,7 +368,7 @@ textarea::placeholder {
 .profile-kebab-item.danger,
 .navbar-logout,
 .blocked-user button {
-  border-color: rgba(180, 35, 24, .22);
+  border-color: rgba(180, 35, 24, 0.22);
   background: #fff7f6;
   color: #b42318;
 }
@@ -385,7 +417,7 @@ textarea::placeholder {
 .search-results-header > div > span {
   color: var(--color-primary);
   font-weight: 850;
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -419,7 +451,9 @@ textarea::placeholder {
   background: var(--color-primary-hover);
 }
 
-.loading-spinner__ring { border-top-color: var(--color-primary); }
+.loading-spinner__ring {
+  border-top-color: var(--color-primary);
+}
 
 .ip-title,
 .items-header h2,
@@ -438,7 +472,7 @@ textarea::placeholder {
   color: var(--color-text);
   font-family: var(--font-ui);
   font-weight: 700;
-  letter-spacing: -.025em;
+  letter-spacing: -0.025em;
 }
 
 /* Keep media-heavy Home content, but use the same UI typography and controls. */
@@ -454,7 +488,7 @@ textarea::placeholder {
 }
 
 .home-carousel-arrow {
-  border-color: rgba(255, 255, 255, .6);
+  border-color: rgba(255, 255, 255, 0.6);
   border-radius: var(--radius-sm);
   color: var(--color-text);
   box-shadow: var(--shadow-sm);
@@ -463,7 +497,7 @@ textarea::placeholder {
 .home-value-strip {
   border-color: var(--color-border);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, .97);
+  background: rgba(255, 255, 255, 0.97);
   box-shadow: var(--shadow-md);
 }
 
@@ -481,7 +515,7 @@ textarea::placeholder {
 
 .home-signup-card::before,
 .home-signup-card::after {
-  border-color: rgba(27, 74, 145, .10);
+  border-color: rgba(27, 74, 145, 0.1);
 }
 
 .home-signup-eyebrow,
@@ -489,8 +523,12 @@ textarea::placeholder {
   color: var(--color-primary);
 }
 
-.home-signup h2 { color: var(--color-text); }
-.home-signup p { color: var(--color-text-muted); }
+.home-signup h2 {
+  color: var(--color-text);
+}
+.home-signup p {
+  color: var(--color-text-muted);
+}
 
 .home-signup button {
   border: 1px solid var(--color-primary);
@@ -504,7 +542,7 @@ textarea::placeholder {
 .home-signup button:hover {
   background: var(--color-primary-hover);
   color: #fff;
-  box-shadow: 0 8px 18px rgba(27, 74, 145, .18);
+  box-shadow: 0 8px 18px rgba(27, 74, 145, 0.18);
 }
 
 .post-type-toggle {
@@ -512,29 +550,45 @@ textarea::placeholder {
   background: var(--color-surface-subtle);
 }
 
-.post-type-toggle > button { color: var(--color-text-muted); }
-.post-type-toggle > button strong { color: var(--color-text); }
-.post-type-toggle > button:hover { background: var(--color-primary-soft); }
+.post-type-toggle > button {
+  color: var(--color-text-muted);
+}
+.post-type-toggle > button strong {
+  color: var(--color-text);
+}
+.post-type-toggle > button:hover {
+  background: var(--color-primary-soft);
+}
 .post-type-toggle > button.is-active {
-  border-color: rgba(27, 74, 145, .22);
+  border-color: rgba(27, 74, 145, 0.22);
   background: var(--color-surface);
   color: var(--color-primary);
   box-shadow: var(--shadow-xs);
 }
 
 .upload-box {
-  border-color: rgba(27, 74, 145, .35);
+  border-color: rgba(27, 74, 145, 0.35);
   background: var(--color-primary-soft);
   color: var(--color-primary);
 }
 
 @media (max-width: 640px) {
-  .logo { max-width: calc(100vw - 132px); font-size: 1.32rem; }
-  .navbar-inner { overflow: visible; }
+  .logo {
+    max-width: calc(100vw - 132px);
+    font-size: 1.32rem;
+  }
+  .navbar-inner {
+    overflow: visible;
+  }
   .item-card,
   .accommodation-card,
   .ip-card,
-  .profile-item-card { border-radius: var(--radius-md); }
+  .profile-item-card {
+    border-radius: var(--radius-md);
+  }
 }
 
-.listing-feed-actions .save-listing-button.is-saved { background: var(--color-primary-soft); border-color: var(--color-primary); }
+.listing-feed-actions .save-listing-button.is-saved {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+}

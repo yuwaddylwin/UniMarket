@@ -1,7 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore";
 import ProfileAvatar from "../common/ProfileAvatar";
-import { getNavigationTarget, isNavigationItemActive, primaryNavigationItems } from "../../config/navigation";
+import {
+  getNavigationTarget,
+  isNavigationItemActive,
+  primaryNavigationItems,
+} from "../../config/navigation";
 import "./BottomNav.css";
 
 export default function BottomNav() {
@@ -16,9 +20,16 @@ export default function BottomNav() {
       {mobileItems.map((item) => {
         const Icon = item.icon;
         const active = isNavigationItemActive(item, location.pathname);
-        const icon = item.id === "profile" && authUser?.profilePic
-          ? <ProfileAvatar className="bottom-nav-profile-photo" profilePic={authUser.profilePic} alt="" />
-          : <Icon aria-hidden="true" />;
+        const icon =
+          item.id === "profile" && authUser?.profilePic ? (
+            <ProfileAvatar
+              className="bottom-nav-profile-photo"
+              profilePic={authUser.profilePic}
+              alt=""
+            />
+          ) : (
+            <Icon aria-hidden="true" />
+          );
         if (item.id === "post") {
           return (
             <button
@@ -29,7 +40,8 @@ export default function BottomNav() {
               aria-current={active ? "page" : undefined}
               onClick={() => navigate(getNavigationTarget(item, authUser))}
             >
-              <span className="bottom-nav-sell-icon">{icon}</span><span>{item.label}</span>
+              <span className="bottom-nav-sell-icon">{icon}</span>
+              <span>{item.label}</span>
             </button>
           );
         }
@@ -40,7 +52,15 @@ export default function BottomNav() {
             icon={icon}
             active={active}
             onClick={() => navigate(getNavigationTarget(item, authUser))}
-            badge={item.id === "chat" && !location.pathname.startsWith("/chat") && totalUnread > 0 ? (totalUnread > 99 ? "99+" : totalUnread) : null}
+            badge={
+              item.id === "chat" &&
+              !location.pathname.startsWith("/chat") &&
+              totalUnread > 0
+                ? totalUnread > 99
+                  ? "99+"
+                  : totalUnread
+                : null
+            }
           />
         );
       })}

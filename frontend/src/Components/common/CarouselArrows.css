@@ -14,11 +14,23 @@
   box-shadow: 0 9px 22px rgba(20, 35, 60, 0.13);
   cursor: pointer;
   transform: translateY(-50%);
-  transition: background var(--transition), transform var(--transition);
+  transition:
+    background var(--transition),
+    transform var(--transition);
 }
-.il-arrow:hover { background: #fff; transform: translateY(-50%) scale(1.06); }
-.il-left { left: 6px; }
-.il-right { right: 6px; }
+.il-arrow:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.06);
+}
+.il-left {
+  left: 6px;
+}
+.il-right {
+  right: 6px;
+}
 
-
-@media (max-width: 599px) { .il-arrow { display: none; } }
+@media (max-width: 599px) {
+  .il-arrow {
+    display: none;
+  }
+}

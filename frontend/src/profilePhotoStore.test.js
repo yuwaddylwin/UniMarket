@@ -1,7 +1,7 @@
-import { axiosInstance } from "./Components/lib/axios.js";
-import { useAuthStore } from "./Components/store/useAuthStore";
+import { axiosInstance } from "./lib/axios.js";
+import { useAuthStore } from "./store/useAuthStore";
 
-jest.mock("./Components/lib/axios.js", () => ({
+jest.mock("./lib/axios.js", () => ({
   axiosInstance: {
     post: jest.fn(),
     patch: jest.fn(),
@@ -21,7 +21,8 @@ jest.mock("react-hot-toast", () => ({
 const userWithoutPhoto = { _id: "user-a", fullName: "User A", profilePic: "" };
 const userWithPhoto = {
   ...userWithoutPhoto,
-  profilePic: "https://res.cloudinary.com/example/image/upload/profile_pictures/user-a.jpg",
+  profilePic:
+    "https://res.cloudinary.com/example/image/upload/profile_pictures/user-a.jpg",
 };
 
 beforeEach(() => {
@@ -63,7 +64,10 @@ test("persisting preferences immediately updates authenticated user state", asyn
 
   await useAuthStore.getState().updatePreferences(preferences);
 
-  expect(axiosInstance.patch).toHaveBeenCalledWith("/auth/preferences", preferences);
+  expect(axiosInstance.patch).toHaveBeenCalledWith(
+    "/auth/preferences",
+    preferences
+  );
   expect(useAuthStore.getState().authUser).toEqual(updatedUser);
   expect(useAuthStore.getState().isUpdatingPreferences).toBe(false);
 });
@@ -71,7 +75,9 @@ test("persisting preferences immediately updates authenticated user state", asyn
 test("uploading a profile photo immediately updates authenticated user state", async () => {
   axiosInstance.post.mockResolvedValue({ data: userWithPhoto });
 
-  await useAuthStore.getState().updateProfile({ profilePic: "data:image/png;base64,image" });
+  await useAuthStore
+    .getState()
+    .updateProfile({ profilePic: "data:image/png;base64,image" });
 
   expect(axiosInstance.post).toHaveBeenCalledWith("/auth/update-profile", {
     profilePic: "data:image/png;base64,image",

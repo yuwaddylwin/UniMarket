@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import ProfileAvatar from "../common/ProfileAvatar";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { formatListingPrice } from "../common/listingPrice";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore";
 import FeedDescription from "./FeedDescription";
 import "../common/ListingPrice.css";
 import "./ListingFeed.css";
@@ -83,13 +83,18 @@ export default function ListingFeed({
     navigate(`/chat/${ownerId}`);
   };
 
-
   return (
     <main className="listing-feed-page">
       {isLoading ? (
-        <LoadingSpinner className="listing-feed-state" label={`Loading ${isAccommodation ? "accommodation" : "items"}…`} />
+        <LoadingSpinner
+          className="listing-feed-state"
+          label={`Loading ${isAccommodation ? "accommodation" : "items"}…`}
+        />
       ) : error ? (
-        <div className="listing-feed-state listing-feed-state--error" role="alert">
+        <div
+          className="listing-feed-state listing-feed-state--error"
+          role="alert"
+        >
           <strong>We couldn't load this feed.</strong>
           <span>{error}</span>
         </div>
@@ -99,16 +104,22 @@ export default function ListingFeed({
           <span>New posts will appear here.</span>
         </div>
       ) : (
-        <div className="listing-feed" aria-label={`${isAccommodation ? "Accommodation" : "Item"} listings`}>
+        <div
+          className="listing-feed"
+          aria-label={`${isAccommodation ? "Accommodation" : "Item"} listings`}
+        >
           {!selectedExists && (
             <div className="listing-feed-missing" role="status">
-              The selected listing is no longer available. Showing other current listings.
+              The selected listing is no longer available. Showing other current
+              listings.
             </div>
           )}
           {orderedListings.map((listing) => {
             const ownerId = getOwnerId(listing);
             const isMine = Boolean(
-              currentUserId && ownerId && String(currentUserId) === String(ownerId)
+              currentUserId &&
+                ownerId &&
+                String(currentUserId) === String(ownerId)
             );
             return (
               <ListingFeedPost
@@ -128,8 +139,11 @@ export default function ListingFeed({
 
 function ListingFeedPost({ listing, listingType, isMine, onChat }) {
   const isAccommodation = listingType === "accommodation";
-  const seller = listing?.seller || (typeof listing?.user === "object" ? listing.user : null);
-  const sellerName = seller?.fullName || seller?.name || seller?.username || "Seller";
+  const seller =
+    listing?.seller ||
+    (typeof listing?.user === "object" ? listing.user : null);
+  const sellerName =
+    seller?.fullName || seller?.name || seller?.username || "Seller";
   const images = useMemo(() => {
     const normalized = Array.isArray(listing?.images)
       ? listing.images
@@ -159,7 +173,8 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
   }, [fullscreen]);
 
   const showPrevious = () => setActiveImage((index) => Math.max(0, index - 1));
-  const showNext = () => setActiveImage((index) => Math.min(images.length - 1, index + 1));
+  const showNext = () =>
+    setActiveImage((index) => Math.min(images.length - 1, index + 1));
   const handleTouchEnd = (event) => {
     const endX = event.changedTouches[0]?.clientX;
     const endY = event.changedTouches[0]?.clientY;
@@ -168,7 +183,11 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
     if (!start || endX === undefined || endY === undefined) return;
     const distanceX = endX - start.x;
     const distanceY = endY - start.y;
-    if (Math.abs(distanceX) < 45 || Math.abs(distanceX) <= Math.abs(distanceY) * 1.15) return;
+    if (
+      Math.abs(distanceX) < 45 ||
+      Math.abs(distanceX) <= Math.abs(distanceY) * 1.15
+    )
+      return;
     didSwipe.current = true;
     if (distanceX < 0) showNext();
     else showPrevious();
@@ -193,7 +212,10 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
   const meta = isAccommodation ? listing.location : null;
 
   return (
-    <article className="listing-feed-post" data-listing-id={listing._id || listing.id}>
+    <article
+      className="listing-feed-post"
+      data-listing-id={listing._id || listing.id}
+    >
       <header className="listing-feed-owner">
         <ProfileAvatar
           className="listing-feed-avatar"
@@ -203,7 +225,12 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
         <div>
           <strong>{sellerName}</strong>
           {seller?.username && <small>@{seller.username}</small>}
-          {meta && <span>{isAccommodation && <MapPin size={12} aria-hidden="true" />}{meta}</span>}
+          {meta && (
+            <span>
+              {isAccommodation && <MapPin size={12} aria-hidden="true" />}
+              {meta}
+            </span>
+          )}
         </div>
         {isMine && <span className="listing-feed-owner-badge">My Listing</span>}
       </header>
@@ -212,11 +239,15 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
         className="listing-feed-gallery"
         onTouchStart={(event) => {
           const touch = event.touches[0];
-          touchStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+          touchStart.current = touch
+            ? { x: touch.clientX, y: touch.clientY }
+            : null;
           didSwipe.current = false;
         }}
         onTouchEnd={handleTouchEnd}
-        onTouchCancel={() => { touchStart.current = null; }}
+        onTouchCancel={() => {
+          touchStart.current = null;
+        }}
       >
         <div
           className="listing-feed-gallery-track"
@@ -224,32 +255,57 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
           onClick={openFullscreen}
         >
           {images.map((image, index) => (
-            <div className="listing-feed-gallery-slide" key={`${image}-${index}`} aria-hidden={index !== activeImage}>
+            <div
+              className="listing-feed-gallery-slide"
+              key={`${image}-${index}`}
+              aria-hidden={index !== activeImage}
+            >
               <img
                 src={image}
                 alt={`${listing.title || "Listing"} ${index + 1}`}
                 draggable="false"
                 onError={(event) => {
                   event.currentTarget.onerror = null;
-                  event.currentTarget.src = isAccommodation ? ACCOMMODATION_PLACEHOLDER : ITEM_PLACEHOLDER;
+                  event.currentTarget.src = isAccommodation
+                    ? ACCOMMODATION_PLACEHOLDER
+                    : ITEM_PLACEHOLDER;
                 }}
               />
             </div>
           ))}
         </div>
-        {images.length > 1 && <>
-          <button type="button" className="listing-feed-gallery-arrow is-left" aria-label="Previous image" disabled={activeImage === 0} onClick={showPrevious}>
-            <ChevronLeft aria-hidden="true" />
-          </button>
-          <button type="button" className="listing-feed-gallery-arrow is-right" aria-label="Next image" disabled={activeImage === images.length - 1} onClick={showNext}>
-            <ChevronRight aria-hidden="true" />
-          </button>
-          <span className="listing-feed-image-count">{activeImage + 1}/{images.length}</span>
-        </>}
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="listing-feed-gallery-arrow is-left"
+              aria-label="Previous image"
+              disabled={activeImage === 0}
+              onClick={showPrevious}
+            >
+              <ChevronLeft aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="listing-feed-gallery-arrow is-right"
+              aria-label="Next image"
+              disabled={activeImage === images.length - 1}
+              onClick={showNext}
+            >
+              <ChevronRight aria-hidden="true" />
+            </button>
+            <span className="listing-feed-image-count">
+              {activeImage + 1}/{images.length}
+            </span>
+          </>
+        )}
       </div>
 
       {images.length > 1 && (
-        <div className="listing-feed-carousel-dots" aria-label="Choose listing image">
+        <div
+          className="listing-feed-carousel-dots"
+          aria-label="Choose listing image"
+        >
           {images.map((image, index) => (
             <button
               type="button"
@@ -265,14 +321,20 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
 
       <div className="listing-feed-content">
         <div className="listing-feed-actions">
-          <SaveButton listing={listing} listingType={listingType} listingId={listing._id || listing.id} />
+          <SaveButton
+            listing={listing}
+            listingType={listingType}
+            listingId={listing._id || listing.id}
+          />
           {!isMine && (
             <button type="button" onClick={onChat}>
               <MessageCircle size={18} aria-hidden="true" />
               Chat with Seller
             </button>
           )}
-          {isMine && <span className="listing-feed-own-note">This is your listing</span>}
+          {isMine && (
+            <span className="listing-feed-own-note">This is your listing</span>
+          )}
         </div>
 
         <div className="listing-feed-heading listing-title-price-row">
@@ -280,7 +342,10 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
           <strong className="listing-price">{price}</strong>
         </div>
 
-        <FeedDescription description={listing?.description} sellerName={sellerName} />
+        <FeedDescription
+          description={listing?.description}
+          sellerName={sellerName}
+        />
 
         {isAccommodation && Number.isInteger(listing.bedrooms) && (
           <p className="listing-feed-extra">
@@ -305,14 +370,56 @@ function ListingFeedPost({ listing, listingType, isMine, onChat }) {
           }}
           onTouchStart={(event) => {
             const touch = event.touches[0];
-            touchStart.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+            touchStart.current = touch
+              ? { x: touch.clientX, y: touch.clientY }
+              : null;
           }}
           onTouchEnd={handleTouchEnd}
         >
-          <button type="button" className="listing-feed-lightbox-close" aria-label="Close image" onClick={closeFullscreen}><X aria-hidden="true" /></button>
-          {images.length > 1 && <button type="button" className="listing-feed-lightbox-arrow is-left" aria-label="Previous image" disabled={activeImage === 0} onClick={(event) => { event.stopPropagation(); showPrevious(); }}><ChevronLeft aria-hidden="true" /></button>}
-          <img src={images[activeImage]} alt={listing.title || "Listing"} onClick={(event) => { event.stopPropagation(); didSwipe.current = false; }} />
-          {images.length > 1 && <button type="button" className="listing-feed-lightbox-arrow is-right" aria-label="Next image" disabled={activeImage === images.length - 1} onClick={(event) => { event.stopPropagation(); showNext(); }}><ChevronRight aria-hidden="true" /></button>}
+          <button
+            type="button"
+            className="listing-feed-lightbox-close"
+            aria-label="Close image"
+            onClick={closeFullscreen}
+          >
+            <X aria-hidden="true" />
+          </button>
+          {images.length > 1 && (
+            <button
+              type="button"
+              className="listing-feed-lightbox-arrow is-left"
+              aria-label="Previous image"
+              disabled={activeImage === 0}
+              onClick={(event) => {
+                event.stopPropagation();
+                showPrevious();
+              }}
+            >
+              <ChevronLeft aria-hidden="true" />
+            </button>
+          )}
+          <img
+            src={images[activeImage]}
+            alt={listing.title || "Listing"}
+            onClick={(event) => {
+              event.stopPropagation();
+              didSwipe.current = false;
+            }}
+          />
+          {images.length > 1 && (
+            <button
+              type="button"
+              className="listing-feed-lightbox-arrow is-right"
+              aria-label="Next image"
+              disabled={activeImage === images.length - 1}
+              onClick={(event) => {
+                event.stopPropagation();
+                showNext();
+              }}
+            >
+              <ChevronRight aria-hidden="true" />
+            </button>
+          )}
         </div>
       )}
     </article>

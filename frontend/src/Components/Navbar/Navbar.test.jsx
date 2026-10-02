@@ -1,19 +1,29 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Navbar from "./Navbar";
 
-jest.mock("../lib/axios", () => ({ axiosInstance: { get: jest.fn(), put: jest.fn(), delete: jest.fn() } }));
+jest.mock("../../lib/axios", () => ({
+  axiosInstance: { get: jest.fn(), put: jest.fn(), delete: jest.fn() },
+}));
 
 let mockAuthUser = null;
 const mockLogout = jest.fn();
 const mockNavigate = jest.fn();
 
-jest.mock("react-router-dom", () => ({
-  Link: ({ children, to, ...props }) => <a href={to} {...props}>{children}</a>,
-  useLocation: () => ({ pathname: "/" }),
-  useNavigate: () => mockNavigate,
-}), { virtual: true });
+jest.mock(
+  "react-router-dom",
+  () => ({
+    Link: ({ children, to, ...props }) => (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    ),
+    useLocation: () => ({ pathname: "/" }),
+    useNavigate: () => mockNavigate,
+  }),
+  { virtual: true }
+);
 
-jest.mock("../store/useAuthStore", () => ({
+jest.mock("../../store/useAuthStore", () => ({
   useAuthStore: () => ({ authUser: mockAuthUser, logout: mockLogout }),
 }));
 
@@ -30,7 +40,9 @@ test("home search opens the combined Search page with the entered query", () => 
   mockNavigate.mockReset();
   render(<Navbar />);
 
-  const searchInput = screen.getByRole("searchbox", { name: "Search UniMarket" });
+  const searchInput = screen.getByRole("searchbox", {
+    name: "Search UniMarket",
+  });
   fireEvent.change(searchInput, {
     target: { value: "study desk" },
   });
@@ -43,17 +55,22 @@ test("home search opens the combined Search page with the entered query", () => 
 test("profile settings and help routes are available from the menu", () => {
   renderNavbar();
 
-  const profileSettingsLink = screen.getByRole("link", { name: "01 Profile Settings" });
-  expect(profileSettingsLink).toHaveAttribute(
-    "href",
-    "/profile/settings"
-  );
+  const profileSettingsLink = screen.getByRole("link", {
+    name: "01 Profile Settings",
+  });
+  expect(profileSettingsLink).toHaveAttribute("href", "/profile/settings");
+  // Verify decorative icon markup; these SVGs have no accessible role.
+  // eslint-disable-next-line testing-library/no-node-access
   expect(profileSettingsLink.querySelector("svg")).toBeNull();
-  expect(screen.queryByRole("link", { name: "01 Profile" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: "01 Profile" })
+  ).not.toBeInTheDocument();
 
   const helpToggle = screen.getByRole("button", { name: /help & support/i });
   expect(helpToggle).toHaveAttribute("aria-expanded", "false");
-  expect(screen.queryByRole("link", { name: "Privacy" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: "Privacy" })
+  ).not.toBeInTheDocument();
 
   fireEvent.click(helpToggle);
   expect(helpToggle).toHaveAttribute("aria-expanded", "true");
@@ -61,11 +78,19 @@ test("profile settings and help routes are available from the menu", () => {
     "href",
     "/how-it-works"
   );
-  expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/privacy");
-  expect(screen.getByRole("link", { name: "Terms" })).toHaveAttribute("href", "/terms");
+  expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute(
+    "href",
+    "/privacy"
+  );
+  expect(screen.getByRole("link", { name: "Terms" })).toHaveAttribute(
+    "href",
+    "/terms"
+  );
 
   fireEvent.click(helpToggle);
-  expect(screen.queryByRole("link", { name: "Privacy" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: "Privacy" })
+  ).not.toBeInTheDocument();
 });
 
 test("contact and help behave as an accordion and reuse the official contact details", () => {
@@ -78,16 +103,20 @@ test("contact and help behave as an accordion and reuse the official contact det
 
   expect(helpToggle).toHaveAttribute("aria-expanded", "false");
   expect(contactToggle).toHaveAttribute("aria-expanded", "true");
-  expect(screen.queryByRole("link", { name: "Privacy" })).not.toBeInTheDocument();
-  expect(screen.getByRole("link", { name: /email unimarket\.app\.official@gmail\.com/i })).toHaveAttribute(
-    "href",
-    "mailto:unimarket.app.official@gmail.com"
-  );
-  expect(screen.getByRole("link", { name: /phone \+66 817-374-337/i })).toHaveAttribute(
-    "href",
-    "tel:+66817374337"
-  );
-  expect(screen.getByRole("link", { name: /address bangkok, thailand/i })).toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: "Privacy" })
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("link", {
+      name: /email unimarket\.app\.official@gmail\.com/i,
+    })
+  ).toHaveAttribute("href", "mailto:unimarket.app.official@gmail.com");
+  expect(
+    screen.getByRole("link", { name: /phone \+66 817-374-337/i })
+  ).toHaveAttribute("href", "tel:+66817374337");
+  expect(
+    screen.getByRole("link", { name: /address bangkok, thailand/i })
+  ).toBeInTheDocument();
 });
 
 test("clicking away from an open dropdown closes its submenu", () => {
@@ -99,7 +128,9 @@ test("clicking away from an open dropdown closes its submenu", () => {
 
   fireEvent.pointerDown(screen.getByText("Explore UniMarket"));
   expect(helpToggle).toHaveAttribute("aria-expanded", "false");
-  expect(screen.queryByRole("link", { name: "Privacy" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: "Privacy" })
+  ).not.toBeInTheDocument();
 });
 
 test("authenticated users can log out from the menu", async () => {
@@ -112,7 +143,11 @@ test("authenticated users can log out from the menu", async () => {
 
 test("bookmark navigation opens Saved in the existing action position", () => {
   render(<Navbar />);
-  const saved = screen.getByRole('link', { name: 'Saved listings with 0 listings' });
-  expect(saved).toHaveAttribute('href', '/saved');
-  expect(saved.querySelector('.lucide-bookmark')).not.toBeNull();
+  const saved = screen.getByRole("link", {
+    name: "Saved listings with 0 listings",
+  });
+  expect(saved).toHaveAttribute("href", "/saved");
+  // Verify the existing decorative bookmark icon without changing its accessibility.
+  // eslint-disable-next-line testing-library/no-node-access
+  expect(saved.querySelector(".lucide-bookmark")).not.toBeNull();
 });

@@ -1,8 +1,8 @@
 import ChatSafetyMenu from "./ChatSafetyMenu";
 import { ArrowLeft } from "lucide-react";
-import { useChatStore } from "../store/useChatStore";
-import { useAuthStore } from "../store/useAuthStore";
-import { useIsMobile } from "./IsMobile";
+import { useChatStore } from "../../store/useChatStore";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useIsMobile } from "./useIsMobile";
 import { useNavigate, useParams } from "react-router-dom";
 import "./ChatHeader.css";
 import ProfileAvatar from "../common/ProfileAvatar";
@@ -12,7 +12,7 @@ const ChatHeader = () => {
   const { onlineUsers } = useAuthStore();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { sellerId } = useParams(); 
+  const { sellerId } = useParams();
 
   if (!selectedUser) return null;
 
@@ -31,7 +31,12 @@ const ChatHeader = () => {
     <div className="chat-header">
       <div className="chat-header-left">
         {isMobile && (
-          <button className="chat-header-back" type="button" aria-label="Back to conversations" onClick={handleBack}>
+          <button
+            className="chat-header-back"
+            type="button"
+            aria-label="Back to conversations"
+            onClick={handleBack}
+          >
             <ArrowLeft size={22} />
           </button>
         )}

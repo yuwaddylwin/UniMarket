@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { axiosInstance } from "../Components/lib/axios";
+import { axiosInstance } from "../lib/axios";
 import LoadingSpinner from "../Components/common/LoadingSpinner";
 import "./VerificationPages.css";
 
@@ -81,7 +81,9 @@ export default function VerifyEmailPage() {
 
         {status === "success" && (
           <>
-            <div className="verification-icon" aria-hidden="true">✓</div>
+            <div className="verification-icon" aria-hidden="true">
+              ✓
+            </div>
             <h1>Email verified successfully.</h1>
             <p>Your UniMarket account is ready to use.</p>
             <button type="button" onClick={() => navigate("/login")}>
@@ -92,9 +94,16 @@ export default function VerifyEmailPage() {
 
         {status === "invalid" && (
           <>
-            <div className="verification-icon verification-icon--error" aria-hidden="true">!</div>
+            <div
+              className="verification-icon verification-icon--error"
+              aria-hidden="true"
+            >
+              !
+            </div>
             <h1>Verification link is invalid or expired.</h1>
-            <p>Request a new verification link to finish setting up your account.</p>
+            <p>
+              Request a new verification link to finish setting up your account.
+            </p>
             <button
               type="button"
               onClick={() => navigate("/resend-verification")}
@@ -106,7 +115,12 @@ export default function VerifyEmailPage() {
 
         {status === "error" && (
           <>
-            <div className="verification-icon verification-icon--error" aria-hidden="true">!</div>
+            <div
+              className="verification-icon verification-icon--error"
+              aria-hidden="true"
+            >
+              !
+            </div>
             <h1>We could not verify your email right now.</h1>
             <p>Please try the verification link again in a moment.</p>
           </>

@@ -1,83 +1,88 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useChatStore } from "../store/useChatStore";
-import { useAuthStore } from "../store/useAuthStore";
+import { useChatStore } from "../../store/useChatStore";
+import { useAuthStore } from "../../store/useAuthStore";
 import Sidebar from "./Sidebar";
 import NoChatSelected from "./NoChatSelected";
 import ChatContainer from "./ChatContainer";
 import "./ChatHomePage.css";
-import { useIsMobile } from "./IsMobile";
+import { useIsMobile } from "./useIsMobile";
 import DesktopChatNav from "./DesktopChatNav";
 
 const ChatHomePage = () => {
-  const { sellerId } = useParams(); 
+  const { sellerId } = useParams();
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.authUser);
   const isMobile = useIsMobile();
 
   // get from store
-  const {
-    selectedUser,
-    setSelectedUser,   
-    getUsers,
-    getUserById,
-  } = useChatStore();
+  const { selectedUser, setSelectedUser, getUsers, getUserById } =
+    useChatStore();
 
   useEffect(() => {
+    let cancelled = false;
 
-  let cancelled = false; 
-
-  const pickUser = async () => {
-    if (sellerId && String(sellerId) === String(authUser?._id)) {
-      setSelectedUser(null);
-      navigate("/chat", { replace: true });
-      return;
-    }
-
-    if (!sellerId) {
-      if (useChatStore.getState().selectedUser) setSelectedUser(null);
-      return;
-    }
-    // already selected
-    if (useChatStore.getState().selectedUser?._id === sellerId) return;
-
-    // 1) try from current users list
-    const existing = useChatStore.getState().users?.find((u) => u._id === sellerId);
-    if (existing) {
-      if (!cancelled) setSelectedUser(existing);
-      return;
-    }
-
-    // 2) load users then select
-    await getUsers();
-    if (cancelled) return;
-
-    const afterLoad = useChatStore.getState().users?.find((u) => u._id === sellerId);
-    if (afterLoad) {
-      if (!cancelled) setSelectedUser(afterLoad);
-      return;
-    }
-
-    // 3) Direct seller links can begin a new conversation, so resolve the
-    // user without adding everyone to the sidebar.
-    try {
-      const user = await getUserById(sellerId);
-      if (!cancelled) setSelectedUser(user);
-    } catch {
-      if (!cancelled) {
+    const pickUser = async () => {
+      if (sellerId && String(sellerId) === String(authUser?._id)) {
         setSelectedUser(null);
         navigate("/chat", { replace: true });
+        return;
       }
-    }
-  };
 
-  pickUser();
+      if (!sellerId) {
+        if (useChatStore.getState().selectedUser) setSelectedUser(null);
+        return;
+      }
+      // already selected
+      if (useChatStore.getState().selectedUser?._id === sellerId) return;
 
-  return () => {
-    cancelled = true; // prevents late setSelectedUser after back navigation
-  };
-}, [sellerId, authUser?._id, getUsers, getUserById, navigate, setSelectedUser]);
+      // 1) try from current users list
+      const existing = useChatStore
+        .getState()
+        .users?.find((u) => u._id === sellerId);
+      if (existing) {
+        if (!cancelled) setSelectedUser(existing);
+        return;
+      }
 
+      // 2) load users then select
+      await getUsers();
+      if (cancelled) return;
+
+      const afterLoad = useChatStore
+        .getState()
+        .users?.find((u) => u._id === sellerId);
+      if (afterLoad) {
+        if (!cancelled) setSelectedUser(afterLoad);
+        return;
+      }
+
+      // 3) Direct seller links can begin a new conversation, so resolve the
+      // user without adding everyone to the sidebar.
+      try {
+        const user = await getUserById(sellerId);
+        if (!cancelled) setSelectedUser(user);
+      } catch {
+        if (!cancelled) {
+          setSelectedUser(null);
+          navigate("/chat", { replace: true });
+        }
+      }
+    };
+
+    pickUser();
+
+    return () => {
+      cancelled = true; // prevents late setSelectedUser after back navigation
+    };
+  }, [
+    sellerId,
+    authUser?._id,
+    getUsers,
+    getUserById,
+    navigate,
+    setSelectedUser,
+  ]);
 
   // MOBILE: show ONE page at a time
   if (isMobile) {

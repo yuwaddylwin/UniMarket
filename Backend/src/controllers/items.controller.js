@@ -1,48 +1,14 @@
-import { visibleListing } from '../services/moderationPolicy.js';
+import { visibleListing } from "../services/moderationPolicy.js";
 import Item from "../models/ItemsList.model.js";
 import cloudinary from "../lib/cloudinary.js";
-import mongoose from "mongoose";
+import {
+  buildSellerSnapshot,
+  hasValidId,
+  sendControllerError,
+  parseMaybeJson,
+} from "../services/listingHelpers.js";
+import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 
-function hasValidId(id) {
-  return mongoose.isObjectIdOrHexString(id);
-}
-
-function sendControllerError(res, error, fallback) {
-  if (error?.name === "ValidationError" || error?.name === "CastError") {
-    return res.status(400).json({ message: error.message || fallback });
-  }
-  console.error(fallback, error);
-  return res.status(500).json({ message: fallback });
-}
-
-// build seller snapshot from req.user
-function buildSellerSnapshot(user) {
-  if (!user) return undefined;
-
-  const fullName =
-    user.fullName || user.name || user.username || user.email || "Seller";
-
-  const profilePic = user.profilePic || user.avatar || user.photo || "";
-
-  return {
-    id: user._id,
-    username: user.username || "",
-    fullName,
-    profilePic,
-  };
-}
-
-function parseMaybeJson(value, fallback) {
-  if (value === undefined || value === null) return fallback;
-  if (typeof value !== "string") return value;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
-}
-
-// normalize to [{url, publicId}]
 function normalizeImages(images) {
   if (!Array.isArray(images)) return [];
   return images
@@ -64,18 +30,15 @@ function normalizeImages(images) {
     .slice(0, 6);
 }
 
-// upload buffer to cloudinary using upload_stream
-function uploadBufferToCloudinary(buffer, folder = "items") {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      }
-    );
-    stream.end(buffer);
-  });
+function normalizeItem(item) {
+  const user = item.user && typeof item.user === "object" ? item.user : null;
+  const seller = user
+    ? buildSellerSnapshot(user)
+    : item.seller?.fullName || item.seller?.profilePic || item.seller?.id
+      ? item.seller
+      : null;
+
+  return { ...item, seller };
 }
 
 export const createItem = async (req, res) => {
@@ -142,7 +105,6 @@ export const createItem = async (req, res) => {
       });
     }
 
-    // upload new images to cloudinary
     for (const file of req.files || []) {
       const result = await uploadBufferToCloudinary(file.buffer, "items");
       uploadedImages.push({
@@ -164,39 +126,30 @@ export const createItem = async (req, res) => {
     return res.status(201).json(newItem);
   } catch (err) {
     for (const image of uploadedImages) {
-      if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+      if (image.publicId)
+        await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
     if (err?.name === "ValidationError") {
       return res.status(400).json({ success: false, message: err.message });
     }
     console.error("Error creating item:", err);
-    return res.status(500).json({ success: false, message: "Error creating item" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Error creating item" });
   }
 };
 
 export const getItems = async (req, res) => {
   try {
-    const items = await Item.find({ ...visibleListing, status: { $ne: "sold" } })
+    const items = await Item.find({
+      ...visibleListing,
+      status: { $ne: "sold" },
+    })
       .sort({ createdAt: -1 })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
-    const normalized = items.map((it) => {
-      const u = it.user && typeof it.user === "object" ? it.user : null;
-
-      const seller = u
-          ? {
-              id: u._id,
-              username: u.username || "",
-              fullName: u.fullName || u.name || u.username || u.email || "Seller",
-              profilePic: u.profilePic || u.avatar || u.photo || "",
-            }
-          : it.seller?.fullName || it.seller?.profilePic || it.seller?.id
-          ? it.seller
-          : null;
-
-      return { ...it, seller };
-    });
+    const normalized = items.map(normalizeItem);
 
     return res.status(200).json(normalized);
   } catch (err) {
@@ -211,27 +164,15 @@ export const getMyItems = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const items = await Item.find({ user: req.user._id, status: { $ne: "sold" } })
+    const items = await Item.find({
+      user: req.user._id,
+      status: { $ne: "sold" },
+    })
       .sort({ createdAt: -1 })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
-    const normalized = items.map((it) => {
-      const u = it.user && typeof it.user === "object" ? it.user : null;
-
-      const seller = u
-          ? {
-              id: u._id,
-              username: u.username || "",
-              fullName: u.fullName || u.name || u.username || u.email || "Seller",
-              profilePic: u.profilePic || u.avatar || u.photo || "",
-            }
-          : it.seller?.fullName || it.seller?.profilePic || it.seller?.id
-          ? it.seller
-          : null;
-
-      return { ...it, seller };
-    });
+    const normalized = items.map(normalizeItem);
 
     return res.status(200).json(normalized);
   } catch (err) {
@@ -245,26 +186,17 @@ export const getItemById = async (req, res) => {
     if (!hasValidId(req.params.id)) {
       return res.status(400).json({ message: "Invalid item id" });
     }
-    const item = await Item.findOne({ ...visibleListing, _id: req.params.id, status: { $ne: "sold" } })
+    const item = await Item.findOne({
+      ...visibleListing,
+      _id: req.params.id,
+      status: { $ne: "sold" },
+    })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
 
     if (!item) return res.status(404).json({ message: "Item not found" });
 
-    const u = item.user && typeof item.user === "object" ? item.user : null;
-
-    const seller = u
-        ? {
-            id: u._id,
-            username: u.username || "",
-              fullName: u.fullName || u.name || u.username || u.email || "Seller",
-            profilePic: u.profilePic || u.avatar || u.photo || "",
-          }
-        : item.seller?.fullName || item.seller?.profilePic || item.seller?.id
-        ? item.seller
-        : null;
-
-    return res.status(200).json({ ...item, seller });
+    return res.status(200).json(normalizeItem(item));
   } catch (err) {
     return sendControllerError(res, err, "Error fetching item");
   }
@@ -272,18 +204,22 @@ export const getItemById = async (req, res) => {
 
 export const getMyArchivedItems = async (req, res) => {
   try {
-    if (!req.user?._id) return res.status(401).json({ message: "Unauthorized" });
+    if (!req.user?._id)
+      return res.status(401).json({ message: "Unauthorized" });
     const items = await Item.find({ user: req.user._id, status: "sold" })
       .sort({ soldAt: -1, updatedAt: -1 })
       .populate("user", "fullName username name profilePic avatar photo")
       .lean();
-    return res.status(200).json(items.map((item) => {
-      const user = item.user && typeof item.user === "object" ? item.user : null;
-      return {
-        ...item,
-        seller: user ? buildSellerSnapshot(user) : item.seller || null,
-      };
-    }));
+    return res.status(200).json(
+      items.map((item) => {
+        const user =
+          item.user && typeof item.user === "object" ? item.user : null;
+        return {
+          ...item,
+          seller: user ? buildSellerSnapshot(user) : item.seller || null,
+        };
+      })
+    );
   } catch (error) {
     console.error("Error fetching archived items", error);
     return res.status(500).json({ message: "Error fetching archived items" });
@@ -300,7 +236,14 @@ export const updateItemStatus = async (req, res) => {
       return res.status(400).json({ message: "Status must be active or sold" });
     }
     const item = await Item.findById(req.params.id);
-    if (item && ["hidden", "removed", "under_review"].includes(item.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
+    if (
+      item &&
+      ["hidden", "removed", "under_review"].includes(item.moderationStatus)
+    )
+      return res.status(403).json({
+        message:
+          "This listing is moderated. Contact support to request a review.",
+      });
     if (!item) return res.status(404).json({ message: "Item not found" });
     if (String(item.user) !== String(req.user?._id)) {
       return res.status(403).json({ message: "Forbidden" });
@@ -308,13 +251,15 @@ export const updateItemStatus = async (req, res) => {
     item.status = status;
     item.soldAt = status === "sold" ? new Date() : null;
     await item.save();
-    return res.status(200).json({ message: status === "sold" ? "Item archived" : "Item restored", item });
+    return res.status(200).json({
+      message: status === "sold" ? "Item archived" : "Item restored",
+      item,
+    });
   } catch (error) {
     return sendControllerError(res, error, "Unable to update item status");
   }
 };
 
-// UPDATE (Cloudinary)
 export const updateItem = async (req, res) => {
   const uploadedImages = [];
   try {
@@ -327,7 +272,14 @@ export const updateItem = async (req, res) => {
     }
 
     const item = await Item.findById(req.params.id);
-    if (item && ["hidden", "removed", "under_review"].includes(item.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
+    if (
+      item &&
+      ["hidden", "removed", "under_review"].includes(item.moderationStatus)
+    )
+      return res.status(403).json({
+        message:
+          "This listing is moderated. Contact support to request a review.",
+      });
     if (!item) return res.status(404).json({ message: "Item not found" });
 
     if (String(item.user) !== String(req.user._id)) {
@@ -363,19 +315,26 @@ export const updateItem = async (req, res) => {
       return res.status(400).json({ message: "Price must be a whole number" });
     }
 
-    // kept existing cloudinary images from frontend
-    const existingRaw = normalizeImages(parseMaybeJson(req.body.existingImages, []));
-    const requestedPublicIds = new Set(existingRaw.map((image) => image.publicId).filter(Boolean));
+    const existingRaw = normalizeImages(
+      parseMaybeJson(req.body.existingImages, [])
+    );
+    const requestedPublicIds = new Set(
+      existingRaw.map((image) => image.publicId).filter(Boolean)
+    );
     // Never trust URLs/public IDs supplied by the browser. Only retain images
     // that already belong to this listing.
     const existingImages = (item.images || [])
-      .filter((image) => image.publicId && requestedPublicIds.has(image.publicId))
+      .filter(
+        (image) => image.publicId && requestedPublicIds.has(image.publicId)
+      )
       .map((image) => ({ url: image.url, publicId: image.publicId }));
 
-    // upload new files to cloudinary
     for (const file of req.files || []) {
       const result = await uploadBufferToCloudinary(file.buffer, "items");
-      uploadedImages.push({ url: result.secure_url, publicId: result.public_id });
+      uploadedImages.push({
+        url: result.secure_url,
+        publicId: result.public_id,
+      });
     }
 
     const nextImages = [...existingImages, ...uploadedImages].slice(0, 6);
@@ -418,7 +377,8 @@ export const updateItem = async (req, res) => {
     return res.status(200).json({ message: "Item updated", item: saved });
   } catch (err) {
     for (const image of uploadedImages) {
-      if (image.publicId) await cloudinary.uploader.destroy(image.publicId).catch(() => {});
+      if (image.publicId)
+        await cloudinary.uploader.destroy(image.publicId).catch(() => {});
     }
     return sendControllerError(res, err, "Error updating item");
   }
@@ -435,7 +395,14 @@ export const deleteItem = async (req, res) => {
     }
 
     const item = await Item.findById(req.params.id);
-    if (item && ["hidden", "removed", "under_review"].includes(item.moderationStatus)) return res.status(403).json({ message: "This listing is moderated. Contact support to request a review." });
+    if (
+      item &&
+      ["hidden", "removed", "under_review"].includes(item.moderationStatus)
+    )
+      return res.status(403).json({
+        message:
+          "This listing is moderated. Contact support to request a review.",
+      });
     if (!item) return res.status(404).json({ message: "Item not found" });
 
     if (String(item.user) !== String(req.user._id)) {
