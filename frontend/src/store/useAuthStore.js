@@ -10,7 +10,10 @@ const SOCKET_URL = API_ORIGIN || undefined;
 let unreadRequestVersion = 0;
 let authVersion = 0;
 let authRequest = null;
+let authController = null;
 function invalidateAuthChecks() {
+  authController?.abort();
+  authController = null;
   authVersion += 1;
   authRequest = null;
 }
@@ -25,6 +28,7 @@ export const useAuthStore = create((set, get) => ({
   isUpdatingPreferences: false,
   isRemovingProfilePhoto: false,
   isCheckingAuth: true,
+  hasInitialized: false,
   socket: null,
   unreadCount: {}, // { userId: count }
   totalUnread: 0,
@@ -36,65 +40,66 @@ export const useAuthStore = create((set, get) => ({
     invalidateAuthChecks();
     removeAuthToken();
     if (get().authUser?._id !== user._id) get().disconnectSocket();
-    set({ authUser: user, authError: null, isCheckingAuth: false });
+    set({
+      authUser: user,
+      authError: null,
+      isCheckingAuth: false,
+      hasInitialized: true,
+    });
     get().connectSocket();
   },
   checkAuth: (options = {}) => {
     if (options?.fresh) invalidateAuthChecks();
     if (authRequest) return authRequest;
     const version = authVersion;
+    const controller = new AbortController();
+    authController = controller;
+    set({ isCheckingAuth: true, authError: null });
     const request = (async () => {
-      for (let attempt = 0; attempt < 2; attempt += 1) {
-        try {
-          const res = await axiosInstance.get("/auth/check", {
-            timeout: 20000,
+      try {
+        const res = await axiosInstance.get("/auth/check", {
+          timeout: 20000,
+          signal: controller.signal,
+        });
+        if (!res.data?._id)
+          throw Object.assign(new Error("Invalid session response from the API."), {
+            code: "INVALID_SESSION",
           });
-          if (!res.data?._id)
-            throw Object.assign(
-              new Error("Invalid session response from the API."),
-              { code: "INVALID_SESSION" }
-            );
-          if (version !== authVersion) return get().authUser;
-          if (get().authUser?._id !== res.data._id) get().disconnectSocket();
-          set({ authUser: res.data, authError: null });
-          get().connectSocket();
-          return res.data;
-        } catch (error) {
-          if (version !== authVersion) return get().authUser;
-          if (
-            error.response?.status === 401 ||
-            (error.response?.status === 404 &&
-              error.response?.data?.message === "User not found")
-          ) {
-            get().disconnectSocket();
-            removeAuthToken();
-            set({ authUser: null, authError: null });
-            return null;
-          }
-          const retryable = !error.response || error.response.status >= 500;
-          if (
-            attempt === 0 &&
-            retryable &&
-            !["API_HTML_RESPONSE", "INVALID_SESSION"].includes(error.code)
-          ) {
-            await new Promise((resolve) => setTimeout(resolve, 400));
-            if (version !== authVersion) return get().authUser;
-            continue;
-          }
-          set({
-            authError:
-              error.code === "API_HTML_RESPONSE"
-                ? error.message
-                : "Unable to check your session. Check your connection and retry.",
-          });
+        if (version !== authVersion) return get().authUser;
+        if (get().authUser?._id !== res.data._id) get().disconnectSocket();
+        set({ authUser: res.data, authError: null, hasInitialized: true });
+        get().connectSocket();
+        return res.data;
+      } catch (error) {
+        if (version !== authVersion) return get().authUser;
+        if (
+          error.response?.status === 401 ||
+          (error.response?.status === 404 &&
+            error.response?.data?.message === "User not found")
+        ) {
+          get().disconnectSocket();
+          removeAuthToken();
+          set({ authUser: null, authError: null, hasInitialized: true });
           return null;
         }
+        set({
+          authError:
+            error.code === "API_HTML_RESPONSE"
+              ? error.message
+              : ["ECONNABORTED", "ETIMEDOUT"].includes(error.code)
+                ? "UniMarket is taking longer than expected to respond. Please retry."
+                : "Unable to check your session. Check your connection and retry.",
+        });
+        return null;
       }
     })();
     authRequest = request;
     request.finally(() => {
       if (version === authVersion) set({ isCheckingAuth: false });
-      if (authRequest === request) authRequest = null;
+      if (authRequest === request) {
+        authRequest = null;
+        authController = null;
+      }
     });
     return request;
   },

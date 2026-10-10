@@ -4,7 +4,7 @@ import ListingFeed from "../Feed/ListingFeed";
 
 export default function ProductsDetails() {
   const { id } = useParams();
-  const { items, isLoading, error } = useItemsList();
+  const { items, isLoading, error, refetch } = useItemsList();
 
   return (
     <ListingFeed
@@ -13,6 +13,7 @@ export default function ProductsDetails() {
       listingType="item"
       isLoading={isLoading}
       error={error}
+      onRetry={refetch}
     />
   );
 }

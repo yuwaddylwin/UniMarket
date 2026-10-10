@@ -8,7 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../common/LoadingSpinner";
 
 export default function ItemsPage() {
-  const { items, isLoading, error } = useItemsList();
+  const { items, isLoading, error, refetch } = useItemsList();
   const [searchParams] = useSearchParams();
 
   const incomingSearch = searchParams.get("search") || "";
@@ -66,6 +66,7 @@ export default function ItemsPage() {
             <div className="ip-state ip-state--error" role="alert">
               <strong>We couldn't load the items.</strong>
               <span>{error}</span>
+              <button type="button" onClick={refetch}>Retry</button>
             </div>
           ) : orderedItems.length === 0 ? (
             <p className="ip-state">No items found.</p>

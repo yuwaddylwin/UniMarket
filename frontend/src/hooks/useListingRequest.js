@@ -26,6 +26,7 @@ export function useListingRequest(
 
       const res = await axiosInstance.get(endpoint, {
         signal: controller.signal,
+        timeout: 20000,
       });
 
       const list = Array.isArray(res.data)

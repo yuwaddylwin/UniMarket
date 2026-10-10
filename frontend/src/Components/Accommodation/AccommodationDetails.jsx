@@ -4,7 +4,7 @@ import ListingFeed from "../Feed/ListingFeed";
 
 export default function AccommodationDetails() {
   const { id } = useParams();
-  const { accommodations, isLoading, error } = useAccommodations();
+  const { accommodations, isLoading, error, refetch } = useAccommodations();
 
   return (
     <ListingFeed
@@ -13,6 +13,7 @@ export default function AccommodationDetails() {
       listingType="accommodation"
       isLoading={isLoading}
       error={error}
+      onRetry={refetch}
     />
   );
 }

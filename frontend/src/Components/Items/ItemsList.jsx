@@ -6,7 +6,7 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import ItemListingCard from "./ItemListingCard";
 
 export default function ItemsList() {
-  const { items, isLoading, error } = useItemsList();
+  const { items, isLoading, error, refetch } = useItemsList();
 
   const scrollerRef = useRef(null);
   const [showArrows, setShowArrows] = useState(false);
@@ -85,6 +85,7 @@ export default function ItemsList() {
             <div className="items-state items-state--error" role="alert">
               <strong>We couldn't load the items.</strong>
               <span>{error}</span>
+              <button type="button" onClick={refetch}>Retry</button>
             </div>
           ) : filteredItems.length === 0 ? (
             <p className="items-state">No items found.</p>

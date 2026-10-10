@@ -31,11 +31,12 @@ export default function SearchPage() {
   const incomingSearch = searchParams.get("search") || "";
   const [search, setSearch] = useState("");
   const [activeSearch, setActiveSearch] = useState(incomingSearch);
-  const { items, isLoading: itemsLoading, error: itemsError } = useItemsList();
+  const { items, isLoading: itemsLoading, error: itemsError, refetch: retryItems } = useItemsList();
   const {
     accommodations,
     isLoading: accommodationsLoading,
     error: accommodationsError,
+    refetch: retryAccommodations,
   } = useAccommodations();
   const query = activeSearch.trim().toLowerCase();
 
@@ -98,6 +99,10 @@ export default function SearchPage() {
           <div className="search-results-warning" role="status">
             Some listings could not be loaded. Available results are shown
             below.
+            <button type="button" disabled={isLoading} onClick={() => {
+              if (itemsError) retryItems();
+              if (accommodationsError) retryAccommodations();
+            }}>Retry</button>
           </div>
         )}
 

@@ -2,7 +2,7 @@ import AuthCodePage from "./pages/AuthCodePage";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 import ChatActivityBridge from "./Components/Chat/ChatActivityBridge";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import Home from "./Components/Home/Home";
 import Sell from "./Components/SellPage/sell";
@@ -24,7 +24,8 @@ import HowItWorksPage from "./pages/HowItWorksPage";
 import { PrivacyPage, TermsPage } from "./pages/LegalPage";
 
 import { useAuthStore } from "./store/useAuthStore";
-import LoadingSpinner from "./Components/common/LoadingSpinner";
+import StartupScreen from "./Components/common/StartupScreen";
+import Navbar from "./Components/Navbar/Navbar";
 import RequireAuth from "./Components/common/RequireAuth";
 
 import MainLayout from "./layouts/MainLayout";
@@ -33,10 +34,20 @@ import "./App.css";
 import "./theme.css";
 
 export default function App() {
+  const [showStartup, setShowStartup] = useState(
+    () => !useAuthStore.getState().hasInitialized
+  );
   const checkAuth = useAuthStore((state) => state.checkAuth);
+  const hasInitialized = useAuthStore((state) => state.hasInitialized);
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
   const authUser = useAuthStore((state) => state.authUser);
   const authError = useAuthStore((state) => state.authError);
+  useEffect(() => {
+    if (!hasInitialized) return undefined;
+    // Routes mount immediately; only the non-interactive completion layer fades.
+    const timer = window.setTimeout(() => setShowStartup(false), 180);
+    return () => window.clearTimeout(timer);
+  }, [hasInitialized]);
   useEffect(() => {
     useSavedStore.getState().setUser(authUser?._id || null);
   }, [authUser?._id]);
@@ -49,23 +60,29 @@ export default function App() {
     document.documentElement.lang = authUser?.preferences?.language || "en";
   }, [authUser?.preferences?.language]);
 
-  if (isCheckingAuth) {
-    return (
-      <LoadingSpinner
-        className="loading-spinner--page"
-        label="Loading UniMarket…"
-      />
-    );
-  }
-
   return (
     <Router>
       <Toaster />
-      <ChatActivityBridge />
-      {authError && (
-        <div role="alert">
-          {authError}{" "}
-          <button onClick={() => checkAuth()}>Retry session check</button>
+      {showStartup && (
+        <StartupScreen
+          error={authError}
+          onRetry={checkAuth}
+          ready={hasInitialized}
+        />
+      )}
+      {!hasInitialized ? (
+        <div className="startup-shell">
+          <Navbar />
+        </div>
+      ) : (
+        <div className="startup-ready">
+          <ChatActivityBridge />
+          {authError && (
+            <div role="alert">
+              {authError}{" "}
+              <button disabled={isCheckingAuth} onClick={() => checkAuth()}>
+                {isCheckingAuth ? "Checking session…" : "Retry session check"}
+              </button>
         </div>
       )}
 
@@ -146,6 +163,8 @@ export default function App() {
           <Route path="/resend-verification" element={<AuthCodePage />} />
         </Route>
       </Routes>
+        </div>
+      )}
     </Router>
   );
 }

@@ -10,7 +10,7 @@ export default function AccommodationSection({
   searchQuery = "",
   listingPage = false,
 }) {
-  const { accommodations, isLoading, error } = useAccommodations();
+  const { accommodations, isLoading, error, refetch } = useAccommodations();
   const scrollerRef = useRef(null);
   const scrollByCards = (direction) => {
     const row = scrollerRef.current;
@@ -85,6 +85,7 @@ export default function AccommodationSection({
             >
               <strong>We couldn't load accommodation.</strong>
               <span>{error}</span>
+              <button type="button" onClick={refetch}>Retry</button>
             </div>
           ) : visibleAccommodations.length === 0 ? (
             <div className="accommodation-state">

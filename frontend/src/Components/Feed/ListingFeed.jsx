@@ -49,6 +49,7 @@ export default function ListingFeed({
   listingType,
   isLoading,
   error,
+  onRetry,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -97,6 +98,7 @@ export default function ListingFeed({
         >
           <strong>We couldn't load this feed.</strong>
           <span>{error}</span>
+          <button type="button" onClick={onRetry}>Retry</button>
         </div>
       ) : orderedListings.length === 0 ? (
         <div className="listing-feed-state">
