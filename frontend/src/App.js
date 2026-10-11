@@ -2,7 +2,7 @@ import AuthCodePage from "./pages/AuthCodePage";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 import ChatActivityBridge from "./Components/Chat/ChatActivityBridge";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import Home from "./Components/Home/Home";
 import Sell from "./Components/SellPage/sell";
@@ -25,7 +25,6 @@ import { PrivacyPage, TermsPage } from "./pages/LegalPage";
 
 import { useAuthStore } from "./store/useAuthStore";
 import StartupScreen from "./Components/common/StartupScreen";
-import Navbar from "./Components/Navbar/Navbar";
 import RequireAuth from "./Components/common/RequireAuth";
 
 import MainLayout from "./layouts/MainLayout";
@@ -34,20 +33,11 @@ import "./App.css";
 import "./theme.css";
 
 export default function App() {
-  const [showStartup, setShowStartup] = useState(
-    () => !useAuthStore.getState().hasInitialized
-  );
   const checkAuth = useAuthStore((state) => state.checkAuth);
   const hasInitialized = useAuthStore((state) => state.hasInitialized);
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
   const authUser = useAuthStore((state) => state.authUser);
   const authError = useAuthStore((state) => state.authError);
-  useEffect(() => {
-    if (!hasInitialized) return undefined;
-    // Routes mount immediately; only the non-interactive completion layer fades.
-    const timer = window.setTimeout(() => setShowStartup(false), 180);
-    return () => window.clearTimeout(timer);
-  }, [hasInitialized]);
   useEffect(() => {
     useSavedStore.getState().setUser(authUser?._id || null);
   }, [authUser?._id]);
@@ -63,18 +53,14 @@ export default function App() {
   return (
     <Router>
       <Toaster />
-      {showStartup && (
+      {!hasInitialized && (
         <StartupScreen
           error={authError}
           onRetry={checkAuth}
           ready={hasInitialized}
         />
       )}
-      {!hasInitialized ? (
-        <div className="startup-shell">
-          <Navbar />
-        </div>
-      ) : (
+      {hasInitialized && (
         <div className="startup-ready">
           <ChatActivityBridge />
           {authError && (

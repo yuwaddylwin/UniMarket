@@ -1,73 +1,78 @@
 .startup-screen {
+  min-height: 100vh;
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 160px 24px 64px;
-  background: radial-gradient(ellipse at 50% 35%, var(--color-primary-soft), transparent 65%), var(--color-page);
+  padding: 32px 20px;
+  background: var(--color-page);
 }
-.startup-card {
-  width: min(100%, 480px);
-  padding: 40px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
+
+.startup-content {
+  width: min(100%, 400px);
   text-align: center;
 }
+
 .startup-mark {
-  margin: 0 auto 18px;
+  margin: 0 auto 20px;
 }
-.startup-brand {
-  margin: 0 0 20px;
-  font: 800 32px/1 var(--font-brand);
+
+.startup-content .startup-brand {
+  margin: 0 0 12px;
+  font: 800 clamp(32px, 5vw, 40px)/1.1 var(--font-brand);
   letter-spacing: -0.045em;
   color: var(--color-primary);
 }
-.startup-card h1 {
-  font-size: 20px;
-  line-height: 1.4;
-  margin: 0 0 10px;
-}
-.startup-intro {
+
+.startup-tagline {
+  margin: 0;
+  font-size: clamp(14px, 2.5vw, 16px);
+  line-height: 1.5;
   color: var(--color-text-secondary);
-  font-size: 14px;
-  margin: 0 0 32px;
 }
+
+.startup-spinner {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 36px auto 20px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--color-primary-soft),
+    var(--color-primary-muted) 65%,
+    var(--color-primary) 90%,
+    var(--color-primary) 100%
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)
+  );
+  mask: radial-gradient(
+    farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)
+  );
+  animation: startup-spin 1100ms linear infinite;
+}
+
 .startup-status {
-  font-size: 14px;
-  margin-bottom: 18px;
+  margin: 0;
+  min-height: 3em;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
 }
-.startup-status p {
+
+.startup-message {
+  display: block;
+  animation: startup-message-in 350ms ease-out;
+}
+
+.startup-error {
+  margin: 32px 0 20px;
+  font-size: 14px;
   color: var(--color-text-secondary);
   overflow-wrap: anywhere;
 }
-.startup-progress-label {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-.startup-track {
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--color-primary-soft);
-  overflow: hidden;
-}
-.startup-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-muted));
-  transition: width 300ms ease-out;
-}
-.startup-note {
-  margin: 16px 0 0;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  min-height: 36px;
-}
+
 .startup-retry {
   border: 0;
   border-radius: var(--radius-sm);
@@ -76,51 +81,28 @@
   padding: 12px 24px;
   cursor: pointer;
 }
+
 .startup-retry:hover {
   background: var(--color-primary-hover);
 }
-.startup-screen--complete {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  pointer-events: none;
-  animation: startup-exit 180ms ease-out forwards;
-}
+
 .startup-ready {
-  animation: startup-enter 180ms ease-out;
+  animation: startup-message-in 180ms ease-out;
 }
-@keyframes startup-enter {
-  from {
-    opacity: 0.6;
-  }
-  to {
-    opacity: 1;
-  }
+
+@keyframes startup-spin {
+  to { transform: rotate(360deg); }
 }
-@keyframes startup-exit {
-  to {
-    opacity: 0;
-  }
+
+@keyframes startup-message-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-@media (max-width: 600px) {
-  .startup-screen {
-    padding: 144px 16px 32px;
-  }
-  .startup-card {
-    padding: 32px 24px;
-  }
-  .startup-card h1 {
-    font-size: 18px;
-  }
-}
+
 @media (prefers-reduced-motion: reduce) {
-  .startup-fill {
-    transition: none;
-  }
-  .startup-ready, .startup-screen--complete {
+  .startup-spinner,
+  .startup-message,
+  .startup-ready {
     animation: none;
-  }
-  .startup-screen--complete {
-    visibility: hidden;
   }
 }
