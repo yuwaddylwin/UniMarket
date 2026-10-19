@@ -10,17 +10,17 @@ const MESSAGES = [
   "Still waiting for a response…",
 ];
 
-export default function StartupScreen({ error, onRetry, ready = false }) {
+export default function StartupScreen({ ready = false }) {
   const [messageIndex, setMessageIndex] = useState(0);
 
   useEffect(() => {
-    if (error || ready) return undefined;
+    if (ready) return undefined;
     setMessageIndex(0);
     const timer = window.setInterval(() => {
       setMessageIndex((index) => (index + 1) % MESSAGES.length);
     }, 3500);
     return () => window.clearInterval(timer);
-  }, [error, ready]);
+  }, [ready]);
 
   if (ready) return null;
 
@@ -36,27 +36,12 @@ export default function StartupScreen({ error, onRetry, ready = false }) {
         />
         <h1 className="startup-brand" id="startup-title">UniMarket</h1>
         <p className="startup-tagline">Your Campus, Your Marketplace.</p>
-        {error ? (
-          <>
-            <p className="startup-error" role="alert">{error}</p>
-            <button
-              className="startup-retry"
-              type="button"
-              onClick={() => onRetry()}
-            >
-              Retry connection
-            </button>
-          </>
-        ) : (
-          <>
-            <span className="startup-spinner" aria-hidden="true" />
-            <p className="startup-status" role="status" aria-atomic="true">
-              <span className="startup-message" key={messageIndex}>
-                {MESSAGES[messageIndex]}
-              </span>
-            </p>
-          </>
-        )}
+        <span className="startup-spinner" aria-hidden="true" />
+        <p className="startup-status" role="status" aria-atomic="true">
+          <span className="startup-message" key={messageIndex}>
+            {MESSAGES[messageIndex]}
+          </span>
+        </p>
       </section>
     </main>
   );
