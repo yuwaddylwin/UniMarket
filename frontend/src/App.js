@@ -33,6 +33,7 @@ import "./App.css";
 import "./theme.css";
 
 export default function App() {
+  const checkAuth = useAuthStore((state) => state.checkAuth);
   const hasInitialized = useAuthStore((state) => state.hasInitialized);
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
   const authUser = useAuthStore((state) => state.authUser);
@@ -46,7 +47,7 @@ export default function App() {
     let timer;
     let failures = 0;
     const checkUntilReady = async () => {
-      const result = await useAuthStore.getState().checkAuth();
+      await useAuthStore.getState().checkAuth();
       if (disposed || useAuthStore.getState().hasInitialized) return;
       failures += 1;
       const delay = Math.min(1000 * 2 ** Math.min(failures - 1, 5), 30000);
